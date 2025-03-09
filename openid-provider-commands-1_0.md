@@ -276,7 +276,73 @@ A non-normative example JWT Claims Set for the Command Token for an Unauthorize 
 }
 ```
 
+# Command Trigger
 
+The Command Trigger enables a Relying Party (RP) to proactively request that the OpenID Provider (OP) invoke specific command. This mechanism allows the RP to explicitly notify the OP of changes at the RP, such as updated metadata.
+
+## Endpoint
+
+The OP indicates support for receiving a Command Trigger by including the `command_trigger_endpoint` property in the metadata it sends to the RP. This URL is opaque to the RP and SHOULD have sufficient entropy to prevent guessing and unauthorized access. For multi-tenant OPs, a unique command_trigger_endpoint SHOULD be provided per tenant. The OP SHOULD require authentication from the RP if the RP is capable of authenticating. If the RP cannot authenticate, the OP SHOULD generate a new endpoint for each metadata request and SHOULD not accept a Command Trigger Request to an previous `command_trigger_endpoint`
+
+> NOTE: should the OP specify which Commands can be triggered by the RP? A list in `command_triggers_supported` ?
+
+## Request
+
+The RP uses an HTTP POST to the provided `command_trigger_endpoint` to initiate a Command Trigger request at the OP. The POST body uses the application/x-www-form-urlencoded encoding and must include a command_trigger parameter containing the Command the RP would like the OP to send.
+
+The POST body MAY contain other values in addition to command_token. Values that are not understood by the implementation MUST be ignored.
+
+The following is a non-normative example of such a Command Trigger request by the RP for the OP to issue a `metadata` Command:
+
+```
+POST /command/trigger/20394848383939 HTTP/1.1
+Host: op.example.net
+Content-Type: application/x-www-form-urlencoded
+
+command_trigger=metadata
+```
+
+## Response
+
+The OP's response MUST include the Cache-Control HTTP response header field with a no-store value, keeping the response from being cached to prevent cached responses from interfering with future Command requests. An example of this is:
+
+```
+Cache-Control: no-store
+```
+
+If there is a response body, it MUST be JSON and use the `application/json` media type.
+
+**Valid Request**
+
+The OP MUST respond with a HTTP 200 OK response if it will execute the Command.
+However, note that some Web frameworks will substitute an HTTP 204 No Content response for an HTTP 200 OK when the HTTP body is empty.
+Therefore, RPs should be prepared to also process an HTTP 204 No Content response as a successful response.
+
+
+If the request is not valid, the OP MUST return an `error` parameter, and may include a `error_description` parameter. 
+Note that the information conveyed in an error response is intended to help debug deployments;
+it is not intended that implementations use different `error` values
+to trigger different runtime behaviors.
+
+**Invalid Request Error**
+
+If there was a problem with the syntax of the Command request, or the Command Token was invalid, the OP MUST return an HTTP 400 Bad Request and include the `error` parameter with a value of `invalid_request`. 
+
+**Unsupported Command Error**
+
+If the OP does not support the RP triggering the Command provided, the OP MUST return an HTTP 400 Bad Request and include the `error` parameter with the value of `unsupported_command`.
+
+**Authentication Required Error**
+
+If authentication is required but the RP fails to authenticate, the OP MUST return an HTTP 401 Unauthorized response and include the `error` parameter with the value `authentication_required`
+
+**Invalid URL Error**
+
+If the endpoint is invalid, the OP MUST return the an HTTP 404 Not Found response.
+
+**Server Error**
+
+If the RP is unable to process a valid request, the RP MUST respond with a 5xx Server Error status code as defined in RFC 9110 section 15.6.
 
 # Account Commands
 
