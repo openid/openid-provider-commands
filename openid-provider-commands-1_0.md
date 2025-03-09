@@ -35,6 +35,7 @@ OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP)
 OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
 
 
+
 {mainmatter}
 
 # Introduction
