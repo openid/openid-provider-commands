@@ -53,40 +53,31 @@ jobs:
       - name: Show branch name
         run: echo "$BRANCH_NAME"
 
-      # Set up Haskell so we can install MMark
-      - name: Set up Haskell
-        uses: actions/setup-haskell@v1
+      - name: Set up Go
+        uses: actions/setup-go@v3
         with:
-          ghc-version: '8.10.7'
+          go-version: '1.20'
+      
+      - name: Install mmark
+        run: go install github.com/mmarkdown/mmark@latest
 
-      # Install MMark using cabal
-      - name: Install MMark
-        run: |
-          cabal update
-          cabal install mmark
-
-      # Convert the Markdown file to RFC XML using MMark
       - name: Convert Markdown to RFC XML with MMark
         run: |
           mmark -xml2rfc openid-provider-commands-1_0.md > openid-provider-commands-1_0.xml
 
-      # Setup Python so we can install xml2rfc
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10' 
 
-      # Install xml2rfc using pip
       - name: Install xml2rfc
         run: pip install xml2rfc
 
-      # Convert the RFC XML to HTML and text using xml2rfc
       - name: Render HTML
         run: xml2rfc openid-provider-commands-1_0.xml --html -o openid-provider-commands-1_0.html
       - name: Render Text
         run: xml2rfc openid-provider-commands-1_0.xml --text
 
-      # Copy the HTML to the html folder for gh-pages
       - id: deployment
         name: Deploy to GitHub Pages
         if: success()
