@@ -78,13 +78,24 @@ jobs:
       - name: Render HTML
         run: xml2rfc --html openid-provider-commands-1_0.xml --out html/$BRANCH_NAME.html
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: crazy-max/ghaction-github-pages@v2
         with:
-          # Upload entire repository
-          path: 'html'
+          target_branch: gh-pages
+          build_dir: html
+          keep_history: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+      # - name: Setup Pages
+      #   uses: actions/configure-pages@v5
+
+      # - name: Upload artifact
+      #   uses: actions/upload-pages-artifact@v3
+      #   with:
+      #     # Upload entire repository
+      #     path: 'html'
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
