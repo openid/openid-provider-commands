@@ -285,7 +285,7 @@ Account Commands that operate on an Account. Support for any Account Command is 
 
 ## Account Lifecycle States
 
-Lifecycle Commands are defined for each transition defined in ISO 24760-1 (2019-05 edition), Section 7.2 for Accounts in an RP's identity register as defined in {{ISO}} 3.4.5.
+Lifecycle Commands are defined for each transition defined in ISO 24760-1 (2019-05 edition), Section 7.2 for Accounts in an RP's identity register as defined in Section 3.4.5.
 
 Lifecycle Commands transition the Account between the following states:
 
@@ -841,7 +841,6 @@ as described in Section 3.11 of {{!RFC8725}} and as required in [#command-token]
 
 This specification registers the following JSON web token claim definitions
 in the IANA "JSON Web Token Claims" registry
-[IANA JSON Web Token Claims](#IANA.JSON.Web.Token.Claims)
 established by [RFC7519](#RFC7519).
 
 ### Registry Contents
@@ -904,11 +903,20 @@ This specification registers the `application/command+jwt` media type as per {{!
 
 ## Normative References
 
-*To be completed.*
+- **[RFC2119]** Bradner, S. “Key words for use in RFCs to Indicate Requirement Levels,” *RFC 2119*, March 1997.
+- **[RFC3986]** Berners-Lee, T., Fielding, R., and Masinter, L. “Uniform Resource Identifier (URI): Generic Syntax,” *RFC 3986*, January 2005.
+- **[RFC7519]** Jones, M., Bradley, J., and Sakimura, N. “JSON Web Token (JWT),” *RFC 7519*, May 2015.
+- **[RFC7591]** Jones, M., Bradley, J., and Sakimura, N. “OAuth 2.0 Dynamic Client Registration Protocol,” *RFC 7591*, March 2015.
+- **[RFC9110]** Fielding, R. “HTTP Semantics,” *RFC 9110*, June 2022.
+- **[RFC8725]** Bromberg, L. “Security Considerations for JSON Web Tokens,” *RFC 8725*, June 2020.
+- **[RFC6838]** IANA. “Media Types,” *RFC 6838*, June 2013.
+- **ISO/IEC 24760-1:2019**, “IT Security – A framework for identity management – Part 1: Terminology and concepts.”
+- **OpenID Connect Core 1.0** – “OpenID Connect Core 1.0 incorporating errata set 1,” available at <https://openid.net/specs/openid-connect-core-1_0.html>.
 
 ## Informative References
 
-*To be completed.*
+- **IANA JSON Web Token Claims Registry**, available at <https://www.iana.org/assignments/jwt/jwt.xhtml>.
+- **IANA OAuth Parameters**, available at <https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata>.
 
 # Acknowledgements
 
