@@ -38,9 +38,7 @@ jobs:
     env:
         BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
 
       - name: Set up Go
         uses: actions/setup-go@v3
