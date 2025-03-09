@@ -1747,7 +1747,7 @@ of using explicit typing.<a href="#section-4-12" class="pilcrow">¶</a></p>
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-command-trigger" class="section-name selfRef">Command Trigger</a>
       </h2>
 <p id="section-5-1">The Command Trigger enables a Relying Party (RP) to proactively request that the OpenID Provider (OP) invoke specific command. This mechanism allows the RP to explicitly notify the OP of changes at the RP, such as updated metadata.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<div id="endpoint">
+<div id="trigger-endpoint">
 <section id="section-5.1">
         <h3 id="name-endpoint">
 <a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-endpoint" class="section-name selfRef">Endpoint</a>
@@ -2030,35 +2030,41 @@ REQUIRED.
 A JSON object that MAY include the following Claims:<a href="#section-7.1-6.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.1-6.1.2.1">
-                <p id="section-7.1-6.1.2.1.1"><strong>domains</strong>
+                <p id="section-7.1-6.1.2.1.1"><strong>command<em>trigger</em>endpoint</strong>
 OPTIONAL.
-A JSON array of one or more domain names the OP has verified the Tenant controls.<a href="#section-7.1-6.1.2.1.1" class="pilcrow">¶</a></p>
+A URL as defined in <a href="#trigger-endpoint">Command Trigger Endpoint</a><a href="#section-7.1-6.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-7.1-6.1.2.2">
-                <p id="section-7.1-6.1.2.2.1"><strong>groups</strong>
+                <p id="section-7.1-6.1.2.2.1"><strong>domains</strong>
 OPTIONAL.
-A JSON array of objects that MUST contain:<a href="#section-7.1-6.1.2.2.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-7.1-6.1.2.2.2.1">
-                    <p id="section-7.1-6.1.2.2.2.1.1"><strong>id</strong>
-REQUIRED.
-The OP unique value for the group.<a href="#section-7.1-6.1.2.2.2.1.1" class="pilcrow">¶</a></p>
+A JSON array of one or more domain names the OP has verified the Tenant controls.<a href="#section-7.1-6.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
-                  <li class="normal" id="section-7.1-6.1.2.2.2.2">
-                    <p id="section-7.1-6.1.2.2.2.2.1"><strong>display</strong>
+              <li class="normal" id="section-7.1-6.1.2.3">
+                <p id="section-7.1-6.1.2.3.1"><strong>groups</strong>
+OPTIONAL.
+A JSON array of objects that MUST contain:<a href="#section-7.1-6.1.2.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.1-6.1.2.3.2.1">
+                    <p id="section-7.1-6.1.2.3.2.1.1"><strong>id</strong>
 REQUIRED.
-The Tenant unique human readable name for the group.<a href="#section-7.1-6.1.2.2.2.2.1" class="pilcrow">¶</a></p>
+The OP unique value for the group.<a href="#section-7.1-6.1.2.3.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                  <li class="normal" id="section-7.1-6.1.2.3.2.2">
+                    <p id="section-7.1-6.1.2.3.2.2.1"><strong>display</strong>
+REQUIRED.
+The Tenant unique human readable name for the group.<a href="#section-7.1-6.1.2.3.2.2.1" class="pilcrow">¶</a></p>
 </li>
                 </ul>
 </li>
             </ul>
 </li>
         </ul>
-<p id="section-7.1-7">The OP sends the <code>domains</code> array for the RP to link any data the RP has to the OP Tenant.<a href="#section-7.1-7" class="pilcrow">¶</a></p>
-<p id="section-7.1-8">The OP sends the <code>groups</code> array to provide the display value for each identifier that the OP MAY include in a <code>groups</code> Claim in an ID Token or a Command Token for the Activate and Maintain Commands. This allows an admin at the RP to map centrally managed <code>groups</code> from an OP to roles or entitlements at an RP.<a href="#section-7.1-8" class="pilcrow">¶</a></p>
-<p id="section-7.1-9">The OP MAY include any other metadata in the <code>metadata</code> Claim, including metadata defined in OAuth Authorization Server Metadata. <strong>add reference</strong><a href="#section-7.1-9" class="pilcrow">¶</a></p>
-<p id="section-7.1-10">Following is a non-normative example of a Claim set in a Command Token for the Metadata Command:<a href="#section-7.1-10" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-7.1-11">
+<p id="section-7.1-7">The OP sends the <code>command_trigger_endpoint</code> if it supports receiving a <a href="#command-trigger">Command Trigger</a> from the RP.<a href="#section-7.1-7" class="pilcrow">¶</a></p>
+<p id="section-7.1-8">The OP sends the <code>domains</code> array for the RP to link any data the RP has to the OP Tenant.<a href="#section-7.1-8" class="pilcrow">¶</a></p>
+<p id="section-7.1-9">The OP sends the <code>groups</code> array to provide the display value for each identifier that the OP MAY include in a <code>groups</code> Claim in an ID Token or a Command Token for the Activate and Maintain Commands. This allows an admin at the RP to map centrally managed <code>groups</code> from an OP to roles or entitlements at an RP.<a href="#section-7.1-9" class="pilcrow">¶</a></p>
+<p id="section-7.1-10">The OP MAY include any other metadata in the <code>metadata</code> Claim, including metadata defined in OAuth Authorization Server Metadata. <strong>add reference</strong><a href="#section-7.1-10" class="pilcrow">¶</a></p>
+<p id="section-7.1-11">Following is a non-normative example of a Claim set in a Command Token for the Metadata Command:<a href="#section-7.1-11" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-7.1-12">
 <pre>{
   "iss": "https://op.example.org",
   "aud": "s6BhdRkqt3",
@@ -2090,7 +2096,7 @@ The Tenant unique human readable name for the group.<a href="#section-7.1-6.1.2.
     ]
   }
 }
-</pre><a href="#section-7.1-11" class="pilcrow">¶</a>
+</pre><a href="#section-7.1-12" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
