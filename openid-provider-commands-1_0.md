@@ -280,7 +280,7 @@ A non-normative example JWT Claims Set for the Command Token for an Unauthorize 
 
 The Command Trigger enables a Relying Party (RP) to proactively request that the OpenID Provider (OP) invoke specific command. This mechanism allows the RP to explicitly notify the OP of changes at the RP, such as updated metadata.
 
-## Endpoint
+## Endpoint {#trigger-endpoint}
 
 The OP indicates support for receiving a Command Trigger by including the `command_trigger_endpoint` property in the metadata it sends to the RP. This URL is opaque to the RP and SHOULD have sufficient entropy to prevent guessing and unauthorized access. For multi-tenant OPs, a unique command_trigger_endpoint SHOULD be provided per tenant. The OP SHOULD require authentication from the RP if the RP is capable of authenticating. If the RP cannot authenticate, the OP SHOULD generate a new endpoint for each metadata request and SHOULD not accept a Command Trigger Request to an previous `command_trigger_endpoint`
 
@@ -524,6 +524,10 @@ The Claims set in a Metadata Command Token MUST include the following claim:
   REQUIRED.
   A JSON object that MAY include the following Claims:
 
+  - **command_trigger_endpoint**
+    OPTIONAL.
+    A URL as defined in [Command Trigger Endpoint](#trigger-endpoint)
+
   - **domains**
     OPTIONAL.
     A JSON array of one or more domain names the OP has verified the Tenant controls.
@@ -538,6 +542,8 @@ The Claims set in a Metadata Command Token MUST include the following claim:
     - **display**
       REQUIRED.
       The Tenant unique human readable name for the group.
+
+The OP sends the `command_trigger_endpoint` if it supports receiving a [Command Trigger](#command-trigger) from the RP.
 
 The OP sends the `domains` array for the RP to link any data the RP has to the OP Tenant.
 
