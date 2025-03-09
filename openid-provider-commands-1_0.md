@@ -1,63 +1,41 @@
----
-title: "OpenID Provider Commands 1.0 - draft 00"
-abbrev: "openid-provider-commands"
-workgroup : "OpenID Connect"
-docname: openid-provider-commands-1_0
-date: 2024-06-25
+%%%
+title = "OpenID Provider Commands 1.0 - draft 00"
+abbrev = "openid-provider-commands"
+ipr = "none"
+workgroup = "OpenID Connect"
+keyword = ["security", "openid", "lifecycle"]
 
-keyword: ["security", "openid", "lifecycle"]
+[seriesInfo]
+name = "Internet-Draft"
+value = "openid-connect-commands-1_0"
+status = "standard"
 
-ipr: none
-cat: std
-wg: connect
+[[author]]
+initials="D."
+surname="Hardt"
+fullname="Dick Hardt"
+organization="Hellō"
+    [author.address]
+    email = "dick.hardt@gmail.com"
 
-pi:
-  toc: yes
-  sortrefs: yes
-  symrefs: yes
-  private: yes
+[[author]]  
+initials="K."
+surname="McGuinness"
+fullname="Karl McGuinness"
+organization="Independent"
+    [author.address]
+    email = "me@karlmcguinness.com"
 
+%%%
 
-author:
-      -
-        ins: "D. Hardt"
-        name: "Dick Hardt"
-        org: "Hellō"
-        email : "dick.hardt@gmail.com"
-
-      -
-        ins: "K. McGuinness"
-        name: "Karl McGuinness"
-        org: "Independent"
-        email : "me@karlmcguinness.com"
-
-normative:
-
-  OpenID.Core:
-    author:
-    - ins: N. Sakimura
-      name: Nat Sakimura
-    - ins: J. Bradley
-      name: John Bradley
-    - ins: M.B. Jones
-      name: Michael B. Jones
-    - ins: B. de Medeiros
-      name: Breno de Medeiros
-    - ins: C. Mortimore
-      name: Chuck Mortimore
-    date: November 2014
-    target: https://openid.net/specs/openid-connect-core-1_0.html#IDToken
-    title: OpenID Connect Core 1.0 - ID Token
-
-
-
---- abstract
+.# Abstract
 
 OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP
 
 OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
 
---- middle
+
+{mainmatter}
 
 # Introduction
 
@@ -321,7 +299,7 @@ Lifecycle Commands transition the Account between the following states:
 
 Following are the potential state transitions:
 
-```
+```text
                       +--------------------------------------- reactivate ---+                   
                       |  +--- maintain --+                                   |
                       |  |               |                                   |
@@ -655,45 +633,45 @@ If there are no Accounts for the Tenant at the RP, the RP responds with only the
 
 The following is a non-normative example of a Streaming Response for an Audit Tenant Command:
 
-```
-HTTP/1.1 200 OK
-Content-Type: text/event-stream
-Cache-Control: no-cache
-Connection: keep-alive
-Content-Encoding: gzip
+```text
+  HTTP/1.1 200 OK
+  Content-Type: text/event-stream
+  Cache-Control: no-cache
+  Connection: keep-alive
+  Content-Encoding: gzip
 
-id: 1
-event: account-state
-data: {
-  "sub": "248289761001",
-  "email": "janes.smith@example.com",
-  "given_name": "Jane",
-  "family_name": "Smith",  
-  "groups": [
-    "b0f4861d-f3d6-4f76-be2f-e467daddc6f6",
-    "88799417-c72f-48fc-9e63-f012d8822ad1"
-  ],
-  "account_state": "active"
-}
+  id: 1
+  event: account-state
+  data: {
+    "sub": "248289761001",
+    "email": "janes.smith@example.com",
+    "given_name": "Jane",
+    "family_name": "Smith",  
+    "groups": [
+      "b0f4861d-f3d6-4f76-be2f-e467daddc6f6",
+      "88799417-c72f-48fc-9e63-f012d8822ad1"
+    ],
+    "account_state": "active"
+  }
 
-id: 2
-event: account-state
-data: {
-  "sub": "98765412345",
-  "email": "john.doe@example.com",
-  "given_name": "John",
-  "family_name": "Doe",
-  "groups": [
-    "88799417-c72f-48fc-9e63-f012d8822ad1"
-  ],
-  "account_state": "suspended"
-}
+  id: 2
+  event: account-state
+  data: {
+    "sub": "98765412345",
+    "email": "john.doe@example.com",
+    "given_name": "John",
+    "family_name": "Doe",
+    "groups": [
+      "88799417-c72f-48fc-9e63-f012d8822ad1"
+    ],
+    "account_state": "suspended"
+  }
 
-id: 3
-event: command-complete
-data: {
-  "total_accounts": 2
-}
+  id: 3
+  event: command-complete
+  data: {
+    "total_accounts": 2
+  }
 ```
 
 
