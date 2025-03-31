@@ -618,7 +618,7 @@ command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
 
 ## Streaming Response
 
-The RP sends a Streaming Response to a Streaming Request. In a Streaming Response, the RP uses SSE to stream the Command Response as a sequence of events. If the RP receives a valid Command, it MUST sent the `HTTP/1.1 200 OK` response, followed by the following headers:
+The RP sends a Streaming Response to a Streaming Request. In a Streaming Response, the RP uses SSE to stream the Command Response as a sequence of events. If the RP receives a valid Command, it MUST sent the `200 OK` response, followed by the following headers:
 
 - `Content-Type` with the `text/event-stream` value
 - `Cache-Control` with the `no-cache` value
