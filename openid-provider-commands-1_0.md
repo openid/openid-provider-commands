@@ -244,17 +244,16 @@ A non-normative example JWT Claims Set for the Command Token for an Activate Com
 ```json
 {
   "iss": "https://op.example.org",
-  "sub": "248289761001",
   "aud": "s6BhdRkqt3",
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJq",
   "command": "activate",
+  "sub": "248289761001",
   "given_name": "Jane",
   "family_name": "Smith",
   "email": "jane.smith@example.org",
   "email_verified": true,
-  "tenant": "ff6e7c9",
   "groups": [
     "b0f4861d",
     "88799417"
@@ -267,12 +266,12 @@ A non-normative example JWT Claims Set for the Command Token for an Unauthorize 
 ```json
 {
   "iss": "https://op.example.org",
-  "sub": "248289761001",
   "aud": "s6BhdRkqt3",
   "iat": 1734004000,
   "exp": 1734004060,
   "jti": "bWJr",
   "command": "unauthorize",
+  "sub": "248289761001"
 }
 ```
 
@@ -328,13 +327,14 @@ Following are the potential state transitions:
 
 ## Success Response
 
-When an RP successful processes an Account Command, the RP returns an HTTP 200 Ok and a JSON object containing `account_state` set to the state of the Account after processing. 
+When an RP successful processes an Account Command, the RP returns an HTTP 200 Ok and a JSON object containing the provided `sub`, and the `account_state` set to the state of the Account after processing. 
 
 Following is a non-normative response to a successful Activate Command:
 
 ```json
 {
-  "account_state": "active"
+  "account_state": "active",
+  "sub": "248289761001"
 }
 ```
 
@@ -350,7 +350,8 @@ Following is a non-normative response to a unsuccessful Restore Command where th
 ```json
 {
   "account_state": "suspended",
-  "error": "incompatible_state"
+  "error": "incompatible_state",
+  "sub": "248289761001"
 }
 ```
 
@@ -362,7 +363,8 @@ Following is a non-normative response to an unsuccessful Activate Command for an
 ```json
 {
   "account_state": "active",
-  "error": "incompatible_state"
+  "error": "incompatible_state",
+  "sub": "248289761001"
 }
 ```
 
@@ -371,7 +373,8 @@ Following is a non-normative response to an unsuccessful Maintain Command for a 
 ```json
 {
   "account_state": "unknown",
-  "error": "incompatible_state"
+  "error": "incompatible_state",
+  "sub": "248289761001"
 }
 ```
 
