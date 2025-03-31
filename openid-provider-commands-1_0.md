@@ -80,7 +80,7 @@ This specification defines the following terms:
 
 - **Command Token**: A JSON Web Token (JWT) signed by the OP that contains Claims about the Command being issued.
 
-- **Commands URI**: The URL at the RP where OPs post Command Tokens.
+- **Command Endpoint**: The URL at the RP where OPs post Command Tokens.
 
 - **Tenant**: A logically isolated entity within an OP that represents a distinct organizational or administrative boundary. An OP may have a single Tenant, or multiple Tenants. The Tenant may contain Accounts managed by individuals, or may contain Accounts managed by an organization.
 
@@ -108,7 +108,7 @@ A Tenant with Accounts managed by individuals will typically only support the Me
 
 # Command Request
 
-The OP uses an HTTP POST to the registered Commands URI
+The OP uses an HTTP POST to the registered Command Endpoint
 to send Account Commands to the RP. The POST body uses the
 `application/x-www-form-urlencoded` encoding
 and must include a `command_token` parameter
@@ -527,7 +527,7 @@ If the Command Token is valid, the RP responds with an `application/json` media 
   REQUIRED. the `tenant` value from the Command Token.
   
 - **commands_supported**: a JSON array of Commands the RP supports. The `metadata` value MUST be included.
-- **commands_uri**: the RP's Commands URI. This is the URL the Command Token was sent to.
+- **command_endpoint**: the RP's Command Endpoint. This is the URL the Command Token was sent to.
 - **describe_ttl**: the time in seconds the Command Response to the Metadata Command is valid for.
 - **client_id**: the `client_id` for the RP.
 
@@ -773,20 +773,20 @@ used.
 
 # OpenID Provider Command Support
 
-Relying Parties supporting OpenID Provider Commands register a Commands URI with the OP as part of their client registration.
+Relying Parties supporting OpenID Provider Commands register a Command Endpoint with the OP as part of their client registration.
 
-The Commands URI MUST be an absolute URI as defined by
+The Command Endpoint MUST be an absolute URI as defined by
 Section 4.3 of {{RFC3986}}.
-The Commands URI MAY include an
+The Command Endpoint MAY include an
 `application/x-www-form-urlencoded` formatted
 query component, per Section 3.4 of {{RFC3986}}.
-The Commands URI MUST NOT include a fragment component.
+The Command Endpoint MUST NOT include a fragment component.
 
 If the RP supports
 [OpenID Connect Dynamic Client Registration 1.0](#OpenID.Registration),
-it uses this metadata value to register the OpenID Provider Commands URI:
+it uses this metadata value to register the OpenID Provider Command Endpoint:
 
-- **commands_uri**  
+- **command_endpoint**  
   OPTIONAL.  
   RP URL that will receive OpenID Provider Commands from the OP.
   This URL MUST use the `https` scheme
