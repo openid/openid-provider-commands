@@ -556,7 +556,7 @@ Following is a non-normative example of Command Response for a Metadata Command:
     "iss": "https://op.example.org",
     "tenant":"73849284748493"
   },
-  "commands_uri": "https://rp.example.net/commands",
+  "command_endpoint": "https://rp.example.net/commands",
   "commands_supported":[
     "describe",
     "unauthorize",
@@ -623,7 +623,7 @@ The RP sends a Streaming Response to a Streaming Request. In a Streaming Respons
 
 If the OP sent a `Content-Encoding` header in the request with a compression the RP understands, the RP MAY include a `Content-Encoding` header with one of the OP provided values.
 
-Per SSE, the body of the response is a series of events. In addition to the required field name `data`, each event MUST include the `id` field with a unique value for each event, and the `event` field with a value of either `account-state`, or `command-complete`. The RP sends an `account-state` event for each Account at the RP for the `iss`, and `org` if sent, in the Audit Tenant Command. When all `account-state` events have been sent, the RP sends an `command-complete` event.
+Per SSE, the body of the response is a series of events. In addition to the required field name `data`, each event MUST include the `id` field with a unique value for each event, and the `event` field with a value of either `account-state`, `command-complete`, or `error`. The RP sends an `account-state` event for each Account at the RP for the `iss`, and `org` if sent, in the Audit Tenant Command. When all `account-state` events have been sent, the RP sends an `command-complete` event. If an unrecoverable error occurs during processing, the RP SHOULD sent an `error` event where the `data` field is JSON with the JSON string property `error_description` set to a value determined by the RP.
 
 The `data` parameter of the `account-state` event MUST contain the following:
 
