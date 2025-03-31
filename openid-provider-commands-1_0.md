@@ -701,6 +701,8 @@ Last-Event-Id: 3
 command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
 ```
 
+If the RP is unable to resume a Streaming Response when provided a `Last-Event-Id` HTTP header, it MUST respond with an HTTP 404 Not Found and include the `error` parameter of `last-event-id-unavailable`.
+
 ## Audit Tenant Command
 
 Sent in a Streaming Request and identified by the `audit_tenant` value in the `command` Claim in a Command Token.
@@ -716,8 +718,7 @@ The following is a non-normative example of the Claims Set in the Command Token 
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJz",
-  "command": "audit_tenant",
-  "tenant": "ff6e7c9"
+  "command": "audit_tenant"
 }
 ```
 
@@ -891,7 +892,7 @@ established by [RFC7591](#RFC7591).
 
 ### Registry Contents
 
-- **Client Metadata Name:** `commands_uri`
+- **Client Metadata Name:** `command_endpoint`
   
 **Client Metadata Description:**
   RP URL that will receive OpenID Provider Commands from the OP
