@@ -11,19 +11,19 @@
        OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP 
        OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs. 
     " name="description">
-<meta content="xml2rfc 3.28.0" name="generator">
+<meta content="xml2rfc 3.28.1" name="generator">
 <meta content="security" name="keyword">
 <meta content="openid" name="keyword">
 <meta content="lifecycle" name="keyword">
 <meta name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.28.0
+  xml2rfc 3.28.1
     Python 3.10.16
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
-    lxml 5.3.1
+    lxml 5.3.2
     platformdirs 4.3.7
     pycountry 24.6.1
     PyYAML 6.0.2
@@ -1214,7 +1214,7 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left"></td>
 <td class="center">openid-provider-commands</td>
-<td class="right">March 2025</td>
+<td class="right">April 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Hardt &amp; McGuinness</td>
@@ -1229,7 +1229,7 @@ li > p:last-of-type:only-child {
 <dd class="workgroup">OpenID Connect</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-03-26" class="published">26 March 2025</time>
+<time datetime="2025-04-09" class="published">9 April 2025</time>
     </dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
@@ -2099,7 +2099,7 @@ cause confusion if the Command Response is signed in the future since the <code>
         <h3 id="name-streaming-request">
 <a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-streaming-request" class="section-name selfRef">Streaming Request</a>
         </h3>
-<p id="section-6.3-1">All Tenant Commands besides the Metadata Command use <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events">Server-Side Events</a> (SSE) for the RP to transfer the Command Response. When performing a Streaming Request, the OP MUST include the following HTTP headers when sending the Command Request:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.3-1">All Tenant Commands besides the Metadata Command use <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events">Server-Sent Events</a> (SSE) for the RP to transfer the Command Response. When performing a Streaming Request, the OP MUST include the following HTTP headers when sending the Command Request:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.3-2.1">
             <p id="section-6.3-2.1.1"><code>Accept</code> with the value of <code>text/event-stream</code> to indicate support for Server-Sent Events.<a href="#section-6.3-2.1.1" class="pilcrow">¶</a></p>
