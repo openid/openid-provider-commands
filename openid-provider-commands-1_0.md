@@ -582,7 +582,7 @@ Following is a non-normative example of Command Response for a Metadata Command:
 
 ## Streaming Request
 
-All Tenant Commands besides the Metadata Command use [Server-Side Events](https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events) (SSE) for the RP to transfer the Command Response. When performing a Streaming Request, the OP MUST include the following HTTP headers when sending the Command Request:
+All Tenant Commands besides the Metadata Command use [Server-Sent Events](https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events) (SSE) for the RP to transfer the Command Response. When performing a Streaming Request, the OP MUST include the following HTTP headers when sending the Command Request:
 
 - `Accept` with the value of `text/event-stream` to indicate support for Server-Sent Events.
 - `Cache-Control` with the value of `no-cache` to signal to intermediaries to not cache the response.
