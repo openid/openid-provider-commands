@@ -418,7 +418,7 @@ Identified by the `delete` value in the `command` Claim in a Command Token.
 The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account, and delete all data associated with an Account. The Account can be in any state except **unknown**. The Account is in the **unknown** state after successful processing.
 
 ## Audit Command
-Identified by the `audit` value in the `command` Claim in a Command Token.
+Identified by the `audit` value in the `command` Claim of a Command Token.
 
 The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns `unknown` state.
 
