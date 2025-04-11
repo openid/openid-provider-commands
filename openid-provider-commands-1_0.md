@@ -327,7 +327,7 @@ Following are the potential state transitions:
 
 ## Success Response
 
-When an RP successful processes an Account Command, the RP returns an HTTP 200 Ok and a JSON object containing the provided `sub`, and the `account_state` set to the state of the Account after processing. 
+When an RP successful processes an Account Command, the RP returns the `HTTP 200 OK` response and a JSON object containing the provided `sub`, and the `account_state` set to the state of the Account after processing. 
 
 Following is a non-normative response to a successful Activate Command:
 
