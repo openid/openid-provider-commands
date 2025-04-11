@@ -11,19 +11,19 @@
        OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP 
        OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs. 
     " name="description">
-<meta content="xml2rfc 3.28.0" name="generator">
+<meta content="xml2rfc 3.28.1" name="generator">
 <meta content="security" name="keyword">
 <meta content="openid" name="keyword">
 <meta content="lifecycle" name="keyword">
 <meta name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.28.0
+  xml2rfc 3.28.1
     Python 3.10.16
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
-    lxml 5.3.1
+    lxml 5.3.2
     platformdirs 4.3.7
     pycountry 24.6.1
     PyYAML 6.0.2
@@ -1214,7 +1214,7 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left"></td>
 <td class="center">openid-provider-commands</td>
-<td class="right">March 2025</td>
+<td class="right">April 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Hardt &amp; McGuinness</td>
@@ -1229,7 +1229,7 @@ li > p:last-of-type:only-child {
 <dd class="workgroup">OpenID Connect</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-03-31" class="published">31 March 2025</time>
+<time datetime="2025-04-11" class="published">11 April 2025</time>
     </dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
@@ -2077,7 +2077,7 @@ cause confusion if the Command Response is signed in the future since the <code>
     "iss": "https://op.example.org",
     "tenant":"73849284748493"
   },
-  "command_endpoint": "https://rp.example.net/commands",
+  "command_endpoint": "https://rp.example.net/command",
   "commands_supported":[
     "describe",
     "unauthorize",
