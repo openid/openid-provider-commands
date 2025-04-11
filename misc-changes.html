@@ -1793,7 +1793,7 @@ of using explicit typing.<a href="#section-4-12" class="pilcrow">¶</a></p>
         <h3 id="name-success-response">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-success-response" class="section-name selfRef">Success Response</a>
         </h3>
-<p id="section-5.2-1">When an RP successful processes an Account Command, the RP returns an HTTP 200 Ok and a JSON object containing the provided <code>sub</code>, and the <code>account_state</code> set to the state of the Account after processing.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">When an RP successful processes an Account Command, the RP returns the <code>HTTP 200 OK</code> response and a JSON object containing the provided <code>sub</code>, and the <code>account_state</code> set to the state of the Account after processing.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">Following is a non-normative response to a successful Activate Command:<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-5.2-3">
 <pre>{
@@ -1917,7 +1917,7 @@ the Account is incompatible state.<a href="#section-5.3-5" class="pilcrow">¶</a
         <h3 id="name-audit-command">
 <a href="#section-5.11" class="section-number selfRef">5.11. </a><a href="#name-audit-command" class="section-name selfRef">Audit Command</a>
         </h3>
-<p id="section-5.11-1">Identified by the <code>audit</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.11-1" class="pilcrow">¶</a></p>
+<p id="section-5.11-1">Identified by the <code>audit</code> value in the <code>command</code> Claim of a Command Token.<a href="#section-5.11-1" class="pilcrow">¶</a></p>
 <p id="section-5.11-2">The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns <code>unknown</code> state.<a href="#section-5.11-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2148,7 +2148,7 @@ command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
         <h3 id="name-streaming-response">
 <a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-streaming-response" class="section-name selfRef">Streaming Response</a>
         </h3>
-<p id="section-6.4-1">The RP sends a Streaming Response to a Streaming Request. In a Streaming Response, the RP uses SSE to stream the Command Response as a sequence of events. If the RP receives a valid Command, it MUST sent the <code>200 OK</code> response, followed by the following headers:<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-1">The RP sends a Streaming Response to a Streaming Request. In a Streaming Response, the RP uses SSE to stream the Command Response as a sequence of events. If the RP receives a valid Command, it MUST sent the <code>HTTP 200 OK</code> response, followed by the following headers:<a href="#section-6.4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.4-2.1">
             <p id="section-6.4-2.1.1"><code>Content-Type</code> with the <code>text/event-stream</code> value<a href="#section-6.4-2.1.1" class="pilcrow">¶</a></p>
