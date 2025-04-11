@@ -559,7 +559,7 @@ Following is a non-normative example of Command Response for a Metadata Command:
     "iss": "https://op.example.org",
     "tenant":"73849284748493"
   },
-  "command_endpoint": "https://rp.example.net/commands",
+  "command_endpoint": "https://rp.example.net/command",
   "commands_supported":[
     "describe",
     "unauthorize",
