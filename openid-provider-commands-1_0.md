@@ -32,7 +32,7 @@ organization="Independent"
 
 OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP
 
-OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
+OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
 
 
 {mainmatter}
@@ -80,7 +80,7 @@ This specification defines the following terms:
 
 - **Command Token**: A JSON Web Token (JWT) signed by the OP that contains Claims about the Command being issued.
 
-- **Commands URI**: The URL at the RP where OPs post Command Tokens.
+- **Command Endpoint**: The URL at the RP where OPs post Command Tokens.
 
 - **Tenant**: A logically isolated entity within an OP that represents a distinct organizational or administrative boundary. An OP may have a single Tenant, or multiple Tenants. The Tenant may contain Accounts managed by individuals, or may contain Accounts managed by an organization.
 
@@ -100,7 +100,7 @@ This specification defines a Command Request containing a Command Token sent fro
 
 An OP will typically send a Metadata Command at the start of the relationship between a Tenant and an RP to share the OP's capabilities and metadata and to learn the Commands an RP supports, and other RP metadata. The OP will typically send the Metadata Command when there is a change in the OP capabilities or metadata, and periodically to learn of any RP changes. The OP may use the response from the Metadata Command to determine if the RP supports functionality required by the Tenant before issuing ID Tokens or Activate Commands to the RP.
 
-If the RP supports any Account Commands, the OP will send supported Account Commands to synchronize the state of Accounts at the RP with the state at the Tenant. If the RP supports Account Commands, the RP should also support the Audit Tenant Command. The OP will typically send an Audit Tenant Command at the start of the Tenant and RP relationship, and then periodically, to learn the state of the Tenant's Accounts at the RP and correct any drift between the Account state at the Tenant and the RP.
+If the RP supports any Account Commands, the OP will send supported Account Commands to synchronize the state of Accounts at the RP with the state at the Tenant. If the RP supports Account Commands, the RP should also support the Audit Tenant Commands. The OP will typically send an Audit Tenant Command at the start of the Tenant and RP relationship, and then periodically, to learn the state of the Tenant's Accounts at the RP and correct any drift between the Account state at the Tenant and the RP.
 
 If the RP supports the Unauthorize Command, the OP will send the Unauthorize Command if the OP suspects an Account has been taken over by a malicious actor.
 
@@ -108,7 +108,7 @@ A Tenant with Accounts managed by individuals will typically only support the Me
 
 # Command Request
 
-The OP uses an HTTP POST to the registered Commands URI
+The OP uses an HTTP POST to the registered Command Endpoint
 to send Account Commands to the RP. The POST body uses the
 `application/x-www-form-urlencoded` encoding
 and must include a `command_token` parameter
@@ -244,17 +244,16 @@ A non-normative example JWT Claims Set for the Command Token for an Activate Com
 ```json
 {
   "iss": "https://op.example.org",
-  "sub": "248289761001",
   "aud": "s6BhdRkqt3",
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJq",
   "command": "activate",
+  "sub": "248289761001",
   "given_name": "Jane",
   "family_name": "Smith",
   "email": "jane.smith@example.org",
   "email_verified": true,
-  "tenant": "ff6e7c9",
   "groups": [
     "b0f4861d",
     "88799417"
@@ -267,12 +266,12 @@ A non-normative example JWT Claims Set for the Command Token for an Unauthorize 
 ```json
 {
   "iss": "https://op.example.org",
-  "sub": "248289761001",
   "aud": "s6BhdRkqt3",
   "iat": 1734004000,
   "exp": 1734004060,
   "jti": "bWJr",
   "command": "unauthorize",
+  "sub": "248289761001"
 }
 ```
 
@@ -328,13 +327,14 @@ Following are the potential state transitions:
 
 ## Success Response
 
-When an RP successful processes an Account Command, the RP returns an HTTP 200 Ok and a JSON object containing `account_state` set to the state of the Account after processing. 
+When an RP successful processes an Account Command, the RP returns the `HTTP 200 OK` response and a JSON object containing the provided `sub`, and the `account_state` set to the state of the Account after processing. 
 
 Following is a non-normative response to a successful Activate Command:
 
 ```json
 {
-  "account_state": "active"
+  "account_state": "active",
+  "sub": "248289761001"
 }
 ```
 
@@ -350,7 +350,8 @@ Following is a non-normative response to a unsuccessful Restore Command where th
 ```json
 {
   "account_state": "suspended",
-  "error": "incompatible_state"
+  "error": "incompatible_state",
+  "sub": "248289761001"
 }
 ```
 
@@ -362,7 +363,8 @@ Following is a non-normative response to an unsuccessful Activate Command for an
 ```json
 {
   "account_state": "active",
-  "error": "incompatible_state"
+  "error": "incompatible_state",
+  "sub": "248289761001"
 }
 ```
 
@@ -371,7 +373,8 @@ Following is a non-normative response to an unsuccessful Maintain Command for a 
 ```json
 {
   "account_state": "unknown",
-  "error": "incompatible_state"
+  "error": "incompatible_state",
+  "sub": "248289761001"
 }
 ```
 
@@ -413,6 +416,12 @@ The RP MUST restore an archived Account to the identity register and mark it as 
 Identified by the `delete` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account, and delete all data associated with an Account. The Account can be in any state except **unknown**. The Account is in the **unknown** state after successful processing.
+
+## Audit Command
+Identified by the `audit` value in the `command` Claim of a Command Token.
+
+The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns `unknown` state.
+
 
 ## Unauthorize Command
 
@@ -527,7 +536,7 @@ If the Command Token is valid, the RP responds with an `application/json` media 
   REQUIRED. the `tenant` value from the Command Token.
   
 - **commands_supported**: a JSON array of Commands the RP supports. The `metadata` value MUST be included.
-- **commands_uri**: the RP's Commands URI. This is the URL the Command Token was sent to.
+- **command_endpoint**: the RP's Command Endpoint. This is the URL the Command Token was sent to.
 - **describe_ttl**: the time in seconds the Command Response to the Metadata Command is valid for.
 - **client_id**: the `client_id` for the RP.
 
@@ -550,7 +559,7 @@ Following is a non-normative example of Command Response for a Metadata Command:
     "iss": "https://op.example.org",
     "tenant":"73849284748493"
   },
-  "commands_uri": "https://rp.example.net/commands",
+  "command_endpoint": "https://rp.example.net/command",
   "commands_supported":[
     "describe",
     "unauthorize",
@@ -609,7 +618,7 @@ command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
 
 ## Streaming Response
 
-The RP sends a Streaming Response to a Streaming Request. In a Streaming Response, the RP uses SSE to stream the Command Response as a sequence of events. If the RP receives a valid Command, it MUST sent the `HTTP/1.1 200 OK` response, followed by the following headers:
+The RP sends a Streaming Response to a Streaming Request. In a Streaming Response, the RP uses SSE to stream the Command Response as a sequence of events. If the RP receives a valid Command, it MUST sent the `HTTP 200 OK` response, followed by the following headers:
 
 - `Content-Type` with the `text/event-stream` value
 - `Cache-Control` with the `no-cache` value
@@ -617,7 +626,7 @@ The RP sends a Streaming Response to a Streaming Request. In a Streaming Respons
 
 If the OP sent a `Content-Encoding` header in the request with a compression the RP understands, the RP MAY include a `Content-Encoding` header with one of the OP provided values.
 
-Per SSE, the body of the response is a series of events. In addition to the required field name `data`, each event MUST include the `id` field with a unique value for each event, and the `event` field with a value of either `account-state`, or `command-complete`. The RP sends an `account-state` event for each Account at the RP for the `iss`, and `org` if sent, in the Audit Tenant Command. When all `account-state` events have been sent, the RP sends an `command-complete` event.
+Per SSE, the body of the response is a series of events. In addition to the required field name `data`, each event MUST include the `id` field with a unique value for each event, and the `event` field with a value of either `account-state`, `command-complete`, or `error`. The RP sends an `account-state` event for each Account at the RP for the `iss`, and `org` if sent, in the Audit Tenant Command. When all `account-state` events have been sent, the RP sends an `command-complete` event. If an unrecoverable error occurs during processing, the RP SHOULD sent an `error` event where the `data` field is JSON with the JSON string property `error_description` set to a value determined by the RP.
 
 The `data` parameter of the `account-state` event MUST contain the following:
 
@@ -692,6 +701,8 @@ Last-Event-Id: 3
 command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
 ```
 
+If the RP is unable to resume a Streaming Response when provided a `Last-Event-Id` HTTP header, it MUST respond with an HTTP 404 Not Found and include the `error` parameter of `last-event-id-unavailable`.
+
 ## Audit Tenant Command
 
 Sent in a Streaming Request and identified by the `audit_tenant` value in the `command` Claim in a Command Token.
@@ -707,8 +718,7 @@ The following is a non-normative example of the Claims Set in the Command Token 
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJz",
-  "command": "audit_tenant",
-  "tenant": "ff6e7c9"
+  "command": "audit_tenant"
 }
 ```
 
@@ -773,20 +783,20 @@ used.
 
 # OpenID Provider Command Support
 
-Relying Parties supporting OpenID Provider Commands register a Commands URI with the OP as part of their client registration.
+Relying Parties supporting OpenID Provider Commands register a Command Endpoint with the OP as part of their client registration.
 
-The Commands URI MUST be an absolute URI as defined by
+The Command Endpoint MUST be an absolute URI as defined by
 Section 4.3 of {{RFC3986}}.
-The Commands URI MAY include an
+The Command Endpoint MAY include an
 `application/x-www-form-urlencoded` formatted
 query component, per Section 3.4 of {{RFC3986}}.
-The Commands URI MUST NOT include a fragment component.
+The Command Endpoint MUST NOT include a fragment component.
 
 If the RP supports
 [OpenID Connect Dynamic Client Registration 1.0](#OpenID.Registration),
-it uses this metadata value to register the OpenID Provider Commands URI:
+it uses this metadata value to register the OpenID Provider Command Endpoint:
 
-- **commands_uri**  
+- **command_endpoint**  
   OPTIONAL.  
   RP URL that will receive OpenID Provider Commands from the OP.
   This URL MUST use the `https` scheme
@@ -882,7 +892,7 @@ established by [RFC7591](#RFC7591).
 
 ### Registry Contents
 
-- **Client Metadata Name:** `commands_uri`
+- **Client Metadata Name:** `command_endpoint`
   
 **Client Metadata Description:**
   RP URL that will receive OpenID Provider Commands from the OP
