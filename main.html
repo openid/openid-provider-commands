@@ -9,7 +9,7 @@
 <meta content="Karl McGuinness" name="author">
 <meta content="
        OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP 
-       OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs. 
+       OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs. 
     " name="description">
 <meta content="xml2rfc 3.28.1" name="generator">
 <meta content="security" name="keyword">
@@ -1229,7 +1229,7 @@ li > p:last-of-type:only-child {
 <dd class="workgroup">OpenID Connect</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-04-09" class="published">9 April 2025</time>
+<time datetime="2025-04-16" class="published">16 April 2025</time>
     </dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
@@ -1248,7 +1248,7 @@ li > p:last-of-type:only-child {
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <div id="toc">
 <section id="section-toc.1">
@@ -1330,10 +1330,13 @@ li > p:last-of-type:only-child {
                 <p id="section-toc.1-1.5.2.10.1"><a href="#section-5.10" class="auto internal xref">5.10</a>. <a href="#name-delete-command" class="internal xref">Delete Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.11">
-                <p id="section-toc.1-1.5.2.11.1"><a href="#section-5.11" class="auto internal xref">5.11</a>. <a href="#name-unauthorize-command" class="internal xref">Unauthorize Command</a></p>
+                <p id="section-toc.1-1.5.2.11.1"><a href="#section-5.11" class="auto internal xref">5.11</a>. <a href="#name-audit-command" class="internal xref">Audit Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.12">
-                <p id="section-toc.1-1.5.2.12.1"><a href="#section-5.12" class="auto internal xref">5.12</a>. <a href="#name-unauthorize-functionality" class="internal xref">Unauthorize Functionality</a></p>
+                <p id="section-toc.1-1.5.2.12.1"><a href="#section-5.12" class="auto internal xref">5.12</a>. <a href="#name-unauthorize-command" class="internal xref">Unauthorize Command</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.13">
+                <p id="section-toc.1-1.5.2.13.1"><a href="#section-5.13" class="auto internal xref">5.13</a>. <a href="#name-unauthorize-functionality" class="internal xref">Unauthorize Functionality</a></p>
 </li>
             </ul>
 </li>
@@ -1501,7 +1504,7 @@ the use of <em>this fixed-width font</em>.<a href="#section-1.1-3" class="pilcro
             <p id="section-1.2-2.3.1"><strong>Command Token</strong>: A JSON Web Token (JWT) signed by the OP that contains Claims about the Command being issued.<a href="#section-1.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.2-2.4">
-            <p id="section-1.2-2.4.1"><strong>Commands URI</strong>: The URL at the RP where OPs post Command Tokens.<a href="#section-1.2-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-1.2-2.4.1"><strong>Command Endpoint</strong>: The URL at the RP where OPs post Command Tokens.<a href="#section-1.2-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.2-2.5">
             <p id="section-1.2-2.5.1"><strong>Tenant</strong>: A logically isolated entity within an OP that represents a distinct organizational or administrative boundary. An OP may have a single Tenant, or multiple Tenants. The Tenant may contain Accounts managed by individuals, or may contain Accounts managed by an organization.<a href="#section-1.2-2.5.1" class="pilcrow">¶</a></p>
@@ -1531,7 +1534,7 @@ the use of <em>this fixed-width font</em>.<a href="#section-1.1-3" class="pilcro
 <a href="#section-1.4" class="section-number selfRef">1.4. </a><a href="#name-command-usage-overview" class="section-name selfRef">Command Usage Overview</a>
         </h3>
 <p id="section-1.4-1">An OP will typically send a Metadata Command at the start of the relationship between a Tenant and an RP to share the OP's capabilities and metadata and to learn the Commands an RP supports, and other RP metadata. The OP will typically send the Metadata Command when there is a change in the OP capabilities or metadata, and periodically to learn of any RP changes. The OP may use the response from the Metadata Command to determine if the RP supports functionality required by the Tenant before issuing ID Tokens or Activate Commands to the RP.<a href="#section-1.4-1" class="pilcrow">¶</a></p>
-<p id="section-1.4-2">If the RP supports any Account Commands, the OP will send supported Account Commands to synchronize the state of Accounts at the RP with the state at the Tenant. If the RP supports Account Commands, the RP should also support the Audit Tenant Command. The OP will typically send an Audit Tenant Command at the start of the Tenant and RP relationship, and then periodically, to learn the state of the Tenant's Accounts at the RP and correct any drift between the Account state at the Tenant and the RP.<a href="#section-1.4-2" class="pilcrow">¶</a></p>
+<p id="section-1.4-2">If the RP supports any Account Commands, the OP will send supported Account Commands to synchronize the state of Accounts at the RP with the state at the Tenant. If the RP supports Account Commands, the RP should also support the Audit Tenant Commands. The OP will typically send an Audit Tenant Command at the start of the Tenant and RP relationship, and then periodically, to learn the state of the Tenant's Accounts at the RP and correct any drift between the Account state at the Tenant and the RP.<a href="#section-1.4-2" class="pilcrow">¶</a></p>
 <p id="section-1.4-3">If the RP supports the Unauthorize Command, the OP will send the Unauthorize Command if the OP suspects an Account has been taken over by a malicious actor.<a href="#section-1.4-3" class="pilcrow">¶</a></p>
 <p id="section-1.4-4">A Tenant with Accounts managed by individuals will typically only support the Metadata, Unauthorize, and Delete Commands.<a href="#section-1.4-4" class="pilcrow">¶</a></p>
 </section>
@@ -1543,7 +1546,7 @@ the use of <em>this fixed-width font</em>.<a href="#section-1.1-3" class="pilcro
       <h2 id="name-command-request">
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-command-request" class="section-name selfRef">Command Request</a>
       </h2>
-<p id="section-2-1">The OP uses an HTTP POST to the registered Commands URI
+<p id="section-2-1">The OP uses an HTTP POST to the registered Command Endpoint
 to send Account Commands to the RP. The POST body uses the
 <code>application/x-www-form-urlencoded</code> encoding
 and must include a <code>command_token</code> parameter
@@ -1697,17 +1700,16 @@ of using explicit typing.<a href="#section-4-12" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-4-15">
 <pre>{
   "iss": "https://op.example.org",
-  "sub": "248289761001",
   "aud": "s6BhdRkqt3",
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJq",
   "command": "activate",
+  "sub": "248289761001",
   "given_name": "Jane",
   "family_name": "Smith",
   "email": "jane.smith@example.org",
   "email_verified": true,
-  "tenant": "ff6e7c9",
   "groups": [
     "b0f4861d",
     "88799417"
@@ -1719,12 +1721,12 @@ of using explicit typing.<a href="#section-4-12" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-4-17">
 <pre>{
   "iss": "https://op.example.org",
-  "sub": "248289761001",
   "aud": "s6BhdRkqt3",
   "iat": 1734004000,
   "exp": 1734004060,
   "jti": "bWJr",
   "command": "unauthorize",
+  "sub": "248289761001"
 }
 </pre><a href="#section-4-17" class="pilcrow">¶</a>
 </div>
@@ -1791,11 +1793,12 @@ of using explicit typing.<a href="#section-4-12" class="pilcrow">¶</a></p>
         <h3 id="name-success-response">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-success-response" class="section-name selfRef">Success Response</a>
         </h3>
-<p id="section-5.2-1">When an RP successful processes an Account Command, the RP returns an HTTP 200 Ok and a JSON object containing <code>account_state</code> set to the state of the Account after processing.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">When an RP successful processes an Account Command, the RP returns the <code>HTTP 200 OK</code> response and a JSON object containing the provided <code>sub</code>, and the <code>account_state</code> set to the state of the Account after processing.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">Following is a non-normative response to a successful Activate Command:<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-5.2-3">
 <pre>{
-  "account_state": "active"
+  "account_state": "active",
+  "sub": "248289761001"
 }
 </pre><a href="#section-5.2-3" class="pilcrow">¶</a>
 </div>
@@ -1819,7 +1822,8 @@ of using explicit typing.<a href="#section-4-12" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-5.3-4">
 <pre>{
   "account_state": "suspended",
-  "error": "incompatible_state"
+  "error": "incompatible_state",
+  "sub": "248289761001"
 }
 </pre><a href="#section-5.3-4" class="pilcrow">¶</a>
 </div>
@@ -1829,7 +1833,8 @@ the Account is incompatible state.<a href="#section-5.3-5" class="pilcrow">¶</a
 <div class="lang-json sourcecode" id="section-5.3-7">
 <pre>{
   "account_state": "active",
-  "error": "incompatible_state"
+  "error": "incompatible_state",
+  "sub": "248289761001"
 }
 </pre><a href="#section-5.3-7" class="pilcrow">¶</a>
 </div>
@@ -1837,7 +1842,8 @@ the Account is incompatible state.<a href="#section-5.3-5" class="pilcrow">¶</a
 <div class="lang-json sourcecode" id="section-5.3-9">
 <pre>{
   "account_state": "unknown",
-  "error": "incompatible_state"
+  "error": "incompatible_state",
+  "sub": "248289761001"
 }
 </pre><a href="#section-5.3-9" class="pilcrow">¶</a>
 </div>
@@ -1906,24 +1912,33 @@ the Account is incompatible state.<a href="#section-5.3-5" class="pilcrow">¶</a
 <p id="section-5.10-2">The RP MUST perform the <a href="#unauthorize-functionality">Unauthorize Functionality</a> on the Account, and delete all data associated with an Account. The Account can be in any state except <strong>unknown</strong>. The Account is in the <strong>unknown</strong> state after successful processing.<a href="#section-5.10-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="unauthorize-command">
+<div id="audit-command">
 <section id="section-5.11">
-        <h3 id="name-unauthorize-command">
-<a href="#section-5.11" class="section-number selfRef">5.11. </a><a href="#name-unauthorize-command" class="section-name selfRef">Unauthorize Command</a>
+        <h3 id="name-audit-command">
+<a href="#section-5.11" class="section-number selfRef">5.11. </a><a href="#name-audit-command" class="section-name selfRef">Audit Command</a>
         </h3>
-<p id="section-5.11-1">Identified by the <code>unauthorize</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.11-1" class="pilcrow">¶</a></p>
-<p id="section-5.11-2">The RP MUST perform the <a href="#unauthorize-functionality">Unauthorize Functionality</a> on the Account.
-The OP sends this Command when it wants the RP to undo the last OpenID Connect login. The OP may send this when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, or if the user's device was compromised.<a href="#section-5.11-2" class="pilcrow">¶</a></p>
-<p id="section-5.11-3">The Account MUST be in the <strong>active</strong> state, and remains in the <strong>active</strong> state after executing the Command. If the Account is in any other state, the RP MUST return an <a href="#incompatible-state-response">Incompatible State Response</a>.<a href="#section-5.11-3" class="pilcrow">¶</a></p>
-<p id="section-5.11-4">The functionality of the Unauthorize Command is also performed by Suspend, Archive, and Delete Commands to ensure an Account in the <strong>suspended</strong>, <strong>archived</strong>, and <strong>unknown</strong> state no longer has access to resources.<a href="#section-5.11-4" class="pilcrow">¶</a></p>
+<p id="section-5.11-1">Identified by the <code>audit</code> value in the <code>command</code> Claim of a Command Token.<a href="#section-5.11-1" class="pilcrow">¶</a></p>
+<p id="section-5.11-2">The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns <code>unknown</code> state.<a href="#section-5.11-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="unauthorize-command">
+<section id="section-5.12">
+        <h3 id="name-unauthorize-command">
+<a href="#section-5.12" class="section-number selfRef">5.12. </a><a href="#name-unauthorize-command" class="section-name selfRef">Unauthorize Command</a>
+        </h3>
+<p id="section-5.12-1">Identified by the <code>unauthorize</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.12-1" class="pilcrow">¶</a></p>
+<p id="section-5.12-2">The RP MUST perform the <a href="#unauthorize-functionality">Unauthorize Functionality</a> on the Account.
+The OP sends this Command when it wants the RP to undo the last OpenID Connect login. The OP may send this when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, or if the user's device was compromised.<a href="#section-5.12-2" class="pilcrow">¶</a></p>
+<p id="section-5.12-3">The Account MUST be in the <strong>active</strong> state, and remains in the <strong>active</strong> state after executing the Command. If the Account is in any other state, the RP MUST return an <a href="#incompatible-state-response">Incompatible State Response</a>.<a href="#section-5.12-3" class="pilcrow">¶</a></p>
+<p id="section-5.12-4">The functionality of the Unauthorize Command is also performed by Suspend, Archive, and Delete Commands to ensure an Account in the <strong>suspended</strong>, <strong>archived</strong>, and <strong>unknown</strong> state no longer has access to resources.<a href="#section-5.12-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="unauthorize-functionality">
-<section id="section-5.12">
+<section id="section-5.13">
         <h3 id="name-unauthorize-functionality">
-<a href="#section-5.12" class="section-number selfRef">5.12. </a><a href="#name-unauthorize-functionality" class="section-name selfRef">Unauthorize Functionality</a>
+<a href="#section-5.13" class="section-number selfRef">5.13. </a><a href="#name-unauthorize-functionality" class="section-name selfRef">Unauthorize Functionality</a>
         </h3>
-<p id="section-5.12-1">The RP MUST revoke all active sessions and MUST reverse all authorization that may have been granted to applications, including <code>offline_access</code>, for Account resources identified by the <code>sub</code>.<a href="#section-5.12-1" class="pilcrow">¶</a></p>
+<p id="section-5.13-1">The RP MUST revoke all active sessions and MUST reverse all authorization that may have been granted to applications, including <code>offline_access</code>, for Account resources identified by the <code>sub</code>.<a href="#section-5.13-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2039,7 +2054,7 @@ REQUIRED. the <code>tenant</code> value from the Command Token.<a href="#section
             <p id="section-6.2-2.2.1"><strong>commands_supported</strong>: a JSON array of Commands the RP supports. The <code>metadata</code> value MUST be included.<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.2-2.3">
-            <p id="section-6.2-2.3.1"><strong>commands_uri</strong>: the RP's Commands URI. This is the URL the Command Token was sent to.<a href="#section-6.2-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-6.2-2.3.1"><strong>command_endpoint</strong>: the RP's Command Endpoint. This is the URL the Command Token was sent to.<a href="#section-6.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.2-2.4">
             <p id="section-6.2-2.4.1"><strong>describe_ttl</strong>: the time in seconds the Command Response to the Metadata Command is valid for.<a href="#section-6.2-2.4.1" class="pilcrow">¶</a></p>
@@ -2062,7 +2077,7 @@ cause confusion if the Command Response is signed in the future since the <code>
     "iss": "https://op.example.org",
     "tenant":"73849284748493"
   },
-  "commands_uri": "https://rp.example.net/commands",
+  "command_endpoint": "https://rp.example.net/command",
   "commands_supported":[
     "describe",
     "unauthorize",
@@ -2133,7 +2148,7 @@ command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
         <h3 id="name-streaming-response">
 <a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-streaming-response" class="section-name selfRef">Streaming Response</a>
         </h3>
-<p id="section-6.4-1">The RP sends a Streaming Response to a Streaming Request. In a Streaming Response, the RP uses SSE to stream the Command Response as a sequence of events. If the RP receives a valid Command, it MUST sent the <code>HTTP/1.1 200 OK</code> response, followed by the following headers:<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-1">The RP sends a Streaming Response to a Streaming Request. In a Streaming Response, the RP uses SSE to stream the Command Response as a sequence of events. If the RP receives a valid Command, it MUST sent the <code>HTTP 200 OK</code> response, followed by the following headers:<a href="#section-6.4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.4-2.1">
             <p id="section-6.4-2.1.1"><code>Content-Type</code> with the <code>text/event-stream</code> value<a href="#section-6.4-2.1.1" class="pilcrow">¶</a></p>
@@ -2146,7 +2161,7 @@ command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
 </li>
         </ul>
 <p id="section-6.4-3">If the OP sent a <code>Content-Encoding</code> header in the request with a compression the RP understands, the RP MAY include a <code>Content-Encoding</code> header with one of the OP provided values.<a href="#section-6.4-3" class="pilcrow">¶</a></p>
-<p id="section-6.4-4">Per SSE, the body of the response is a series of events. In addition to the required field name <code>data</code>, each event MUST include the <code>id</code> field with a unique value for each event, and the <code>event</code> field with a value of either <code>account-state</code>, or <code>command-complete</code>. The RP sends an <code>account-state</code> event for each Account at the RP for the <code>iss</code>, and <code>org</code> if sent, in the Audit Tenant Command. When all <code>account-state</code> events have been sent, the RP sends an <code>command-complete</code> event.<a href="#section-6.4-4" class="pilcrow">¶</a></p>
+<p id="section-6.4-4">Per SSE, the body of the response is a series of events. In addition to the required field name <code>data</code>, each event MUST include the <code>id</code> field with a unique value for each event, and the <code>event</code> field with a value of either <code>account-state</code>, <code>command-complete</code>, or <code>error</code>. The RP sends an <code>account-state</code> event for each Account at the RP for the <code>iss</code>, and <code>org</code> if sent, in the Audit Tenant Command. When all <code>account-state</code> events have been sent, the RP sends an <code>command-complete</code> event. If an unrecoverable error occurs during processing, the RP SHOULD sent an <code>error</code> event where the <code>data</code> field is JSON with the JSON string property <code>error_description</code> set to a value determined by the RP.<a href="#section-6.4-4" class="pilcrow">¶</a></p>
 <p id="section-6.4-5">The <code>data</code> parameter of the <code>account-state</code> event MUST contain the following:<a href="#section-6.4-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.4-6.1">
@@ -2216,6 +2231,7 @@ Last-Event-Id: 3
 command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
 </pre><a href="#section-6.4-14" class="pilcrow">¶</a>
 </div>
+<p id="section-6.4-15">If the RP is unable to resume a Streaming Response when provided a <code>Last-Event-Id</code> HTTP header, it MUST respond with an HTTP 404 Not Found and include the <code>error</code> parameter of <code>last-event-id-unavailable</code>.<a href="#section-6.4-15" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="audit-tenant-command">
@@ -2233,8 +2249,7 @@ command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJz",
-  "command": "audit_tenant",
-  "tenant": "ff6e7c9"
+  "command": "audit_tenant"
 }
 </pre><a href="#section-6.5-4" class="pilcrow">¶</a>
 </div>
@@ -2332,19 +2347,19 @@ used.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
       <h2 id="name-openid-provider-command-sup">
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-openid-provider-command-sup" class="section-name selfRef">OpenID Provider Command Support</a>
       </h2>
-<p id="section-8-1">Relying Parties supporting OpenID Provider Commands register a Commands URI with the OP as part of their client registration.<a href="#section-8-1" class="pilcrow">¶</a></p>
-<p id="section-8-2">The Commands URI MUST be an absolute URI as defined by
+<p id="section-8-1">Relying Parties supporting OpenID Provider Commands register a Command Endpoint with the OP as part of their client registration.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2">The Command Endpoint MUST be an absolute URI as defined by
 Section 4.3 of {{RFC3986}}.
-The Commands URI MAY include an
+The Command Endpoint MAY include an
 <code>application/x-www-form-urlencoded</code> formatted
 query component, per Section 3.4 of {{RFC3986}}.
-The Commands URI MUST NOT include a fragment component.<a href="#section-8-2" class="pilcrow">¶</a></p>
+The Command Endpoint MUST NOT include a fragment component.<a href="#section-8-2" class="pilcrow">¶</a></p>
 <p id="section-8-3">If the RP supports
 <a href="#OpenID.Registration">OpenID Connect Dynamic Client Registration 1.0</a>,
-it uses this metadata value to register the OpenID Provider Commands URI:<a href="#section-8-3" class="pilcrow">¶</a></p>
+it uses this metadata value to register the OpenID Provider Command Endpoint:<a href="#section-8-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8-4.1">
-          <p id="section-8-4.1.1"><strong>commands_uri</strong><br>
+          <p id="section-8-4.1.1"><strong>command_endpoint</strong><br>
 OPTIONAL.<br>
 RP URL that will receive OpenID Provider Commands from the OP.
 This URL MUST use the <code>https</code> scheme
@@ -2471,7 +2486,7 @@ established by <a href="#RFC7591">RFC7591</a>.<a href="#section-12.2-1" class="p
           </h4>
 <ul class="normal">
 <li class="normal" id="section-12.2.1-1.1">
-              <p id="section-12.2.1-1.1.1"><strong>Client Metadata Name:</strong> <code>commands_uri</code><a href="#section-12.2.1-1.1.1" class="pilcrow">¶</a></p>
+              <p id="section-12.2.1-1.1.1"><strong>Client Metadata Name:</strong> <code>command_endpoint</code><a href="#section-12.2.1-1.1.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <p id="section-12.2.1-2"><strong>Client Metadata Description:</strong>
