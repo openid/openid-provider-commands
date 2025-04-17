@@ -428,7 +428,7 @@ The RP MUST include the state of the Account and any Claims for an Account that 
 Identified by the `unauthorize` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account.
-The OP sends this Command when it wants the RP to undo the last OpenID Connect login. The OP may send this when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, or if the user's device was compromised. 
+The OP sends this Command when it wants the RP to undo previous OpenID Connect logins. The OP may send this when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, or if the user's device was compromised. 
 
 
 The Account MUST be in the **active** state, and remains in the **active** state after executing the Command. If the Account is in any other state, the RP MUST return an [Incompatible State Response](#incompatible-state-response).
