@@ -463,28 +463,28 @@ A Metadata Command replaces any previous metadata provided by the OP to the RP i
 
 The Claims set in a Metadata Command Token MUST include the following claim:
 
-- **metadata**
-  REQUIRED.
+- **metadata**   
+  REQUIRED   
   A JSON object that MAY include the following Claims:
 
-  - **domains**
-    OPTIONAL.
+  - **domains**   
+    OPTIONAL   
     A JSON array of one or more domain names the OP has verified the Tenant controls.
 
-  - **groups**
-    OPTIONAL.
+  - **groups**  
+    OPTIONAL  
     A JSON array of objects that MUST contain:
-    - **id**
-      REQUIRED.
+    - **id**  
+      REQUIRED.  
       The OP unique value for the group.
 
-    - **display**
-      REQUIRED.
+    - **display**   
+      REQUIRED.   
       The Tenant unique human readable name for the group.
 
 The OP sends the `domains` array for the RP to link any data the RP has to the OP Tenant.
 
-The OP sends the `groups` array to provide the display value for each identifier that the OP MAY include in a `groups` Claim in an ID Token or a Command Token for the Activate and Maintain Commands. This allows an admin at the RP to map centrally managed `groups` from an OP to roles or entitlements at an RP.
+The OP sends the `groups` array to provide the display and optional description values for each identifier that the OP MAY include in a `groups` Claim in an ID Token or a Command Token for the Activate and Maintain Commands. This allows an admin at the RP to map centrally managed `groups` from an OP to roles or entitlements at an RP.
 
 The OP MAY include any other metadata in the `metadata` Claim, including metadata defined in OAuth Authorization Server Metadata. **add reference**
 
@@ -503,11 +503,13 @@ Following is a non-normative example of a Claim set in a Command Token for the M
     "groups": [
       {
         "id": "b0f4861d",
-        "display": "Administrators"
+        "display": "Administrators",
+        "description": "Application administrators"
       },
       {
         "id": "88799417",
-        "display": "Finance"
+        "display": "Finance",
+        "description": "Everyone in corporate finance"
       }
     ],
     "domains": ["example.com"],
@@ -529,16 +531,50 @@ Following is a non-normative example of a Claim set in a Command Token for the M
 
 If the Command Token is valid, the RP responds with an `application/json` media type that MUST include:
 
-- **context**: a JSON object.
-  - **iss**
-  REQUIRED. the `iss` value from the Command Token.
-  - **tenant**
-  REQUIRED. the `tenant` value from the Command Token.
+- **context**  
+  REQUIRED  
+  A JSON object containing:
+
+  - **iss**  
+    REQUIRED  
+    The `iss` value from the Command Token.
+
+  - **tenant**  
+    REQUIRED   
+    The `tenant` value from the Command Token.
   
-- **commands_supported**: a JSON array of Commands the RP supports. The `metadata` value MUST be included.
-- **command_endpoint**: the RP's Command Endpoint. This is the URL the Command Token was sent to.
-- **describe_ttl**: the time in seconds the Command Response to the Metadata Command is valid for.
-- **client_id**: the `client_id` for the RP.
+- **commands_supported**   
+  REQUIRED  
+  A JSON array of Commands the RP supports. The `metadata` value MUST be included.
+
+- **command_endpoint**  
+  REQUIRED  
+  The RP's Command Endpoint. This is the URL the Command Token was sent to.
+
+- **client_id**  
+  REQUIRED  
+  The `client_id` for the RP.
+
+And MAY include:
+
+- **roles**  
+  OPTIONAL  
+  A JSON array of objects that contain:
+
+  - **id**  
+    REQUIRED  
+    The RP unique value for the role.
+
+  - **display**  
+    REQUIRED   
+    The Tenant unique human readable name for the role.
+
+  - **description**  
+    OPTIONAL  
+    A description of the role.
+
+
+The RP sends the `roles` array to provide the display and optional description values for each role identifier that the RP supports. The OP MAY include the role identifiers in a `roles` claim in an ID Token or a Command Token for the Activate and Maintain Commands. This allows an admin at the OP to map centrally managed attributes to the RP `roles`.
 
 
 The response MAY also include any OAuth Dynamic Client Registration Metadata *TBD [IANA reference](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata)*
@@ -568,7 +604,6 @@ Following is a non-normative example of Command Response for a Metadata Command:
     "delete",
     "audit"
   ],
-  "commands_ttl": 86400,
   "claims_supported": [
     "sub",
     "email",
@@ -576,6 +611,23 @@ Following is a non-normative example of Command Response for a Metadata Command:
     "name",
     "groups"
   ],
+  "roles": [
+          {
+        "id": "00001",
+        "display": "Admins",
+        "description": "All administrative"
+      },
+      {
+        "id": "00002",
+        "display": "Editors",
+        "description": "Create, read, update, delete posts"
+      },
+      {
+        "id": "00003",
+        "display": "Reader",
+        "description": "Read posts"
+      }
+  ]
   "client_id": "s6BhdRkqt3",
   "client_name": "Example RP",
   "logo_uri": "https://rp.example.net/logo.png",
