@@ -1229,7 +1229,7 @@ li > p:last-of-type:only-child {
 <dd class="workgroup">OpenID Connect</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-04-17" class="published">17 April 2025</time>
+<time datetime="2025-04-19" class="published">19 April 2025</time>
     </dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
@@ -1928,7 +1928,7 @@ the Account is incompatible state.<a href="#section-5.3-5" class="pilcrow">¶</a
         </h3>
 <p id="section-5.12-1">Identified by the <code>unauthorize</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.12-1" class="pilcrow">¶</a></p>
 <p id="section-5.12-2">The RP MUST perform the <a href="#unauthorize-functionality">Unauthorize Functionality</a> on the Account.
-The OP sends this Command when it wants the RP to undo previous OpenID Connect logins. The OP may send this when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, or if the user's device was compromised.<a href="#section-5.12-2" class="pilcrow">¶</a></p>
+The OP MAY send this Command when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, if the user's device was compromised, or any other security related concern about the account.<a href="#section-5.12-2" class="pilcrow">¶</a></p>
 <p id="section-5.12-3">The Account MUST be in the <strong>active</strong> state, and remains in the <strong>active</strong> state after executing the Command. If the Account is in any other state, the RP MUST return an <a href="#incompatible-state-response">Incompatible State Response</a>.<a href="#section-5.12-3" class="pilcrow">¶</a></p>
 <p id="section-5.12-4">The functionality of the Unauthorize Command is also performed by Suspend, Archive, and Delete Commands to ensure an Account in the <strong>suspended</strong>, <strong>archived</strong>, and <strong>unknown</strong> state no longer has access to resources.<a href="#section-5.12-4" class="pilcrow">¶</a></p>
 </section>
