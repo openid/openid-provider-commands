@@ -190,7 +190,11 @@ The following Claims are used within the Command Token:
 
 - **aud**  
   REQUIRED.  
-  Audience(s), as specified in Section 2 of {{OpenID.Core}}.
+  The Command Endpoint.
+
+- **client_id**
+  REQUIRED.
+  The `client_id` of the RP.
 
 - **iat**  
   REQUIRED.  
@@ -244,7 +248,8 @@ A non-normative example JWT Claims Set for the Command Token for an Activate Com
 ```json
 {
   "iss": "https://op.example.org",
-  "aud": "s6BhdRkqt3",
+  "aud": "https://rp.example.net/command",
+  "client_id": "s6BhdRkqt3",
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJq",
@@ -266,7 +271,8 @@ A non-normative example JWT Claims Set for the Command Token for an Unauthorize 
 ```json
 {
   "iss": "https://op.example.org",
-  "aud": "s6BhdRkqt3",
+  "aud": "https://rp.example.net/command",
+  "client_id": "s6BhdRkqt3",
   "iat": 1734004000,
   "exp": 1734004060,
   "jti": "bWJr",
@@ -493,7 +499,8 @@ Following is a non-normative example of a Claim set in a Command Token for the M
 ```json
 {
   "iss": "https://op.example.org",
-  "aud": "s6BhdRkqt3",
+  "aud": "https://rp.example.net/command",
+  "client_id": "s6BhdRkqt3",
   "iat": 1734006000,
   "exp": 1734006060,
   "jti": "bWJt",
@@ -766,7 +773,8 @@ The following is a non-normative example of the Claims Set in the Command Token 
 ```json
 {
   "iss": "https://op.example.org",
-  "aud": "s6BhdRkqt3",
+  "aud": "https://rp.example.net/command",
+  "client_id": "s6BhdRkqt3",
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJz",
