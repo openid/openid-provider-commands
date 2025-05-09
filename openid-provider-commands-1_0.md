@@ -426,8 +426,9 @@ The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) 
 ## Audit Command
 Identified by the `audit` value in the `command` Claim of a Command Token.
 
-The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns `unknown` state.
+The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns `unknown` state. 
 
+The RP MAY include a `last_access` claim, a NumericDate, representing the number of seconds from 1970-01-01T00:00:00Z UTC. The value MUST be an integer and is equivalent to the iat and exp claims as defined in [RFC7519](#RFC7519).
 
 ## Unauthorize Command
 
@@ -719,7 +720,8 @@ The following is a non-normative example of a Streaming Response for an Audit Te
       "b0f4861d-f3d6-4f76-be2f-e467daddc6f6",
       "88799417-c72f-48fc-9e63-f012d8822ad1"
     ],
-    "account_state": "active"
+    "account_state": "active",
+    "last_access": 1746792000,
   }
 
   id: 2
@@ -788,6 +790,8 @@ The following is a non-normative example of the Claims Set in the Command Token 
 The RP sends a Streaming Response if it received a valid Suspend Tenant Command.
 
 The RP MUST include any Claims for an Account that the RP has retained that were provided by the OP in the event `data` parameter JSON string. If the Claim values have been modified at the RP, the modified values should be returned. 
+
+The RP MAY include a `last_access` claim, a NumericDate, representing the number of seconds from 1970-01-01T00:00:00Z UTC. The value MUST be an integer and is equivalent to the iat and exp claims as defined in [RFC7519](#RFC7519).
 
 ## Suspend Tenant Command
 
