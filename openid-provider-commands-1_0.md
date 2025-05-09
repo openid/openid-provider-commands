@@ -171,7 +171,7 @@ Note that the RP may support Commands for some OPs, and not others, and for some
 
 ## Server Error
 
-If the RP is unable to process a valid request, the RP MUST respond with a 5xx Server Error status code as defined in RFC 9110 section 15.6.
+If the RP is unable to process a valid request, the RP MUST respond with a 5xx Server Error status code as defined in [RFC9110](#RFC9110) section 15.6.
 
 # Command Token
 
@@ -762,45 +762,45 @@ If there are no Accounts for the Tenant at the RP, the RP responds with only the
 
 The following is a non-normative example of a Streaming Response for an Audit Tenant Command:
 
-```text
-  HTTP/1.1 200 OK
-  Content-Type: text/event-stream
-  Cache-Control: no-cache
-  Connection: keep-alive
-  Content-Encoding: gzip
+```
+HTTP/1.1 200 OK
+Content-Type: text/event-stream
+Cache-Control: no-cache
+Connection: keep-alive
+Content-Encoding: gzip
 
-  id: 1
-  event: account-state
-  data: {
-    "sub": "248289761001",
-    "email": "janes.smith@example.com",
-    "given_name": "Jane",
-    "family_name": "Smith",  
-    "groups": [
-      "b0f4861d-f3d6-4f76-be2f-e467daddc6f6",
-      "88799417-c72f-48fc-9e63-f012d8822ad1"
-    ],
-    "account_state": "active"
-  }
+id: 1
+event: account-state
+data: {
+  "sub": "248289761001",
+  "email": "janes.smith@example.com",
+  "given_name": "Jane",
+  "family_name": "Smith",  
+  "groups": [
+    "b0f4861d-f3d6-4f76-be2f-e467daddc6f6",
+    "88799417-c72f-48fc-9e63-f012d8822ad1"
+  ],
+  "account_state": "active"
+}
 
-  id: 2
-  event: account-state
-  data: {
-    "sub": "98765412345",
-    "email": "john.doe@example.com",
-    "given_name": "John",
-    "family_name": "Doe",
-    "groups": [
-      "88799417-c72f-48fc-9e63-f012d8822ad1"
-    ],
-    "account_state": "suspended"
-  }
+id: 2
+event: account-state
+data: {
+  "sub": "98765412345",
+  "email": "john.doe@example.com",
+  "given_name": "John",
+  "family_name": "Doe",
+  "groups": [
+    "88799417-c72f-48fc-9e63-f012d8822ad1"
+  ],
+  "account_state": "suspended"
+}
 
-  id: 3
-  event: command-complete
-  data: {
-    "total_accounts": 2
-  }
+id: 3
+event: command-complete
+data: {
+  "total_accounts": 2
+}
 ```
 
 
@@ -907,10 +907,10 @@ used.
 Relying Parties supporting OpenID Provider Commands register a Command Endpoint with the OP as part of their client registration.
 
 The Command Endpoint MUST be an absolute URI as defined by
-Section 4.3 of {{RFC3986}}.
+Section 4.3 of [RFC3986](#RFC3986).
 The Command Endpoint MAY include an
 `application/x-www-form-urlencoded` formatted
-query component, per Section 3.4 of {{RFC3986}}.
+query component, per Section 3.4 of [RFC3986](#RFC3986).
 The Command Endpoint MUST NOT include a fragment component.
 
 If the RP supports
@@ -946,7 +946,7 @@ to prevent captured Command Tokens from being replayed.
 
 ## Cross-JWT Confusion
 
-As described in Section 2.8 of {{RFC8725}},
+As described in Section 2.8 of [RFC8725](#RFC8725),
 attackers may attempt to use a JWT issued for one purpose in a context that it was not intended for.
 The mitigations described for these attacks can be applied to Command Tokens.
 
@@ -957,7 +957,7 @@ inclusion of a `nonce` Claim in a Command Token
 is prohibited to prevent its misuse as an ID Token.
 
 Another way to prevent cross-JWT confusion is to use explicit typing,
-as described in Section 3.11 of {{!RFC8725}} and as required in [#command-token]. 
+as described in Section 3.11 of[RFC8725](#RFC8725) and as required in [#command-token]. 
 
 
 # Privacy Considerations
@@ -1011,6 +1011,8 @@ in the IANA "OAuth Dynamic Client Registration Metadata" registry
 [IANA OAuth Parameters](#IANA.OAuth.Parameters)
 established by [RFC7591](#RFC7591).
 
+
+
 ### Registry Contents
 
 - **Client Metadata Name:** `command_endpoint`
@@ -1025,7 +1027,7 @@ established by [RFC7591](#RFC7591).
 
 ## Media Type Registration
 
-This specification registers the `application/command+jwt` media type as per {{!RFC6838}}.
+This specification registers the `application/command+jwt` media type as per [RFC6838](#RFC6838).
 
 *To be completed.*
 
