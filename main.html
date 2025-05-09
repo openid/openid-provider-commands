@@ -18,13 +18,13 @@
 <meta name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.28.1
-    Python 3.10.16
+    Python 3.10.17
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
-    lxml 5.3.2
-    platformdirs 4.3.7
+    lxml 5.4.0
+    platformdirs 4.3.8
     pycountry 24.6.1
     PyYAML 6.0.2
     requests 2.32.3
@@ -1214,7 +1214,7 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left"></td>
 <td class="center">openid-provider-commands</td>
-<td class="right">April 2025</td>
+<td class="right">May 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Hardt &amp; McGuinness</td>
@@ -1229,7 +1229,7 @@ li > p:last-of-type:only-child {
 <dd class="workgroup">OpenID Connect</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-04-16" class="published">16 April 2025</time>
+<time datetime="2025-05-09" class="published">9 May 2025</time>
     </dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
@@ -1928,7 +1928,7 @@ the Account is incompatible state.<a href="#section-5.3-5" class="pilcrow">¶</a
         </h3>
 <p id="section-5.12-1">Identified by the <code>unauthorize</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.12-1" class="pilcrow">¶</a></p>
 <p id="section-5.12-2">The RP MUST perform the <a href="#unauthorize-functionality">Unauthorize Functionality</a> on the Account.
-The OP sends this Command when it wants the RP to undo the last OpenID Connect login. The OP may send this when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, or if the user's device was compromised.<a href="#section-5.12-2" class="pilcrow">¶</a></p>
+The OP MAY send this Command when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, if the user's device was compromised, or any other security related concern about the account.<a href="#section-5.12-2" class="pilcrow">¶</a></p>
 <p id="section-5.12-3">The Account MUST be in the <strong>active</strong> state, and remains in the <strong>active</strong> state after executing the Command. If the Account is in any other state, the RP MUST return an <a href="#incompatible-state-response">Incompatible State Response</a>.<a href="#section-5.12-3" class="pilcrow">¶</a></p>
 <p id="section-5.12-4">The functionality of the Unauthorize Command is also performed by Suspend, Archive, and Delete Commands to ensure an Account in the <strong>suspended</strong>, <strong>archived</strong>, and <strong>unknown</strong> state no longer has access to resources.<a href="#section-5.12-4" class="pilcrow">¶</a></p>
 </section>
@@ -1961,28 +1961,28 @@ The OP sends this Command when it wants the RP to undo the last OpenID Connect l
 <p id="section-6.1-5">The Claims set in a Metadata Command Token MUST include the following claim:<a href="#section-6.1-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.1-6.1">
-            <p id="section-6.1-6.1.1"><strong>metadata</strong>
-REQUIRED.
+            <p id="section-6.1-6.1.1"><strong>metadata</strong><br>
+REQUIRED<br>
 A JSON object that MAY include the following Claims:<a href="#section-6.1-6.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.1-6.1.2.1">
-                <p id="section-6.1-6.1.2.1.1"><strong>domains</strong>
-OPTIONAL.
+                <p id="section-6.1-6.1.2.1.1"><strong>domains</strong><br>
+OPTIONAL<br>
 A JSON array of one or more domain names the OP has verified the Tenant controls.<a href="#section-6.1-6.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-6.1-6.1.2.2">
-                <p id="section-6.1-6.1.2.2.1"><strong>groups</strong>
-OPTIONAL.
+                <p id="section-6.1-6.1.2.2.1"><strong>groups</strong><br>
+OPTIONAL<br>
 A JSON array of objects that MUST contain:<a href="#section-6.1-6.1.2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.1-6.1.2.2.2.1">
-                    <p id="section-6.1-6.1.2.2.2.1.1"><strong>id</strong>
-REQUIRED.
+                    <p id="section-6.1-6.1.2.2.2.1.1"><strong>id</strong><br>
+REQUIRED.<br>
 The OP unique value for the group.<a href="#section-6.1-6.1.2.2.2.1.1" class="pilcrow">¶</a></p>
 </li>
                   <li class="normal" id="section-6.1-6.1.2.2.2.2">
-                    <p id="section-6.1-6.1.2.2.2.2.1"><strong>display</strong>
-REQUIRED.
+                    <p id="section-6.1-6.1.2.2.2.2.1"><strong>display</strong><br>
+REQUIRED.<br>
 The Tenant unique human readable name for the group.<a href="#section-6.1-6.1.2.2.2.2.1" class="pilcrow">¶</a></p>
 </li>
                 </ul>
@@ -1991,7 +1991,7 @@ The Tenant unique human readable name for the group.<a href="#section-6.1-6.1.2.
 </li>
         </ul>
 <p id="section-6.1-7">The OP sends the <code>domains</code> array for the RP to link any data the RP has to the OP Tenant.<a href="#section-6.1-7" class="pilcrow">¶</a></p>
-<p id="section-6.1-8">The OP sends the <code>groups</code> array to provide the display value for each identifier that the OP MAY include in a <code>groups</code> Claim in an ID Token or a Command Token for the Activate and Maintain Commands. This allows an admin at the RP to map centrally managed <code>groups</code> from an OP to roles or entitlements at an RP.<a href="#section-6.1-8" class="pilcrow">¶</a></p>
+<p id="section-6.1-8">The OP sends the <code>groups</code> array to provide the display and optional description values for each identifier that the OP MAY include in a <code>groups</code> Claim in an ID Token or a Command Token for the Activate and Maintain Commands. This allows an admin at the RP to map centrally managed <code>groups</code> from an OP to roles or entitlements at an RP.<a href="#section-6.1-8" class="pilcrow">¶</a></p>
 <p id="section-6.1-9">The OP MAY include any other metadata in the <code>metadata</code> Claim, including metadata defined in OAuth Authorization Server Metadata. <strong>add reference</strong><a href="#section-6.1-9" class="pilcrow">¶</a></p>
 <p id="section-6.1-10">Following is a non-normative example of a Claim set in a Command Token for the Metadata Command:<a href="#section-6.1-10" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-6.1-11">
@@ -2007,11 +2007,13 @@ The Tenant unique human readable name for the group.<a href="#section-6.1-6.1.2.
     "groups": [
       {
         "id": "b0f4861d",
-        "display": "Administrators"
+        "display": "Administrators",
+        "description": "Application administrators"
       },
       {
         "id": "88799417",
-        "display": "Finance"
+        "display": "Finance",
+        "description": "Everyone in corporate finance"
       }
     ],
     "domains": ["example.com"],
@@ -2038,40 +2040,73 @@ The Tenant unique human readable name for the group.<a href="#section-6.1-6.1.2.
 <p id="section-6.2-1">If the Command Token is valid, the RP responds with an <code>application/json</code> media type that MUST include:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.2-2.1">
-            <p id="section-6.2-2.1.1"><strong>context</strong>: a JSON object.<a href="#section-6.2-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-6.2-2.1.1"><strong>context</strong><br>
+REQUIRED<br>
+A JSON object containing:<a href="#section-6.2-2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.2-2.1.2.1">
-                <p id="section-6.2-2.1.2.1.1"><strong>iss</strong>
-REQUIRED. the <code>iss</code> value from the Command Token.<a href="#section-6.2-2.1.2.1.1" class="pilcrow">¶</a></p>
+                <p id="section-6.2-2.1.2.1.1"><strong>iss</strong><br>
+REQUIRED<br>
+The <code>iss</code> value from the Command Token.<a href="#section-6.2-2.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-6.2-2.1.2.2">
-                <p id="section-6.2-2.1.2.2.1"><strong>tenant</strong>
-REQUIRED. the <code>tenant</code> value from the Command Token.<a href="#section-6.2-2.1.2.2.1" class="pilcrow">¶</a></p>
+                <p id="section-6.2-2.1.2.2.1"><strong>tenant</strong><br>
+REQUIRED<br>
+The <code>tenant</code> value from the Command Token.<a href="#section-6.2-2.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </li>
           <li class="normal" id="section-6.2-2.2">
-            <p id="section-6.2-2.2.1"><strong>commands_supported</strong>: a JSON array of Commands the RP supports. The <code>metadata</code> value MUST be included.<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-6.2-2.2.1"><strong>commands_supported</strong><br>
+REQUIRED<br>
+A JSON array of Commands the RP supports. The <code>metadata</code> value MUST be included.<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.2-2.3">
-            <p id="section-6.2-2.3.1"><strong>command_endpoint</strong>: the RP's Command Endpoint. This is the URL the Command Token was sent to.<a href="#section-6.2-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-6.2-2.3.1"><strong>command_endpoint</strong><br>
+REQUIRED<br>
+The RP's Command Endpoint. This is the URL the Command Token was sent to.<a href="#section-6.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.2-2.4">
-            <p id="section-6.2-2.4.1"><strong>describe_ttl</strong>: the time in seconds the Command Response to the Metadata Command is valid for.<a href="#section-6.2-2.4.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-6.2-2.5">
-            <p id="section-6.2-2.5.1"><strong>client_id</strong>: the <code>client_id</code> for the RP.<a href="#section-6.2-2.5.1" class="pilcrow">¶</a></p>
+            <p id="section-6.2-2.4.1"><strong>client_id</strong><br>
+REQUIRED<br>
+The <code>client_id</code> for the RP.<a href="#section-6.2-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-6.2-3">The response MAY also include any OAuth Dynamic Client Registration Metadata <em>TBD <a href="https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata">IANA reference</a></em><a href="#section-6.2-3" class="pilcrow">¶</a></p>
-<p id="section-6.2-4">The RP MAY provide a different response for different <strong>iss</strong> Claim values, and for different <code>tenant</code> Claim values.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
-<p id="section-6.2-5">Following is a non-normative example of Command Response for a Metadata Command:<a href="#section-6.2-5" class="pilcrow">¶</a></p>
-<blockquote id="section-6.2-6">
-          <p id="section-6.2-6.1">NOTE: we want to include the <code>iss</code> and <code>tenant</code> from the Metadata Command in the Command Response so the OP knows the response from the RP
+<p id="section-6.2-3">And MAY include:<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.2-4.1">
+            <p id="section-6.2-4.1.1"><strong>roles</strong><br>
+OPTIONAL<br>
+A JSON array of objects that contain:<a href="#section-6.2-4.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.2-4.1.2.1">
+                <p id="section-6.2-4.1.2.1.1"><strong>id</strong><br>
+REQUIRED<br>
+The RP unique value for the role.<a href="#section-6.2-4.1.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-6.2-4.1.2.2">
+                <p id="section-6.2-4.1.2.2.1"><strong>display</strong><br>
+REQUIRED<br>
+The Tenant unique human readable name for the role.<a href="#section-6.2-4.1.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-6.2-4.1.2.3">
+                <p id="section-6.2-4.1.2.3.1"><strong>description</strong><br>
+OPTIONAL<br>
+A description of the role.<a href="#section-6.2-4.1.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+        </ul>
+<p id="section-6.2-5">The RP sends the <code>roles</code> array to provide the display and optional description values for each role identifier that the RP supports. The OP MAY include the role identifiers in a <code>roles</code> claim in an ID Token or a Command Token for the Activate and Maintain Commands. This allows an admin at the OP to map centrally managed attributes to the RP <code>roles</code>.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
+<p id="section-6.2-6">The response MAY also include any OAuth Dynamic Client Registration Metadata <em>TBD <a href="https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata">IANA reference</a></em><a href="#section-6.2-6" class="pilcrow">¶</a></p>
+<p id="section-6.2-7">The RP MAY provide a different response for different <strong>iss</strong> Claim values, and for different <code>tenant</code> Claim values.<a href="#section-6.2-7" class="pilcrow">¶</a></p>
+<p id="section-6.2-8">Following is a non-normative example of Command Response for a Metadata Command:<a href="#section-6.2-8" class="pilcrow">¶</a></p>
+<blockquote id="section-6.2-9">
+          <p id="section-6.2-9.1">NOTE: we want to include the <code>iss</code> and <code>tenant</code> from the Metadata Command in the Command Response so the OP knows the response from the RP
 is really for the correct <code>iss</code> and <code>tenant</code>. We don't want the OP <code>iss</code> at the top level as that would
-cause confusion if the Command Response is signed in the future since the <code>iss</code> then would be the RP<a href="#section-6.2-6.1" class="pilcrow">¶</a></p>
+cause confusion if the Command Response is signed in the future since the <code>iss</code> then would be the RP<a href="#section-6.2-9.1" class="pilcrow">¶</a></p>
 </blockquote>
-<div class="lang-json sourcecode" id="section-6.2-7">
+<div class="lang-json sourcecode" id="section-6.2-10">
 <pre>{
   "context": {
     "iss": "https://op.example.org",
@@ -2086,7 +2121,6 @@ cause confusion if the Command Response is signed in the future since the <code>
     "delete",
     "audit"
   ],
-  "commands_ttl": 86400,
   "claims_supported": [
     "sub",
     "email",
@@ -2094,6 +2128,23 @@ cause confusion if the Command Response is signed in the future since the <code>
     "name",
     "groups"
   ],
+  "roles": [
+          {
+        "id": "00001",
+        "display": "Admins",
+        "description": "All administrative"
+      },
+      {
+        "id": "00002",
+        "display": "Editors",
+        "description": "Create, read, update, delete posts"
+      },
+      {
+        "id": "00003",
+        "display": "Reader",
+        "description": "Read posts"
+      }
+  ]
   "client_id": "s6BhdRkqt3",
   "client_name": "Example RP",
   "logo_uri": "https://rp.example.net/logo.png",
@@ -2105,7 +2156,7 @@ cause confusion if the Command Response is signed in the future since the <code>
     "https://rp.example.net/response"
   ]
 }
-</pre><a href="#section-6.2-7" class="pilcrow">¶</a>
+</pre><a href="#section-6.2-10" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
