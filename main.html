@@ -1646,32 +1646,37 @@ PROHIBITED for Tenant Commands.<a href="#section-4-3.2.1" class="pilcrow">¶</a>
 <li class="normal" id="section-4-6.1">
           <p id="section-4-6.1.1"><strong>aud</strong><br>
 REQUIRED.<br>
-Audience(s), as specified in Section 2 of {{OpenID.Core}}.<a href="#section-4-6.1.1" class="pilcrow">¶</a></p>
+The Command Endpoint.<a href="#section-4-6.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-6.2">
-          <p id="section-4-6.2.1"><strong>iat</strong><br>
-REQUIRED.<br>
-Issued at time, as specified in Section 2 of {{OpenID.Core}}.<a href="#section-4-6.2.1" class="pilcrow">¶</a></p>
+          <p id="section-4-6.2.1"><strong>client_id</strong>
+REQUIRED.
+The <code>client_id</code> of the RP.<a href="#section-4-6.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-6.3">
-          <p id="section-4-6.3.1"><strong>exp</strong><br>
+          <p id="section-4-6.3.1"><strong>iat</strong><br>
 REQUIRED.<br>
-Expiration time, as specified in Section 2 of {{OpenID.Core}}.<a href="#section-4-6.3.1" class="pilcrow">¶</a></p>
+Issued at time, as specified in Section 2 of {{OpenID.Core}}.<a href="#section-4-6.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-6.4">
-          <p id="section-4-6.4.1"><strong>jti</strong><br>
+          <p id="section-4-6.4.1"><strong>exp</strong><br>
 REQUIRED.<br>
-Unique identifier for the token, as specified in Section 9 of {{OpenID.Core}}.<a href="#section-4-6.4.1" class="pilcrow">¶</a></p>
+Expiration time, as specified in Section 2 of {{OpenID.Core}}.<a href="#section-4-6.4.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-6.5">
-          <p id="section-4-6.5.1"><strong>command</strong><br>
+          <p id="section-4-6.5.1"><strong>jti</strong><br>
 REQUIRED.<br>
-A JSON string. The Command for the RP to execute. See <a href="#account-commands">Account Commands</a> and <a href="#tenant-commands">Tenant Commands</a> for standard values defined in this document. Other specifications may define additional values as described in <a href="#defining-new-commands">Extensibility</a>.<a href="#section-4-6.5.1" class="pilcrow">¶</a></p>
+Unique identifier for the token, as specified in Section 9 of {{OpenID.Core}}.<a href="#section-4-6.5.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-4-6.6">
-          <p id="section-4-6.6.1"><strong>tenant</strong><br>
+          <p id="section-4-6.6.1"><strong>command</strong><br>
 REQUIRED.<br>
-A JSON string. The Tenant identifier. MAY have the value <code>personal</code>, <code>organization</code> or a stable OP unique value for multi-tenant OPs. The <code>personal</code> value is reserved for when Accounts are managed by individuals. The <code>organization</code> value is reserved for Accounts are managed by an organization.<a href="#section-4-6.6.1" class="pilcrow">¶</a></p>
+A JSON string. The Command for the RP to execute. See <a href="#account-commands">Account Commands</a> and <a href="#tenant-commands">Tenant Commands</a> for standard values defined in this document. Other specifications may define additional values as described in <a href="#defining-new-commands">Extensibility</a>.<a href="#section-4-6.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-4-6.7">
+          <p id="section-4-6.7.1"><strong>tenant</strong><br>
+REQUIRED.<br>
+A JSON string. The Tenant identifier. MAY have the value <code>personal</code>, <code>organization</code> or a stable OP unique value for multi-tenant OPs. The <code>personal</code> value is reserved for when Accounts are managed by individuals. The <code>organization</code> value is reserved for Accounts are managed by an organization.<a href="#section-4-6.7.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-4-7">The combination of <code>iss</code> and <code>tenant</code> uniquely identifies a Tenant.<a href="#section-4-7" class="pilcrow">¶</a></p>
@@ -1700,7 +1705,8 @@ of using explicit typing.<a href="#section-4-12" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-4-15">
 <pre>{
   "iss": "https://op.example.org",
-  "aud": "s6BhdRkqt3",
+  "aud": "https://rp.example.net/command",
+  "client_id": "s6BhdRkqt3",
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJq",
@@ -1721,7 +1727,8 @@ of using explicit typing.<a href="#section-4-12" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-4-17">
 <pre>{
   "iss": "https://op.example.org",
-  "aud": "s6BhdRkqt3",
+  "aud": "https://rp.example.net/command",
+  "client_id": "s6BhdRkqt3",
   "iat": 1734004000,
   "exp": 1734004060,
   "jti": "bWJr",
@@ -1997,7 +2004,8 @@ The Tenant unique human readable name for the group.<a href="#section-6.1-6.1.2.
 <div class="lang-json sourcecode" id="section-6.1-11">
 <pre>{
   "iss": "https://op.example.org",
-  "aud": "s6BhdRkqt3",
+  "aud": "https://rp.example.net/command",
+  "client_id": "s6BhdRkqt3",
   "iat": 1734006000,
   "exp": 1734006060,
   "jti": "bWJt",
@@ -2296,7 +2304,8 @@ command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
 <div class="lang-json sourcecode" id="section-6.5-4">
 <pre>{
   "iss": "https://op.example.org",
-  "aud": "s6BhdRkqt3",
+  "aud": "https://rp.example.net/command",
+  "client_id": "s6BhdRkqt3",
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJz",
