@@ -80,7 +80,7 @@ This specification defines the following terms:
 
 - **Synchronous Command**: A Command where the response from the RP is provided synchronously to the OP with an HTTP 200 Success response.
 
-- **Asynchronous Command**: A Command where the response from the RP is provided asynchronously to the OP with an initial HTTP 202 Accepted response. The RP sends the final response of an Asynchronous Command to the OP **command_callback_endpoint**. Command identifiers for Asynchronous Commands end with the string `_async`. 
+- **Asynchronous Command**: A Command where the response from the RP is provided asynchronously to the OP with an initial HTTP 202 Accepted response. The RP sends the final response of an Asynchronous Command to the OP **callback_endpoint**. Command identifiers for Asynchronous Commands end with the string `_async`. 
 
 - **Command Token**: A JSON Web Token (JWT) signed by the OP that contains Claims about the Command being issued.
 
@@ -223,8 +223,8 @@ The following Claims are used within the Command Token:
   The combination of `iss` and `tenant` uniquely identifies a Tenant. 
 
 - **callback_token**  
-  OPTIONAL in an Asynchronous Command and the `matadata` command.  
-  An OP generated unique and opaque access token for the RP to use when calling the OP's **callback_endpoint** Asynchronous Command responses and making a metadata refresh request.
+  OPTIONAL in an Asynchronous Command and the `metadata` command.  
+  An OP generated unique and opaque token for the RP to use when calling the OP's **callback_endpoint** Asynchronous Command responses and making a metadata refresh request.
   
 Commands may define additional REQUIRED or OPTIONAL Claims.
 An OP MAY include additional Claims. Any Claims that are not understood by the RP MUST be ignored.
@@ -395,7 +395,7 @@ Following is a non-normative response to an unsuccessful Maintain Command for a 
 
 ## Asynchronous Response
 
-When an RP is provided with a valid Asynchronous Command and the account is in a compatible state, the RP returns the HTTP 202 Accepted response.  When the Asynchronous Command has completed processing, and if the OP provided a `callback_endpoint` in its metadata and a `callback_token` in the command, the RP MUST do an HTTP POST of the result of processing to the `callback_endpoint` and include the `callback_token` as a Bearer token in the HTTP `Authorize` header.
+When an RP is provided with a valid Asynchronous Command, and the account is in a compatible state to execute that command, the RP returns the HTTP 202 Accepted response.  When the Asynchronous Command has completed processing, and if the OP provided a `callback_endpoint` in its metadata and a `callback_token` in the command, the RP MUST do an HTTP POST of the result of processing to the `callback_endpoint` and include the `callback_token` as a Bearer token in the HTTP `Authorize` header.
 
 ```
 POST /callback HTTP/1.1
@@ -688,7 +688,7 @@ Following is a non-normative example of Command Response for a Metadata Command:
 
 If the OP provided a `callback_endpoint` and `callback_token` in its last `metadata` Command, the RP may request the the OP to perform a new `metadata` command. One motivation for the RP to make this request is if it's metadata has changed. 
 
-The RP does an HTTP POST to the **command_callback_endpoint** passing the `callback_token` as a bearer token in the HTTP `Authorize` header with a `content-type` of `application/json` and a JSON string with `command_requested` set to `metadata`.
+The RP does an HTTP POST to the **callback_endpoint** passing the `callback_token` as a bearer token in the HTTP `Authorize` header with a `content-type` of `application/json` and a JSON string with `command_requested` set to `metadata`.
 
 Following is a non-normative example:
 
