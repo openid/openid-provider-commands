@@ -78,6 +78,10 @@ This specification defines the following terms:
 
 - **Command**: An instruction from an OP to an RP. It is a synchronous request and response.
 
+- **Synchronous Command**: A Command where the response from the RP is provided synchronously to the OP with an HTTP 200 Success response.
+
+- **Asynchronous Command**: A Command where the response from the RP is provided asynchronously to the OP with an initial HTTP 202 Accepted response. The RP sends the final response of an Asynchronous Command to the OP **callback_endpoint**. Command identifiers for Asynchronous Commands end with the string `_async`. 
+
 - **Command Token**: A JSON Web Token (JWT) signed by the OP that contains Claims about the Command being issued.
 
 - **Command Endpoint**: The URL at the RP where OPs post Command Tokens.
@@ -192,8 +196,8 @@ The following Claims are used within the Command Token:
   REQUIRED.  
   The Command Endpoint.
 
-- **client_id**
-  REQUIRED.
+- **client_id**  
+  REQUIRED.  
   The `client_id` of the RP.
 
 - **iat**  
@@ -218,6 +222,10 @@ The following Claims are used within the Command Token:
 
   The combination of `iss` and `tenant` uniquely identifies a Tenant. 
 
+- **callback_token**  
+  OPTIONAL in an Asynchronous Command and the `metadata` command.  
+  An OP generated unique and opaque token for the RP to use when calling the OP's **callback_endpoint** Asynchronous Command responses and making a metadata refresh request.
+  
 Commands may define additional REQUIRED or OPTIONAL Claims.
 An OP MAY include additional Claims. Any Claims that are not understood by the RP MUST be ignored.
   
@@ -335,7 +343,7 @@ Following are the potential state transitions:
 
 When an RP successful processes an Account Command, the RP returns the `HTTP 200 OK` response and a JSON object containing the provided `sub`, and the `account_state` set to the state of the Account after processing. 
 
-Following is a non-normative response to a successful Activate Command:
+Following is a non-normative response body to a successful Activate Command:
 
 ```json
 {
@@ -385,46 +393,66 @@ Following is a non-normative response to an unsuccessful Maintain Command for a 
 ```
 
 
+## Asynchronous Response
+
+When an RP is provided with a valid Asynchronous Command, and the account is in a compatible state to execute that command, the RP returns the HTTP 202 Accepted response.  When the Asynchronous Command has completed processing, and if the OP provided a `callback_endpoint` in its metadata and a `callback_token` in the command, the RP MUST do an HTTP POST of the result of processing to the `callback_endpoint` and include the `callback_token` as a Bearer token in the HTTP `Authorize` header.
+
+```
+POST /callback HTTP/1.1
+Host: op.example.org
+Authorization: Bearer eyjesudyxhjsjshjedshjdsaajhdsa
+Content-Type: application/json
+Accept: application/json
+Cache-Control: no-cache
+
+{
+  "account_state": "active",
+  "sub": "248289761001"
+}
+```
+
+If the request is invalid or the `callback_token` is invalid, the OP MUST respond with an error per [RFC6750](#RFC6750).
+
 ## Activate Command
-Identified by the `activate` value in the `command` Claim in a Command Token.
+Identified by the `activate` or `activate_audit` value in the `command` Claim in a Command Token.
 
 The RP MUST create an Account with the included Claims in the identity register. The Account MUST be in the **unknown** state. The Account is in the **active** state after successful processing.
 
 ## Maintain Command
-Identified by the `maintain` value in the `command` Claim in a Command Token.
+Identified by the `maintain` or `maintain_audit` value in the `command` Claim in a Command Token.
 
 The RP MUST update an existing Account in the identity register with the included Claims. The Account MUST be in the **active** state. The Account remains in the **active** state after successful processing.
 
 ## Suspend Command
-Identified by the `suspend` value in the `command` Claim in a Command Token.
+Identified by the `suspend` or `suspend_audit` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account and mark the Account as being temporarily unavailable in the identity register. The Account MUST be in the **active** state. The Account is in the **suspended** state after successful processing.
 
 
 ## Reactivate Command
-Identified by the `reactivate` value in the `command` Claim in a Command Token.
+Identified by the `reactivate` or `reactivate_audit` value in the `command` Claim in a Command Token.
 
 The RP MUST mark a suspended Account as being active in the identity register. The Account MUST be in the **suspended** state. The Account is in the **active** state after successful processing. The RP SHOULD support the Reactivate Command if it supports the Suspend Command.
 
 ## Archive Command
-Identified by the `archive` value in the `command` Claim in a Command Token.
+Identified by the `archive` or `archive_audit` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account and remove the Account from the identity register. The Account MUST be in either the **active** or **suspended** state. The Account is in the **archived** state after successful processing.
 
 
 
 ## Restore Command
-Identified by the `restore` value in the `command` Claim in a Command Token.
+Identified by the `restore` or `restore_audit` value in the `command` Claim in a Command Token.
 
 The RP MUST restore an archived Account to the identity register and mark it as being active. The Account MUST be in the **archived** state. The Account is in the **active** state after successful processing. The RP SHOULD support the Restore Command if it suppSs the chA Comma.
 
 ## Delete Command
-Identified by the `delete` value in the `command` Claim in a Command Token.
+Identified by the `delete` or `delete_audit` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account, and delete all data associated with an Account. The Account can be in any state except **unknown**. The Account is in the **unknown** state after successful processing.
 
 ## Audit Command
-Identified by the `audit` value in the `command` Claim of a Command Token.
+Identified by the `audit` or `audit_audit` value in the `command` Claim of a Command Token.
 
 The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns `unknown` state. 
 
@@ -432,7 +460,7 @@ The RP MAY include a `last_access` claim, a NumericDate, representing the number
 
 ## Unauthorize Command
 
-Identified by the `unauthorize` value in the `command` Claim in a Command Token.
+Identified by the `unauthorize` or `unauthorize_audit` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account.
 The OP MAY send this Command when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, if the user's device was compromised, or any other security related concern about the account. 
@@ -457,6 +485,8 @@ The RP MUST revoke all active sessions and MUST reverse all authorization that m
 
 Tenant Commands are executed in the context of a Tenant. The RP MUST support the Metadata Command. Support for other Tenant Commands is optional. Command Tokens for Tenant Commands MUST contain the `tenant` Claim, and are PROHIBITED from containing the `sub` Claim.
 
+Note that no Asynchronous Commands are defined to execute in the context of a Tenant.
+
 ## Metadata Command
 
 Identified by the `metadata` value in the `command` Claim in a Command Token.
@@ -473,6 +503,10 @@ The Claims set in a Metadata Command Token MUST include the following claim:
 - **metadata**   
   REQUIRED   
   A JSON object that MAY include the following Claims:
+
+  - **callback_endpoint**
+    OPTIONAL  
+    A URL that the RP may use to send Asynchronous Command responses and metadata refresh requests. The value may be tenant specific. 
 
   - **domains**   
     OPTIONAL   
@@ -507,7 +541,9 @@ Following is a non-normative example of a Claim set in a Command Token for the M
   "jti": "bWJt",
   "command": "metadata",
   "tenant": "ff6e7c96",
+  "callback_token": "eyhwixm236djs9shne9sjdnjs9dhbsk",
   "metadata": {
+    "callback_endpoint": "https://op.example.org/callback",
     "groups": [
       {
         "id": "b0f4861d",
@@ -648,6 +684,31 @@ Following is a non-normative example of Command Response for a Metadata Command:
   ]
 }
 ```
+
+## Metadata Refresh Request
+
+If the OP provided a `callback_endpoint` and `callback_token` in its last `metadata` Command, the RP may request the the OP to perform a new `metadata` command. One motivation for the RP to make this request is if it's metadata has changed. 
+
+The RP does an HTTP POST to the **callback_endpoint** passing the `callback_token` as a bearer token in the HTTP `Authorize` header with a `content-type` of `application/json` and a JSON string with `command_requested` set to `metadata`.
+
+Following is a non-normative example:
+
+```
+POST /callback HTTP/1.1
+Host: op.example.org
+Authorization: Bearer eyhwixm236djs9shne9sjdnjs9dhbsk
+Content-Type: application/json
+Accept: application/json
+Cache-Control: no-cache
+
+{ 
+  "command_requested": "metadata"
+}
+```
+
+If the `callback_token` is valid, the OP MUST respond with an HTTP 204 No Content response.
+
+If the `callback_token` is not valid, or the content of the request body is not valid, the OP MUST respond with an error per [RFC6750](#RFC6750).
 
 ## Streaming Request
 
@@ -979,6 +1040,7 @@ This specification registers the `application/command+jwt` media type as per {{!
 
 - **[RFC2119]** Bradner, S. “Key words for use in RFCs to Indicate Requirement Levels,” *RFC 2119*, March 1997.
 - **[RFC3986]** Berners-Lee, T., Fielding, R., and Masinter, L. “Uniform Resource Identifier (URI): Generic Syntax,” *RFC 3986*, January 2005.
+- **[RFC6750]** Jones, M., and Hardt, D., “The OAuth 2.0 Authorization Framework: Bearer Token Usage,” *RFC 6750*, October 2012
 - **[RFC7519]** Jones, M., Bradley, J., and Sakimura, N. “JSON Web Token (JWT),” *RFC 7519*, May 2015.
 - **[RFC7591]** Jones, M., Bradley, J., and Sakimura, N. “OAuth 2.0 Dynamic Client Registration Protocol,” *RFC 7591*, March 2015.
 - **[RFC9110]** Fielding, R. “HTTP Semantics,” *RFC 9110*, June 2022.
