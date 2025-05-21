@@ -1229,7 +1229,7 @@ li > p:last-of-type:only-child {
 <dd class="workgroup">OpenID Connect</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-05-09" class="published">9 May 2025</time>
+<time datetime="2025-05-21" class="published">21 May 2025</time>
     </dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
@@ -1510,7 +1510,7 @@ the use of <em>this fixed-width font</em>.<a href="#section-1.1-3" class="pilcro
             <p id="section-1.2-2.3.1"><strong>Synchronous Command</strong>: A Command where the response from the RP is provided synchronously to the OP with an HTTP 200 Success response.<a href="#section-1.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.2-2.4">
-            <p id="section-1.2-2.4.1"><strong>Asynchronous Command</strong>: A Command where the response from the RP is provided asynchronously to the OP with an initial HTTP 202 Accepted response. The RP sends the final response of an Asynchronous Command to the OP <strong>command<em>callback</em>endpoint</strong>. Command identifiers for Asynchronous Commands end with the string <code>_async</code>.<a href="#section-1.2-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-1.2-2.4.1"><strong>Asynchronous Command</strong>: A Command where the response from the RP is provided asynchronously to the OP with an initial HTTP 202 Accepted response. The RP sends the final response of an Asynchronous Command to the OP <strong>callback_endpoint</strong>. Command identifiers for Asynchronous Commands end with the string <code>_async</code>.<a href="#section-1.2-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.2-2.5">
             <p id="section-1.2-2.5.1"><strong>Command Token</strong>: A JSON Web Token (JWT) signed by the OP that contains Claims about the Command being issued.<a href="#section-1.2-2.5.1" class="pilcrow">¶</a></p>
@@ -1695,8 +1695,8 @@ A JSON string. The Tenant identifier. MAY have the value <code>personal</code>, 
 <ul class="normal">
 <li class="normal" id="section-4-8.1">
           <p id="section-4-8.1.1"><strong>callback_token</strong><br>
-OPTIONAL in an Asynchronous Command and the <code>matadata</code> command.<br>
-An OP generated unique and opaque access token for the RP to use when calling the OP's <strong>callback_endpoint</strong> Asynchronous Command responses and making a metadata refresh request.<a href="#section-4-8.1.1" class="pilcrow">¶</a></p>
+OPTIONAL in an Asynchronous Command and the <code>metadata</code> command.<br>
+An OP generated unique and opaque token for the RP to use when calling the OP's <strong>callback_endpoint</strong> Asynchronous Command responses and making a metadata refresh request.<a href="#section-4-8.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-4-9">Commands may define additional REQUIRED or OPTIONAL Claims.
@@ -1880,7 +1880,7 @@ the Account is incompatible state.<a href="#section-5.3-5" class="pilcrow">¶</a
         <h3 id="name-asynchronous-response">
 <a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-asynchronous-response" class="section-name selfRef">Asynchronous Response</a>
         </h3>
-<p id="section-5.4-1">When an RP is provided with a valid Asynchronous Command and the account is in a compatible state, the RP returns the HTTP 202 Accepted response.  When the Asynchronous Command has completed processing, and if the OP provided a <code>callback_endpoint</code> in its metadata and a <code>callback_token</code> in the command, the RP MUST do an HTTP POST of the result of processing to the <code>callback_endpoint</code> and include the <code>callback_token</code> as a Bearer token in the HTTP <code>Authorize</code> header.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+<p id="section-5.4-1">When an RP is provided with a valid Asynchronous Command, and the account is in a compatible state to execute that command, the RP returns the HTTP 202 Accepted response.  When the Asynchronous Command has completed processing, and if the OP provided a <code>callback_endpoint</code> in its metadata and a <code>callback_token</code> in the command, the RP MUST do an HTTP POST of the result of processing to the <code>callback_endpoint</code> and include the <code>callback_token</code> as a Bearer token in the HTTP <code>Authorize</code> header.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5.4-2">
 <pre>POST /callback HTTP/1.1
 Host: op.example.org
@@ -2224,7 +2224,7 @@ cause confusion if the Command Response is signed in the future since the <code>
 <a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-metadata-refresh-request" class="section-name selfRef">Metadata Refresh Request</a>
         </h3>
 <p id="section-6.3-1">If the OP provided a <code>callback_endpoint</code> and <code>callback_token</code> in its last <code>metadata</code> Command, the RP may request the the OP to perform a new <code>metadata</code> command. One motivation for the RP to make this request is if it's metadata has changed.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<p id="section-6.3-2">The RP does an HTTP POST to the <strong>command<em>callback</em>endpoint</strong> passing the <code>callback_token</code> as a bearer token in the HTTP <code>Authorize</code> header with a <code>content-type</code> of <code>application/json</code> and a JSON string with <code>command_requested</code> set to <code>metadata</code>.<a href="#section-6.3-2" class="pilcrow">¶</a></p>
+<p id="section-6.3-2">The RP does an HTTP POST to the <strong>callback_endpoint</strong> passing the <code>callback_token</code> as a bearer token in the HTTP <code>Authorize</code> header with a <code>content-type</code> of <code>application/json</code> and a JSON string with <code>command_requested</code> set to <code>metadata</code>.<a href="#section-6.3-2" class="pilcrow">¶</a></p>
 <p id="section-6.3-3">Following is a non-normative example:<a href="#section-6.3-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-6.3-4">
 <pre>POST /callback HTTP/1.1
