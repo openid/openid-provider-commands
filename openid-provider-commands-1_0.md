@@ -1058,7 +1058,7 @@ This specification registers the `application/command+jwt` media type as per {{!
 
 # Acknowledgements
 
-The authors would like to thank early feedback provided by Tim Cappalli, Pam Dingle, George Fletcher, Michael Jones, Aaron Parecki, Dean Saxe, and Rifaat Shekh-Yusef.
+The authors would like to thank early feedback provided by Tim Cappalli, Andrii Deinega, Pam Dingle, George Fletcher, Michael Jones, Jeff Lombardo, Aaron Parecki, Nat Sakimura, Dean Saxe, and Rifaat Shekh-Yusef.
 
 *To be updated.*
 
