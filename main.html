@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>OpenID Provider Commands 1.0 - draft 00</title>
+<title>OpenID Provider Commands 1.0 - draft 01</title>
 <meta content="Dick Hardt" name="author">
 <meta content="Karl McGuinness" name="author">
 <meta content="
@@ -1229,7 +1229,7 @@ li > p:last-of-type:only-child {
 <dd class="workgroup">OpenID Connect</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-05-21" class="published">21 May 2025</time>
+<time datetime="2025-05-22" class="published">22 May 2025</time>
     </dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
@@ -1244,7 +1244,7 @@ li > p:last-of-type:only-child {
 </dd>
 </dl>
 </div>
-<h1 id="title">OpenID Provider Commands 1.0 - draft 00</h1>
+<h1 id="title">OpenID Provider Commands 1.0 - draft 01</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP<a href="#section-abstract-1" class="pilcrow">¶</a></p>
@@ -2712,7 +2712,7 @@ established by <a href="#RFC7591">RFC7591</a>.<a href="#section-12.2-1" class="p
       <h2 id="name-acknowledgements">
 <a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
       </h2>
-<p id="appendix-A-1">The authors would like to thank early feedback provided by Tim Cappalli, Pam Dingle, George Fletcher, Michael Jones, Aaron Parecki, Dean Saxe, and Rifaat Shekh-Yusef.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-1">The authors would like to thank early feedback provided by Tim Cappalli, Andrii Deinega, Pam Dingle, George Fletcher, Michael Jones, Jeff Lombardo, Aaron Parecki, Nat Sakimura, Dean Saxe, and Rifaat Shekh-Yusef.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 <p id="appendix-A-2"><em>To be updated.</em><a href="#appendix-A-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2766,6 +2766,33 @@ specification.<a href="#appendix-B-3" class="pilcrow">¶</a></p>
 <p id="appendix-C-1">[[ To be removed from the final specification ]]<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 <p id="appendix-C-2">-00<a href="#appendix-C-2" class="pilcrow">¶</a></p>
 <p id="appendix-C-3">initial draft<a href="#appendix-C-3" class="pilcrow">¶</a></p>
+<p id="appendix-C-4">-01<a href="#appendix-C-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-C-5.1">
+          <p id="appendix-C-5.1.1">rename <code>commands_uri</code> to <code>commands_endpoint</code><a href="#appendix-C-5.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-5.2">
+          <p id="appendix-C-5.2.1">added <code>audit</code> account command<a href="#appendix-C-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-5.3">
+          <p id="appendix-C-5.3.1">change <code>aud</code> to be the <code>commands_endpoint</code> and add <code>client_id</code> as a separate claim<a href="#appendix-C-5.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-5.4">
+          <p id="appendix-C-5.4.1">add <code>error</code> as another event type in tenant SSE response<a href="#appendix-C-5.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-5.5">
+          <p id="appendix-C-5.5.1">add async commands, <code>callback_endpoint</code> to OP metadata, and <code>callback_token</code> for async response and <code>metadata</code> request<a href="#appendix-C-5.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-5.6">
+          <p id="appendix-C-5.6.1">add error messages for restarting a stream that cannot be restarted<a href="#appendix-C-5.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-5.7">
+          <p id="appendix-C-5.7.1">add <code>roles</code> claims and <code>roles</code> metadata<a href="#appendix-C-5.7.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-5.8">
+          <p id="appendix-C-5.8.1">add <code>last_access</code> claim for RP to communicate last time user accessed the resource off_line<a href="#appendix-C-5.8.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
 </section>
 </div>
 <div id="authors-addresses">
