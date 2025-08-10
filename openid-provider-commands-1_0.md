@@ -32,7 +32,7 @@ organization="Independent"
 
 OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP
 
-OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
+OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, and unauthorize an end-user Account, and take over management of an existing account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
 
 
 {mainmatter}
@@ -49,7 +49,7 @@ For example, many jurisdictions grant end-users the "right to be forgotten," ena
 
 In scenarios where malicious activity is detected or suspected, OPs play a vital role in protecting end-users. They may need to instruct RPs to revoke authorization or delete Accounts created by malicious actors. This helps contain the impact of unauthorized actions and prevent further misuse of compromised Accounts.
 
-In enterprise environments, where organizations centrally manage workforce access, OPs handle essential Account operations across various stages of the lifecycle. These operations include activating, maintaining, suspending, reactivating, archiving, restoring, and deleting Accounts to maintain security and compliance.
+In enterprise environments, where organizations centrally manage workforce access, OPs handle essential Account operations across various stages of the lifecycle. These operations include activating, maintaining, suspending, reactivating, archiving, restoring, and deleting Accounts to maintain security and compliance. Additional, enterprises want to take over management of the accounts its employees may have created at an RP.
 
 OpenID Provider Commands are a remote procedure call from the OP to the RP that enables OPs to manage the Account lifecycle, building upon the existing OP / RP relationship to cover the full spectrum of Account management requirements.
 
@@ -108,7 +108,13 @@ If the RP supports any Account Commands, the OP will send supported Account Comm
 
 If the RP supports the Unauthorize Command, the OP will send the Unauthorize Command if the OP suspects an Account has been taken over by a malicious actor.
 
+If the RP supports the Manage Command, the OP will send the Manage Command to request management handover of an Account. This enables an enterprise OP to take over management of accounts that employees may have previously created at the RP.
+
 A Tenant with Accounts managed by individuals will typically only support the Metadata, Unauthorize, and Delete Commands.
+
+# Account Resolution 
+
+Account Resolution is the process by which an OP and RP establish a bidirectional mapping between their respective account identifiers. When an OP receives an `aud_sub` value from an RP in response to commands such as Audit, the OP learns the RP's internal identifier for that account. This enables the OP to include the `aud_sub` claim in subsequent Command Tokens, allowing the RP to execute commands using its own identifiers rather than maintaining foreign key relationships based on the OP's `iss` and `sub` values. This simplifies RP implementation by eliminating the need to store and manage external identifiers, while still maintaining the ability to correlate accounts across systems. Account Resolution also facilitates account management handover through the `manage` command, where an OP can request to take management responsibility for an account, with the RP indicating current management status through the `managed_by` claim in its responses.
 
 # Command Request
 
@@ -173,6 +179,7 @@ Note that the RP may support Commands for some OPs, and not others, and for some
 
 If the RP is unable to process a valid request, the RP MUST respond with a 5xx Server Error status code as defined in RFC 9110 section 15.6.
 
+
 # Command Token
 
 OPs send a JWT similar to an ID Token to RPs called a Command Token
@@ -218,15 +225,24 @@ The following Claims are used within the Command Token:
 
 - **tenant**  
   REQUIRED.  
-  A JSON string. The Tenant identifier. MAY have the value `personal`, `organization` or a stable OP unique value for multi-tenant OPs. The `personal` value is reserved for when Accounts are managed by individuals. The `organization` value is reserved for Accounts are managed by an organization.
+  A JSON string. The OP's identifier for the OP's tenant. See {{OpenID.Enterprise}}.
+  
+  MUST have the value `personal`, `organization` or a stable OP unique value for multi-tenant OPs. The `personal` value is reserved for when Accounts are managed by individuals. The `organization` value is reserved for Accounts that are managed by an organization.
 
   The combination of `iss` and `tenant` uniquely identifies a Tenant. 
 
 - **callback_token**  
   OPTIONAL in an Asynchronous Command and the `metadata` command.  
   An OP generated unique and opaque token for the RP to use when calling the OP's **callback_endpoint** Asynchronous Command responses and making a metadata refresh request.
+
+- **aud_sub**  
+  OPTIONAL for Account Commands.  
+  The RP's internal identifier for the Account, as provided by the RP during account resolution. When present, the RP SHOULD use this value to identify the Account rather than the combination of `iss` and `sub`. This claim facilitates more efficient account lookup and management at the RP.
   
-Commands may define additional REQUIRED or OPTIONAL Claims.
+
+
+See command definitions below for which claims are REQUIRED or OPTIONAL for a given request or response.
+
 An OP MAY include additional Claims. Any Claims that are not understood by the RP MUST be ignored.
   
 The following Claim MUST NOT be used within the Command Token:
@@ -293,7 +309,7 @@ A non-normative example JWT Claims Set for the Command Token for an Unauthorize 
 
 # Account Commands
 
-Account Commands that operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified by the `iss` and `sub` Claims in a Command Token. Account Commands include Lifecycle Commands and the Unauthorize Command.
+Account Commands that operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` Claim if provided by the RP during account resolution, or the `iss` and `sub` Claims. Account Commands include Lifecycle Commands and the Unauthorize Command.
 
 
 ## Account Lifecycle States
@@ -341,7 +357,19 @@ Following are the potential state transitions:
 
 ## Success Response
 
-When an RP successful processes an Account Command, the RP returns the `HTTP 200 OK` response and a JSON object containing the provided `sub`, and the `account_state` set to the state of the Account after processing. 
+When an RP successful processes an Account Command, the RP returns the `HTTP 200 OK` response and a JSON object containing the following claims:
+
+-  the provided `sub`
+-  the `account_state` set to the state of the Account after processing
+-  the RP's `aud_sub` if the RP has set `aud_sub_required` in its metadata
+-  the `managed_by` state if the RP supports the `managed` command. 
+
+The `managed_by` claim MUST be set to one of the following values:
+
+- `RP` if the account is managed by the RP
+- `OP` if the account is managed by the OP
+- `other` if the account is managed by a party other than the RP or OP
+- `unknown` if it is unknown which party manages the account
 
 Following is a non-normative response body to a successful Activate Command:
 
@@ -474,11 +502,28 @@ The functionality of the Unauthorize Command is also performed by Suspend, Archi
 
 The RP MUST revoke all active sessions and MUST reverse all authorization that may have been granted to applications, including `offline_access`, for Account resources identified by the `sub`.
 
+## Manage Command
 
+Identified by the `manage` or `manage_async` value in the `command` Claim in a Command Token.
 
+The OP sends this Command to request a change in management responsibility for an Account. The Command Token MUST include the following additional claim:
 
+- **managed_by**  
+  REQUIRED.  
+  A JSON string indicating the requested management state. MUST be set to `OP` if the OP wants to take over management of the Account, or `RP` if the OP wants to hand management back to the RP.
 
+The RP processes the Manage Command based on the current management state of the Account and the requested `managed_by` value:
 
+- If `managed_by` is `OP` and the RP allows the OP to take over management, the RP updates the Account's management status to indicate it is managed by the OP.
+- If `managed_by` is `RP` and the Account is currently managed by the requesting OP, and the RP will take over management, the RP updates the Account's management status to indicate it is managed by the RP.
+
+### Access Denied Error
+
+If the RP does not allow the OP to change management of the Account, the RP MUST return an HTTP 403 Forbidden response and include the `error` parameter with the value of `access_denied`.
+
+### Management Not Transferable Error
+
+If the Account is currently managed by a party that does not allow changes in management responsibility (e.g., managed by a different OP or external system), the RP MUST return an HTTP 409 Conflict response and include the `error` parameter with the value of `management_not_transferable`.
 
 
 # Tenant Commands
@@ -600,6 +645,10 @@ If the Command Token is valid, the RP responds with an `application/json` media 
   The `client_id` for the RP.
 
 And MAY include:
+
+- **aud_sub_required**
+  OPTIONAL.
+  A JSON boolean value set to `true`. Indicates the RP requires its `aud_sub` value be provided in account commands.
 
 - **roles**  
   OPTIONAL  
@@ -1007,6 +1056,24 @@ established by [RFC7519](#RFC7519).
 
 **Specification Document(s):** This document
 
+- **Claim Name:** `aud_sub`
+
+**Claim Description:**
+  The audience's internal identifier for the subject of the token, used for account resolution between identity providers and relying parties.
+  
+**Change Controller:** OpenID Foundation
+
+**Specification Document(s):** This document
+
+- **Claim Name:** `managed_by`
+
+**Claim Description:**
+  Indicates which party has management responsibility for an account, with values including OP, RP, other, or unknown.
+  
+**Change Controller:** OpenID Foundation
+
+**Specification Document(s):** This document
+
 
 ## OAuth Dynamic Client Registration Metadata Registration
 
@@ -1047,7 +1114,8 @@ This specification registers the `application/command+jwt` media type as per {{!
 - **[RFC8725]** Bromberg, L. “Security Considerations for JSON Web Tokens,” *RFC 8725*, June 2020.
 - **[RFC6838]** IANA. “Media Types,” *RFC 6838*, June 2013.
 - **ISO/IEC 24760-1:2019**, “IT Security – A framework for identity management – Part 1: Terminology and concepts.”
-- **OpenID Connect Core 1.0** – “OpenID Connect Core 1.0 incorporating errata set 1,” available at <https://openid.net/specs/openid-connect-core-1_0.html>.
+- **OpenID.Core** – “OpenID Connect Core 1.0 incorporating errata set 1,” available at <https://openid.net/specs/openid-connect-core-1_0.html>.
+- **OpenID.Enterprise** – "OpenID Connect Enterprise Extensions 1.0," available at <https://openid.net/specs/openid-connect-enterprise-extensions-1_0.html>.
 
 ## Informative References
 
