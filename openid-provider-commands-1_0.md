@@ -414,45 +414,45 @@ Cache-Control: no-cache
 If the request is invalid or the `callback_token` is invalid, the OP MUST respond with an error per [RFC6750](#RFC6750).
 
 ## Activate Command
-Identified by the `activate` or `activate_audit` value in the `command` Claim in a Command Token.
+Identified by the `activate` or `activate_async` value in the `command` Claim in a Command Token.
 
 The RP MUST create an Account with the included Claims in the identity register. The Account MUST be in the **unknown** state. The Account is in the **active** state after successful processing.
 
 ## Maintain Command
-Identified by the `maintain` or `maintain_audit` value in the `command` Claim in a Command Token.
+Identified by the `maintain` or `maintain_async` value in the `command` Claim in a Command Token.
 
 The RP MUST update an existing Account in the identity register with the included Claims. The Account MUST be in the **active** state. The Account remains in the **active** state after successful processing.
 
 ## Suspend Command
-Identified by the `suspend` or `suspend_audit` value in the `command` Claim in a Command Token.
+Identified by the `suspend` or `suspend_async` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account and mark the Account as being temporarily unavailable in the identity register. The Account MUST be in the **active** state. The Account is in the **suspended** state after successful processing.
 
 
 ## Reactivate Command
-Identified by the `reactivate` or `reactivate_audit` value in the `command` Claim in a Command Token.
+Identified by the `reactivate` or `reactivate_async` value in the `command` Claim in a Command Token.
 
 The RP MUST mark a suspended Account as being active in the identity register. The Account MUST be in the **suspended** state. The Account is in the **active** state after successful processing. The RP SHOULD support the Reactivate Command if it supports the Suspend Command.
 
 ## Archive Command
-Identified by the `archive` or `archive_audit` value in the `command` Claim in a Command Token.
+Identified by the `archive` or `archive_async` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account and remove the Account from the identity register. The Account MUST be in either the **active** or **suspended** state. The Account is in the **archived** state after successful processing.
 
 
 
 ## Restore Command
-Identified by the `restore` or `restore_audit` value in the `command` Claim in a Command Token.
+Identified by the `restore` or `restore_async` value in the `command` Claim in a Command Token.
 
 The RP MUST restore an archived Account to the identity register and mark it as being active. The Account MUST be in the **archived** state. The Account is in the **active** state after successful processing. The RP SHOULD support the Restore Command if it suppSs the chA Comma.
 
 ## Delete Command
-Identified by the `delete` or `delete_audit` value in the `command` Claim in a Command Token.
+Identified by the `delete` or `delete_async` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account, and delete all data associated with an Account. The Account can be in any state except **unknown**. The Account is in the **unknown** state after successful processing.
 
 ## Audit Command
-Identified by the `audit` or `audit_audit` value in the `command` Claim of a Command Token.
+Identified by the `audit` or `audit_async` value in the `command` Claim of a Command Token.
 
 The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns `unknown` state. 
 
@@ -460,7 +460,7 @@ The RP MAY include a `last_access` claim, a NumericDate, representing the number
 
 ## Unauthorize Command
 
-Identified by the `unauthorize` or `unauthorize_audit` value in the `command` Claim in a Command Token.
+Identified by the `unauthorize` or `unauthorize_async` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account.
 The OP MAY send this Command when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, if the user's device was compromised, or any other security related concern about the account. 
