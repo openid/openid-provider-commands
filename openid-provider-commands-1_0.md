@@ -49,8 +49,8 @@ For example, many jurisdictions grant end-users the "right to be forgotten," ena
 
 In scenarios where malicious activity is detected or suspected, OPs play a vital role in protecting end-users. They may need to instruct RPs to revoke authorization or delete Accounts created by malicious actors. This helps contain the impact of unauthorized actions and prevent further misuse of compromised Accounts.
 
-In enterprise environments, where organizations centrally manage workforce access, OPs handle essential Account operations across various stages of the lifecycle. These operations include activating, maintaining, suspending, reactivating, archiving, restoring, and deleting Accounts to maintain security and compliance. Additional, enterprises want to take over management of the accounts its employees may have created at an RP.
-
+In enterprise environments, where organizations centrally manage workforce access, OPs handle essential Account operations across various stages of the lifecycle. These operations include activating, maintaining, suspending, reactivating, archiving, restoring, and deleting Accounts to maintain security and compliance. Additionally, enterprises want to take over account lifecycle management of accounts its employees may have previously created at an RP.
+  
 OpenID Provider Commands are a remote procedure call from the OP to the RP that enables OPs to manage the Account lifecycle, building upon the existing OP / RP relationship to cover the full spectrum of Account management requirements.
 
 
@@ -112,9 +112,19 @@ If the RP supports the Manage Command, the OP will send the Manage Command to re
 
 A Tenant with Accounts managed by individuals will typically only support the Metadata, Unauthorize, and Delete Commands.
 
-# Account Resolution 
+# Account Resolution
 
-Account Resolution is the process by which an OP and RP establish a bidirectional mapping between their respective account identifiers. When an OP receives an `aud_sub` value from an RP in response to commands such as Audit, the OP learns the RP's internal identifier for that account. This enables the OP to include the `aud_sub` claim in subsequent Command Tokens, allowing the RP to execute commands using its own identifiers rather than maintaining foreign key relationships based on the OP's `iss` and `sub` values. This simplifies RP implementation by eliminating the need to store and manage external identifiers, while still maintaining the ability to correlate accounts across systems. Account Resolution also facilitates account management handover through the `manage` command, where an OP can request to take management responsibility for an account, with the RP indicating current management status through the `managed_by` claim in its responses.
+Account Resolution is the process by which an OP and RP establish a bidirectional mapping between their respective account identifiers. When an OP receives an `aud_sub` value from an RP in response to commands such as Audit, the OP learns the RP's internal identifier for that account. This enables the OP to include the `aud_sub` claim in subsequent Command Tokens, allowing the RP to execute commands using its own identifiers rather than maintaining foreign key relationships based on the OP's `iss` and `sub` values. This simplifies RP implementation by eliminating the need to store and manage external identifiers, while still maintaining the ability to correlate accounts across systems. 
+
+
+# Management Transfer 
+
+Account Resolution facilitates account management handover through the `manage` command, where an OP can request to take management responsibility for an account, with the RP indicating current management status through the `managed_by` claim in its `audit` and `tenant_tenant` responses.
+
+An RP MUST deny any Account Command from an OP on an account identified by an `aud_sub` where `managed_by` is not the OP. The RP MUST not perform any Tenant Command on any account by an OP where `managed_by` is not the OP.
+
+> 
+> Account / identity lifecycle and login / session lifecycle can be managed independently -- perhaps we need more granularity? IE `lifecycle_managed_by` and `session_managed_by` ???
 
 # Command Request
 
@@ -233,11 +243,11 @@ The following Claims are used within the Command Token:
 
 - **callback_token**  
   OPTIONAL in an Asynchronous Command and the `metadata` command.  
-  An OP generated unique and opaque token for the RP to use when calling the OP's **callback_endpoint** Asynchronous Command responses and making a metadata refresh request.
+  A JSON String. An OP generated unique and opaque token for the RP to use when calling the OP's **callback_endpoint** Asynchronous Command responses and making a metadata refresh request.
 
 - **aud_sub**  
   OPTIONAL for Account Commands.  
-  The RP's internal identifier for the Account, as provided by the RP during account resolution. When present, the RP SHOULD use this value to identify the Account rather than the combination of `iss` and `sub`. This claim facilitates more efficient account lookup and management at the RP.
+  A JSON String. The RP's internal identifier for the Account, as provided by the RP during account resolution. When present, the RP SHOULD use this value to identify the Account rather than the combination of `iss` and `sub`. This claim facilitates more efficient account lookup and management at the RP.
   
 
 
@@ -357,7 +367,7 @@ Following are the potential state transitions:
 
 ## Success Response
 
-When an RP successful processes an Account Command, the RP returns the `HTTP 200 OK` response and a JSON object containing the following claims:
+When an RP successfully processes an Account Command, the RP returns the `HTTP 200 OK` response and a JSON object containing the following claims:
 
 -  the provided `sub`
 -  the `account_state` set to the state of the Account after processing
@@ -367,8 +377,8 @@ When an RP successful processes an Account Command, the RP returns the `HTTP 200
 The `managed_by` claim MUST be set to one of the following values:
 
 - `RP` if the account is managed by the RP
-- `OP` if the account is managed by the OP
-- `other` if the account is managed by a party other than the RP or OP
+- `OP` if the account is managed by the OP tenant in the Command
+- `other` if the account is managed by a party other than the RP or OP tenant
 - `unknown` if it is unknown which party manages the account
 
 Following is a non-normative response body to a successful Activate Command:
