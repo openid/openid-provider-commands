@@ -1114,7 +1114,7 @@ This specification registers the `application/command+jwt` media type as per {{!
 - **[RFC8725]** Bromberg, L. “Security Considerations for JSON Web Tokens,” *RFC 8725*, June 2020.
 - **[RFC6838]** IANA. “Media Types,” *RFC 6838*, June 2013.
 - **ISO/IEC 24760-1:2019**, “IT Security – A framework for identity management – Part 1: Terminology and concepts.”
-- **OpenID.Core** – “OpenID Connect Core 1.0 incorporating errata set 1,” available at <https://openid.net/specs/openid-connect-core-1_0.html>.
+- **OpenID.Core** – “OpenID Connect Core 1.0 incorporating errata set 2,” available at <https://openid.net/specs/openid-connect-core-1_0.html>.
 - **OpenID.Enterprise** – "OpenID Connect Enterprise Extensions 1.0," available at <https://openid.net/specs/openid-connect-enterprise-extensions-1_0.html>.
 
 ## Informative References
