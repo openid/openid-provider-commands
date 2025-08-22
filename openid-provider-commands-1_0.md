@@ -700,7 +700,7 @@ Following is a non-normative example of Command Response for a Metadata Command:
   },
   "command_endpoint": "https://rp.example.net/command",
   "commands_supported":[
-    "describe",
+    "audit_tenant",
     "unauthorize",
     "suspend",
     "reactivate",
@@ -712,7 +712,7 @@ Following is a non-normative example of Command Response for a Metadata Command:
     "email",
     "email_verified",
     "name",
-    "groups"
+    "roles"
   ],
   "roles": [
           {
@@ -730,7 +730,7 @@ Following is a non-normative example of Command Response for a Metadata Command:
         "display": "Reader",
         "description": "Read posts"
       }
-  ]
+  ],
   "client_id": "s6BhdRkqt3",
   "client_name": "Example RP",
   "logo_uri": "https://rp.example.net/logo.png",
@@ -822,7 +822,7 @@ If there are no Accounts for the Tenant at the RP, the RP responds with only the
 
 The following is a non-normative example of a Streaming Response for an Audit Tenant Command:
 
-```text
+```bash
   HTTP/1.1 200 OK
   Content-Type: text/event-stream
   Cache-Control: no-cache
@@ -900,7 +900,8 @@ The following is a non-normative example of the Claims Set in the Command Token 
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJz",
-  "command": "audit_tenant"
+  "command": "audit_tenant",
+  "callback_token": "eyhwixm236djs9shne9sjdnjs9dhbsk"
 }
 ```
 
@@ -912,6 +913,32 @@ The RP sends a Streaming Response if it received a valid Suspend Tenant Command.
 The RP MUST include any Claims for an Account that the RP has retained that were provided by the OP in the event `data` parameter JSON string. If the Claim values have been modified at the RP, the modified values should be returned. 
 
 The RP MAY include a `last_access` claim, a NumericDate, representing the number of seconds from 1970-01-01T00:00:00Z UTC. The value MUST be an integer and is equivalent to the iat and exp claims as defined in [RFC7519](#RFC7519).
+
+
+## Audit Tenant Refresh Request
+
+If the OP provided a `callback_endpoint` and a `callback_token` in its last `audit_tenant` Command, the RP may request the the OP to perform a new `audit_tenant` command. One motivation for the RP to make this request is there have been changes to accounts. 
+
+The RP does an HTTP POST to the **callback_endpoint** passing the `callback_token` as a bearer token in the HTTP `Authorize` header with a `content-type` of `application/json` and a JSON string with `command_requested` set to `audit_tenant`.
+
+Following is a non-normative example:
+
+```
+POST /callback HTTP/1.1
+Host: op.example.org
+Authorization: Bearer eyhwixm236djs9shne9sjdnjs9dhbsk
+Content-Type: application/json
+Accept: application/json
+Cache-Control: no-cache
+
+{ 
+  "command_requested": "audit_tenant"
+}
+```
+
+If the `callback_token` is valid, the OP MUST respond with an HTTP 204 No Content response.
+
+If the `callback_token` is not valid, or the content of the request body is not valid, the OP MUST respond with an error per [RFC6750](#RFC6750).
 
 ## Suspend Tenant Command
 
