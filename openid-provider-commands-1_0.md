@@ -32,7 +32,7 @@ organization="Independent"
 
 OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP
 
-OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, and unauthorize an end-user Account, and take over management of an existing account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
+OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, unauthorize an end-user Account, and migrate authentication of an existing account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
 
 
 {mainmatter}
@@ -49,7 +49,7 @@ For example, many jurisdictions grant end-users the "right to be forgotten," ena
 
 In scenarios where malicious activity is detected or suspected, OPs play a vital role in protecting end-users. They may need to instruct RPs to revoke authorization or delete Accounts created by malicious actors. This helps contain the impact of unauthorized actions and prevent further misuse of compromised Accounts.
 
-In enterprise environments, where organizations centrally manage workforce access, OPs handle essential Account operations across various stages of the lifecycle. These operations include activating, maintaining, suspending, reactivating, archiving, restoring, and deleting Accounts to maintain security and compliance. Additionally, enterprises want to take over account lifecycle management of accounts its employees may have previously created at an RP.
+In enterprise environments, where organizations centrally manage workforce access, OPs need to establish control over existing employee accounts at RPs. First, the OP must establish a bidirectional mapping between its account identifiers and the RP's internal identifiers through account resolution, enabling both parties to refer to the same specific account. Once this identifier resolution is complete, enterprises can migrate authentication responsibility for accounts their employees may have previously created using RP-managed credentials or other authentication methods. With authentication control and identifier mapping established, the OP can then handle essential Account operations across various stages of the lifecycle, including activating, maintaining, suspending, reactivating, archiving, restoring, and deleting Accounts to maintain security and compliance.
   
 OpenID Provider Commands are a remote procedure call from the OP to the RP that enables OPs to manage the Account lifecycle, building upon the existing OP / RP relationship to cover the full spectrum of Account management requirements.
 
@@ -92,7 +92,7 @@ This specification defines the following terms:
 
 This specification defines a Command Request containing a Command Token sent from the OP to the RP, and a Command Response returned from the RP to the OP.
 
-```
+```bash
 +------+  Command request       +------+
 |      |---- Command Token ---->|      |
 |  OP  |                        |  RP  | 
@@ -100,31 +100,74 @@ This specification defines a Command Request containing a Command Token sent fro
 +------+      Command response  +------+
 ```
 
-## Command Usage Overview
+The OP may provide a callback endpoint and a callback token for the RP to request a command be sent by the OP such as a metadata or audit_tenant command, or to send the results of an asynchronous command. 
 
-An OP will typically send a Metadata Command at the start of the relationship between a Tenant and an RP to share the OP's capabilities and metadata and to learn the Commands an RP supports, and other RP metadata. The OP will typically send the Metadata Command when there is a change in the OP capabilities or metadata, and periodically to learn of any RP changes. The OP may use the response from the Metadata Command to determine if the RP supports functionality required by the Tenant before issuing ID Tokens or Activate Commands to the RP.
-
-If the RP supports any Account Commands, the OP will send supported Account Commands to synchronize the state of Accounts at the RP with the state at the Tenant. If the RP supports Account Commands, the RP should also support the Audit Tenant Commands. The OP will typically send an Audit Tenant Command at the start of the Tenant and RP relationship, and then periodically, to learn the state of the Tenant's Accounts at the RP and correct any drift between the Account state at the Tenant and the RP.
-
-If the RP supports the Unauthorize Command, the OP will send the Unauthorize Command if the OP suspects an Account has been taken over by a malicious actor.
-
-If the RP supports the Manage Command, the OP will send the Manage Command to request management handover of an Account. This enables an enterprise OP to take over management of accounts that employees may have previously created at the RP.
-
-A Tenant with Accounts managed by individuals will typically only support the Metadata, Unauthorize, and Delete Commands.
-
-# Account Resolution
-
-Account Resolution is the process by which an OP and RP establish a bidirectional mapping between their respective account identifiers. When an OP receives an `aud_sub` value from an RP in response to commands such as Audit, the OP learns the RP's internal identifier for that account. This enables the OP to include the `aud_sub` claim in subsequent Command Tokens, allowing the RP to execute commands using its own identifiers rather than maintaining foreign key relationships based on the OP's `iss` and `sub` values. This simplifies RP implementation by eliminating the need to store and manage external identifiers, while still maintaining the ability to correlate accounts across systems. 
+```bash
++------+             Callback   +------+
+|      |<--- Callback Token ----|      |
+|  OP  |                        |  RP  | 
+|      |----------------------->|      |
++------+  204 or error response +------+
+```
 
 
-# Management Transfer 
+## Command Use Cases
 
-Account Resolution facilitates account management handover through the `manage` command, where an OP can request to take management responsibility for an account, with the RP indicating current management status through the `managed_by` claim in its `audit` and `tenant_tenant` responses.
+OpenID Provider Commands support several distinct use cases, each with different command sequences and requirements. Understanding these use cases helps implementers determine which commands to support and how to sequence them effectively.
 
-An RP MUST deny any Account Command from an OP on an account identified by an `aud_sub` where `managed_by` is not the OP. The RP MUST not perform any Tenant Command on any account by an OP where `managed_by` is not the OP.
+### Personal Applications
 
-> 
-> Account / identity lifecycle and login / session lifecycle can be managed independently -- perhaps we need more granularity? IE `lifecycle_managed_by` and `session_managed_by` ???
+Personal applications serve individual users who manage their own accounts. In this scenario, accounts are created and managed by end-users rather than organizations.
+
+**Supported Commands**: Metadata, Unauthorize, Delete
+
+**Typical Command Sequence**:
+1. **Metadata Command** - Establish capabilities between OP and RP
+2. **Unauthorize Command** - Revoke access if account compromise is suspected  
+3. **Delete Command** - Remove account and data upon user request (e.g., "right to be forgotten")
+
+### Enterprise Application Migration
+
+When organizations implement new identity providers or undergo mergers/acquisitions, they need to migrate authentication responsibility for existing accounts. This commonly occurs when individual users initially create accounts with RP-managed credentials, and organizations later need to centralize authentication under their corporate identity provider.
+
+**Migration from RP-managed to OP-managed Authentication**:
+1. **Metadata Command** - Establish OP capabilities with target RP
+2. **Audit Tenant Command** - Identify accounts requiring migration and establish account resolution
+3. **Migrate Command** - Assume authentication responsibility for existing RP-managed accounts
+4. **Account Lifecycle Commands** - Manage migrated accounts through their lifecycle
+
+**Account Resolution in Migration**: Account Resolution is the process by which an OP and RP establish a bidirectional mapping between their respective account identifiers. When an OP receives an `aud_sub` value from an RP in response to commands such as Audit, the OP learns the RP's internal identifier for that account. This enables the OP to include the `aud_sub` claim in subsequent Command Tokens, allowing the RP to execute commands using its own identifiers rather than maintaining foreign key relationships based on the OP's `iss` and `sub` values. This simplifies RP implementation by eliminating the need to store and manage external identifiers, while still maintaining the ability to correlate accounts across systems.
+
+**Authentication Migration Process**: Authentication Migration enables an OP to become the authentication provider for existing accounts through the Migrate Command. This process is essential during organizational migrations, acquisitions, or when implementing centralized identity governance policies. Account Resolution facilitates an OP becoming the authentication provider for an account with the Migrate Command.
+
+### Enterprise Application Integration
+
+Enterprise applications that are integrated with organizational identity providers need ongoing account management as employees join, change roles, or leave the organization.
+
+**Supported Commands**: Metadata, Audit Tenant, Account Lifecycle Commands (Activate, Maintain, Suspend, Reactivate, Archive, Restore, Delete), Unauthorize, Migrate
+
+**Typical Command Sequence**:
+1. **Metadata Command** - Exchange capabilities and establish relationship
+2. **Audit Tenant Command** - Discover existing accounts and establish account resolution
+3. **Account Lifecycle Commands** - Synchronize account states between OP and RP
+4. **Periodic Audit Commands** - Maintain synchronization and correct drift
+
+### Compliance Auditing
+
+Compliance scenarios involve OPs auditing RPs to verify proper account management and regulatory compliance without taking over account management responsibilities.
+
+**Audit-Only Sequence**:
+1. **Metadata Command** - Establish audit capabilities
+2. **Audit Tenant Command** - Review account states and compliance posture
+3. **Periodic Audit Commands** - Ongoing compliance monitoring
+
+### Security Incident Response
+
+When security incidents occur, OPs may need to rapidly revoke access across multiple RPs to contain potential breaches.
+
+**Incident Response**:
+1. **Unauthorize Command** - Immediately revoke access for compromised accounts
+2. **Suspend/Archive Commands** - Temporarily or permanently disable affected accounts
 
 # Command Request
 
@@ -319,7 +362,7 @@ A non-normative example JWT Claims Set for the Command Token for an Unauthorize 
 
 # Account Commands
 
-Account Commands that operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` Claim if provided by the RP during account resolution, or the `iss` and `sub` Claims. Account Commands include Lifecycle Commands and the Unauthorize Command.
+Account Commands that operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` Claim if provided by the RP during account resolution, or the `iss` and `sub` Claims. Account Commands include Lifecycle Commands, the Unauthorize Command, and the Migrate Command.
 
 
 ## Account Lifecycle States
@@ -372,14 +415,6 @@ When an RP successfully processes an Account Command, the RP returns the `HTTP 2
 -  the provided `sub`
 -  the `account_state` set to the state of the Account after processing
 -  the RP's `aud_sub` if the RP has set `aud_sub_required` in its metadata
--  the `managed_by` state if the RP supports the `managed` command. 
-
-The `managed_by` claim MUST be set to one of the following values:
-
-- `RP` if the account is managed by the RP
-- `OP` if the account is managed by the OP tenant in the Command
-- `other` if the account is managed by a party other than the RP or OP tenant
-- `unknown` if it is unknown which party manages the account
 
 Following is a non-normative response body to a successful Activate Command:
 
@@ -496,6 +531,15 @@ The RP MUST include the state of the Account and any Claims for an Account that 
 
 The RP MAY include a `last_access` claim, a NumericDate, representing the number of seconds from 1970-01-01T00:00:00Z UTC. The value MUST be an integer and is equivalent to the iat and exp claims as defined in [RFC7519](#RFC7519).
 
+The RP MAY include an `authentication_provider` claim that represents which party or parties can authenticate the user:
+
+- **rp**: The Account can only be authenticated directly by the RP (e.g., username/password, RP-managed MFA)
+- **op**: The Account can only be authenticated by the requesting OP tenant
+- **op_migration**: The Account can be authenticated by either the RP or the OP tenant
+- **external**: The Account is authenticated by a different external authentication provider
+- **unknown**: The RP does not know, or does not want to share who the authentication provider is
+
+
 ## Unauthorize Command
 
 Identified by the `unauthorize` or `unauthorize_audit` value in the `command` Claim in a Command Token.
@@ -512,28 +556,28 @@ The functionality of the Unauthorize Command is also performed by Suspend, Archi
 
 The RP MUST revoke all active sessions and MUST reverse all authorization that may have been granted to applications, including `offline_access`, for Account resources identified by the `sub`.
 
-## Manage Command
+## Migrate Command
 
-Identified by the `manage` or `manage_async` value in the `command` Claim in a Command Token.
+Identified by the `migrate` or `migrate_async` value in the `command` Claim in a Command Token.
 
-The OP sends this Command to request a change in management responsibility for an Account. The Command Token MUST include the following additional claim:
+The OP sends this Command to request to become the authentication provider for an existing Account. The Command Token MUST include the following additional claim:
 
-- **managed_by**  
+- **authentication_provider**  
   REQUIRED.  
-  A JSON string indicating the requested management state. MUST be set to `OP` if the OP wants to take over management of the Account, or `RP` if the OP wants to hand management back to the RP.
+  A JSON string indicating the requested authentication provider status. MUST be set to `op` if the OP wants to become the sole authentication provider for the Account, or `op_migration` if the OP wants to enable dual authentication where both the OP and existing authentication methods remain valid.
 
-The RP processes the Manage Command based on the current management state of the Account and the requested `managed_by` value:
+The RP processes the Migrate Command based on the current authentication provider status of the Account and organizational policies:
 
-- If `managed_by` is `OP` and the RP allows the OP to take over management, the RP updates the Account's management status to indicate it is managed by the OP.
-- If `managed_by` is `RP` and the Account is currently managed by the requesting OP, and the RP will take over management, the RP updates the Account's management status to indicate it is managed by the RP.
+- If `authentication_provider` is `op` and the RP allows the migration, the RP updates the Account's authentication provider status to `op`, disabling other authentication methods.
+- If `authentication_provider` is `op_migration` and the RP supports dual authentication, the RP adds the OP as an additional authentication provider while maintaining existing authentication methods. Dual authentication with `op_migration` SHOULD be a temporary state used to provide a seamless migration from RP to OP as the authentication provider.
 
 ### Access Denied Error
 
-If the RP does not allow the OP to change management of the Account, the RP MUST return an HTTP 403 Forbidden response and include the `error` parameter with the value of `access_denied`.
+If the RP does not allow the OP to migrate authentication for the Account, the RP MUST return an HTTP 403 Forbidden response and include the `error` parameter with the value of `access_denied`.
 
-### Management Not Transferable Error
+### Authentication Not Transferable Error
 
-If the Account is currently managed by a party that does not allow changes in management responsibility (e.g., managed by a different OP or external system), the RP MUST return an HTTP 409 Conflict response and include the `error` parameter with the value of `management_not_transferable`.
+If the Account's current authentication provider does not allow changes in authentication responsibility (e.g., managed by a different OP or external system with non-transferable policies), the RP MUST return an HTTP 409 Conflict response and include the `error` parameter with the value of `authentication_not_transferable`.
 
 
 # Tenant Commands
@@ -1102,14 +1146,6 @@ established by [RFC7519](#RFC7519).
 
 **Specification Document(s):** This document
 
-- **Claim Name:** `managed_by`
-
-**Claim Description:**
-  Indicates which party has management responsibility for an account, with values including OP, RP, other, or unknown.
-  
-**Change Controller:** OpenID Foundation
-
-**Specification Document(s):** This document
 
 
 ## OAuth Dynamic Client Registration Metadata Registration
