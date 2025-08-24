@@ -2029,7 +2029,7 @@ Cache-Control: no-cache
         <h3 id="name-activate-command">
 <a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-activate-command" class="section-name selfRef">Activate Command</a>
         </h3>
-<p id="section-5.5-1">Identified by the <code>activate</code> or <code>activate_audit</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-1">Identified by the <code>activate</code> or <code>activate_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
 <p id="section-5.5-2">The RP MUST create an Account with the included Claims in the identity register. The Account MUST be in the <strong>unknown</strong> state. The Account is in the <strong>active</strong> state after successful processing.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2038,7 +2038,7 @@ Cache-Control: no-cache
         <h3 id="name-maintain-command">
 <a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-maintain-command" class="section-name selfRef">Maintain Command</a>
         </h3>
-<p id="section-5.6-1">Identified by the <code>maintain</code> or <code>maintain_audit</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
+<p id="section-5.6-1">Identified by the <code>maintain</code> or <code>maintain_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
 <p id="section-5.6-2">The RP MUST update an existing Account in the identity register with the included Claims. The Account MUST be in the <strong>active</strong> state. The Account remains in the <strong>active</strong> state after successful processing.<a href="#section-5.6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2047,7 +2047,7 @@ Cache-Control: no-cache
         <h3 id="name-suspend-command">
 <a href="#section-5.7" class="section-number selfRef">5.7. </a><a href="#name-suspend-command" class="section-name selfRef">Suspend Command</a>
         </h3>
-<p id="section-5.7-1">Identified by the <code>suspend</code> or <code>suspend_audit</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
+<p id="section-5.7-1">Identified by the <code>suspend</code> or <code>suspend_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
 <p id="section-5.7-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account and mark the Account as being temporarily unavailable in the identity register. The Account MUST be in the <strong>active</strong> state. The Account is in the <strong>suspended</strong> state after successful processing.<a href="#section-5.7-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2056,7 +2056,7 @@ Cache-Control: no-cache
         <h3 id="name-reactivate-command">
 <a href="#section-5.8" class="section-number selfRef">5.8. </a><a href="#name-reactivate-command" class="section-name selfRef">Reactivate Command</a>
         </h3>
-<p id="section-5.8-1">Identified by the <code>reactivate</code> or <code>reactivate_audit</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.8-1" class="pilcrow">¶</a></p>
+<p id="section-5.8-1">Identified by the <code>reactivate</code> or <code>reactivate_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.8-1" class="pilcrow">¶</a></p>
 <p id="section-5.8-2">The RP MUST mark a suspended Account as being active in the identity register. The Account MUST be in the <strong>suspended</strong> state. The Account is in the <strong>active</strong> state after successful processing. The RP SHOULD support the Reactivate Command if it supports the Suspend Command.<a href="#section-5.8-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2065,7 +2065,7 @@ Cache-Control: no-cache
         <h3 id="name-archive-command">
 <a href="#section-5.9" class="section-number selfRef">5.9. </a><a href="#name-archive-command" class="section-name selfRef">Archive Command</a>
         </h3>
-<p id="section-5.9-1">Identified by the <code>archive</code> or <code>archive_audit</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.9-1" class="pilcrow">¶</a></p>
+<p id="section-5.9-1">Identified by the <code>archive</code> or <code>archive_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.9-1" class="pilcrow">¶</a></p>
 <p id="section-5.9-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account and remove the Account from the identity register. The Account MUST be in either the <strong>active</strong> or <strong>suspended</strong> state. The Account is in the <strong>archived</strong> state after successful processing.<a href="#section-5.9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2074,7 +2074,7 @@ Cache-Control: no-cache
         <h3 id="name-restore-command">
 <a href="#section-5.10" class="section-number selfRef">5.10. </a><a href="#name-restore-command" class="section-name selfRef">Restore Command</a>
         </h3>
-<p id="section-5.10-1">Identified by the <code>restore</code> or <code>restore_audit</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.10-1" class="pilcrow">¶</a></p>
+<p id="section-5.10-1">Identified by the <code>restore</code> or <code>restore_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.10-1" class="pilcrow">¶</a></p>
 <p id="section-5.10-2">The RP MUST restore an archived Account to the identity register and mark it as being active. The Account MUST be in the <strong>archived</strong> state. The Account is in the <strong>active</strong> state after successful processing. The RP SHOULD support the Restore Command if it suppSs the chA Comma.<a href="#section-5.10-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2083,7 +2083,7 @@ Cache-Control: no-cache
         <h3 id="name-delete-command">
 <a href="#section-5.11" class="section-number selfRef">5.11. </a><a href="#name-delete-command" class="section-name selfRef">Delete Command</a>
         </h3>
-<p id="section-5.11-1">Identified by the <code>delete</code> or <code>delete_audit</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.11-1" class="pilcrow">¶</a></p>
+<p id="section-5.11-1">Identified by the <code>delete</code> or <code>delete_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.11-1" class="pilcrow">¶</a></p>
 <p id="section-5.11-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account, and delete all data associated with an Account. The Account can be in any state except <strong>unknown</strong>. The Account is in the <strong>unknown</strong> state after successful processing.<a href="#section-5.11-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2092,7 +2092,7 @@ Cache-Control: no-cache
         <h3 id="name-audit-command">
 <a href="#section-5.12" class="section-number selfRef">5.12. </a><a href="#name-audit-command" class="section-name selfRef">Audit Command</a>
         </h3>
-<p id="section-5.12-1">Identified by the <code>audit</code> or <code>audit_audit</code> value in the <code>command</code> Claim of a Command Token.<a href="#section-5.12-1" class="pilcrow">¶</a></p>
+<p id="section-5.12-1">Identified by the <code>audit</code> or <code>audit_async</code> value in the <code>command</code> Claim of a Command Token.<a href="#section-5.12-1" class="pilcrow">¶</a></p>
 <p id="section-5.12-2">The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns <code>unknown</code> state.<a href="#section-5.12-2" class="pilcrow">¶</a></p>
 <p id="section-5.12-3">The RP MAY include a <code>last_access</code> claim, a NumericDate, representing the number of seconds from 1970-01-01T00:00:00Z UTC. The value MUST be an integer and is equivalent to the iat and exp claims as defined in <a href="#RFC7519">RFC7519</a>.<a href="#section-5.12-3" class="pilcrow">¶</a></p>
 <p id="section-5.12-4">The RP MAY include an <code>authentication_provider</code> claim that represents which party or parties can authenticate the user:<a href="#section-5.12-4" class="pilcrow">¶</a></p>
