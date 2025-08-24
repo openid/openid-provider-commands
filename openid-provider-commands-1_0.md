@@ -32,7 +32,7 @@ organization="Independent"
 
 OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP
 
-OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, unauthorize an end-user Account, and migrate authentication of an existing account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
+OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, invalidate an end-user Account, and migrate authentication of an existing account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
 
 
 {mainmatter}
@@ -119,11 +119,11 @@ OpenID Provider Commands support several distinct use cases, each with different
 
 Personal applications serve individual users who manage their own accounts. In this scenario, accounts are created and managed by end-users rather than organizations.
 
-**Supported Commands**: Metadata, Unauthorize, Delete
+**Supported Commands**: Metadata, Invalidate, Delete
 
 **Typical Command Sequence**:
 1. **Metadata Command** - Establish capabilities between OP and RP
-2. **Unauthorize Command** - Revoke access if account compromise is suspected  
+2. **Invalidate Command** - Invalidate all sessions and tokens if account compromise is suspected  
 3. **Delete Command** - Remove account and data upon user request (e.g., "right to be forgotten")
 
 ### Enterprise Application Migration
@@ -144,7 +144,7 @@ When organizations implement new identity providers or undergo mergers/acquisiti
 
 Enterprise applications that are integrated with organizational identity providers need ongoing account management as employees join, change roles, or leave the organization.
 
-**Supported Commands**: Metadata, Audit Tenant, Account Lifecycle Commands (Activate, Maintain, Suspend, Reactivate, Archive, Restore, Delete), Unauthorize, Migrate
+**Supported Commands**: Metadata, Audit Tenant, Account Lifecycle Commands (Activate, Maintain, Suspend, Reactivate, Archive, Restore, Delete), Invalidate, Migrate
 
 **Typical Command Sequence**:
 1. **Metadata Command** - Exchange capabilities and establish relationship
@@ -166,8 +166,8 @@ Compliance scenarios involve OPs auditing RPs to verify proper account managemen
 When security incidents occur, OPs may need to rapidly revoke access across multiple RPs to contain potential breaches.
 
 **Incident Response**:
-1. **Unauthorize Command** - Immediately revoke access for compromised accounts
-2. **Suspend/Archive Commands** - Temporarily or permanently disable affected accounts
+1. **Invalidate Command** - Immediately invalidate all sessions and tokens for a compromised account
+2. **Suspend/Archive Commands** - Temporarily or permanently disable an affected account
 
 # Command Request
 
@@ -343,7 +343,7 @@ A non-normative example JWT Claims Set for the Command Token for an Activate Com
 }
 ```
 
-A non-normative example JWT Claims Set for the Command Token for an Unauthorize Command follows:
+A non-normative example JWT Claims Set for the Command Token for an Invalidate Command follows:
 
 ```json
 {
@@ -353,7 +353,7 @@ A non-normative example JWT Claims Set for the Command Token for an Unauthorize 
   "iat": 1734004000,
   "exp": 1734004060,
   "jti": "bWJr",
-  "command": "unauthorize",
+  "command": "invalidate",
   "sub": "248289761001"
 }
 ```
@@ -362,7 +362,7 @@ A non-normative example JWT Claims Set for the Command Token for an Unauthorize 
 
 # Account Commands
 
-Account Commands that operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` Claim if provided by the RP during account resolution, or the `iss` and `sub` Claims. Account Commands include Lifecycle Commands, the Unauthorize Command, and the Migrate Command.
+Account Commands that operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` Claim if provided by the RP during account resolution, or the `iss` and `sub` Claims. Account Commands include Lifecycle Commands, the Invalidate Command, and the Migrate Command.
 
 
 ## Account Lifecycle States
@@ -499,7 +499,7 @@ The RP MUST update an existing Account in the identity register with the include
 ## Suspend Command
 Identified by the `suspend` or `suspend_audit` value in the `command` Claim in a Command Token.
 
-The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account and mark the Account as being temporarily unavailable in the identity register. The Account MUST be in the **active** state. The Account is in the **suspended** state after successful processing.
+The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on the Account and mark the Account as being temporarily unavailable in the identity register. The Account MUST be in the **active** state. The Account is in the **suspended** state after successful processing.
 
 
 ## Reactivate Command
@@ -510,7 +510,7 @@ The RP MUST mark a suspended Account as being active in the identity register. T
 ## Archive Command
 Identified by the `archive` or `archive_audit` value in the `command` Claim in a Command Token.
 
-The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account and remove the Account from the identity register. The Account MUST be in either the **active** or **suspended** state. The Account is in the **archived** state after successful processing.
+The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on the Account and remove the Account from the identity register. The Account MUST be in either the **active** or **suspended** state. The Account is in the **archived** state after successful processing.
 
 
 
@@ -522,7 +522,7 @@ The RP MUST restore an archived Account to the identity register and mark it as 
 ## Delete Command
 Identified by the `delete` or `delete_audit` value in the `command` Claim in a Command Token.
 
-The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account, and delete all data associated with an Account. The Account can be in any state except **unknown**. The Account is in the **unknown** state after successful processing.
+The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on the Account, and delete all data associated with an Account. The Account can be in any state except **unknown**. The Account is in the **unknown** state after successful processing.
 
 ## Audit Command
 Identified by the `audit` or `audit_audit` value in the `command` Claim of a Command Token.
@@ -540,21 +540,21 @@ The RP MAY include an `authentication_provider` claim that represents which part
 - **unknown**: The RP does not know, or does not want to share who the authentication provider is
 
 
-## Unauthorize Command
+## Invalidate Command
 
-Identified by the `unauthorize` or `unauthorize_audit` value in the `command` Claim in a Command Token.
+Identified by the `invalidate` or `invalidate_audit` value in the `command` Claim in a Command Token.
 
-The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account.
+The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on the Account.
 The OP MAY send this Command when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, if the user's device was compromised, or any other security related concern about the account. 
 
 
 The Account MUST be in the **active** state, and remains in the **active** state after executing the Command. If the Account is in any other state, the RP MUST return an [Incompatible State Response](#incompatible-state-response).
 
-The functionality of the Unauthorize Command is also performed by Suspend, Archive, and Delete Commands to ensure an Account in the **suspended**, **archived**, and **unknown** state no longer has access to resources.
+The functionality of the Invalidate Command is also performed by Suspend, Archive, and Delete Commands to ensure an Account in the **suspended**, **archived**, and **unknown** state no longer has access to resources.
 
-## Unauthorize Functionality
+## Invalidate Functionality
 
-The RP MUST revoke all active sessions and MUST reverse all authorization that may have been granted to applications, including `offline_access`, for Account resources identified by the `sub`.
+The RP MUST revoke all sessions and tokens including authorization that may have been granted to applications, including `offline_access`, for Account resources identified by the `sub`.
 
 ## Migrate Command
 
@@ -1006,12 +1006,12 @@ Upon receiving this Command, the RP MUST delete all Accounts for the Tenant iden
 
 The RP sends a Streaming Response if it received a valid Delete Tenant Command. If the Delete Tenant Command was successful, the RP will send only a `command_completed` event with a `data` parameter containing the JSON string `{"total_accounts":0}`.
 
-## Unauthorize Tenant Command
+## Invalidate Tenant Command
 
-Sent in a Streaming Request and identified by the `unauthorize_tenant` value in the `command` Claim in a Command Token.
-Upon receiving this Command, the RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on all Accounts in the **active** state for the Tenant identified by the `tenant` Claim in the Command Token.
+Sent in a Streaming Request and identified by the `invalidate_tenant` value in the `command` Claim in a Command Token.
+Upon receiving this Command, the RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on all Accounts in the **active** state for the Tenant identified by the `tenant` Claim in the Command Token.
 
-The RP sends a Streaming Response if it received a valid Unauthorize Tenant Command.
+The RP sends a Streaming Response if it received a valid Invalidate Tenant Command.
 
 # Extensibility
 
