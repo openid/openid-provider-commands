@@ -1137,16 +1137,6 @@ established by [RFC7519](#RFC7519).
 
 **Specification Document(s):** This document
 
-- **Claim Name:** `aud_sub`
-
-**Claim Description:**
-  The audience's internal identifier for the subject of the token, used for account resolution between identity providers and relying parties.
-  
-**Change Controller:** OpenID Foundation
-
-**Specification Document(s):** This document
-
-
 
 ## OAuth Dynamic Client Registration Metadata Registration
 
