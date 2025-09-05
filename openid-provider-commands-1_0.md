@@ -542,7 +542,7 @@ The RP MAY include an `authentication_provider` claim that represents which part
 
 ## Invalidate Command
 
-Identified by the `invalidate` or `invalidate_audit` value in the `command` Claim in a Command Token.
+Identified by the `invalidate` or `invalidate_async` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on the Account.
 The OP MAY send this Command when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, if the user's device was compromised, or any other security related concern about the account. 
