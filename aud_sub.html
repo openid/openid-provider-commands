@@ -1220,7 +1220,7 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left"></td>
 <td class="center">openid-provider-commands</td>
-<td class="right">August 2025</td>
+<td class="right">September 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Hardt &amp; McGuinness</td>
@@ -1235,7 +1235,7 @@ li > p:last-of-type:only-child {
 <dd class="workgroup">OpenID Connect</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-08-26" class="published">26 August 2025</time>
+<time datetime="2025-09-05" class="published">5 September 2025</time>
     </dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
@@ -2119,7 +2119,7 @@ Cache-Control: no-cache
         <h3 id="name-invalidate-command">
 <a href="#section-5.13" class="section-number selfRef">5.13. </a><a href="#name-invalidate-command" class="section-name selfRef">Invalidate Command</a>
         </h3>
-<p id="section-5.13-1">Identified by the <code>invalidate</code> or <code>invalidate_audit</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.13-1" class="pilcrow">¶</a></p>
+<p id="section-5.13-1">Identified by the <code>invalidate</code> or <code>invalidate_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-5.13-1" class="pilcrow">¶</a></p>
 <p id="section-5.13-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account.
 The OP MAY send this Command when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, if the user's device was compromised, or any other security related concern about the account.<a href="#section-5.13-2" class="pilcrow">¶</a></p>
 <p id="section-5.13-3">The Account MUST be in the <strong>active</strong> state, and remains in the <strong>active</strong> state after executing the Command. If the Account is in any other state, the RP MUST return an <a href="#incompatible-state-response">Incompatible State Response</a>.<a href="#section-5.13-3" class="pilcrow">¶</a></p>
