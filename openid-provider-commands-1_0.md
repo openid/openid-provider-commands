@@ -32,7 +32,7 @@ organization="Independent"
 
 OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP
 
-OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, and unauthorize an end-user Account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
+OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, invalidate an end-user Account, and migrate authentication of an existing account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs.
 
 
 {mainmatter}
@@ -49,8 +49,8 @@ For example, many jurisdictions grant end-users the "right to be forgotten," ena
 
 In scenarios where malicious activity is detected or suspected, OPs play a vital role in protecting end-users. They may need to instruct RPs to revoke authorization or delete Accounts created by malicious actors. This helps contain the impact of unauthorized actions and prevent further misuse of compromised Accounts.
 
-In enterprise environments, where organizations centrally manage workforce access, OPs handle essential Account operations across various stages of the lifecycle. These operations include activating, maintaining, suspending, reactivating, archiving, restoring, and deleting Accounts to maintain security and compliance.
-
+In enterprise environments, where organizations centrally manage workforce access, OPs need to establish control over existing employee accounts at RPs. First, the OP must establish a bidirectional mapping between its account identifiers and the RP's internal identifiers through account resolution, enabling both parties to refer to the same specific account. Once this identifier resolution is complete, enterprises can migrate authentication responsibility for accounts their employees may have previously created using RP-managed credentials or other authentication methods. With authentication control and identifier mapping established, the OP can then handle essential Account operations across various stages of the lifecycle, including activating, maintaining, suspending, reactivating, archiving, restoring, and deleting Accounts to maintain security and compliance.
+  
 OpenID Provider Commands are a remote procedure call from the OP to the RP that enables OPs to manage the Account lifecycle, building upon the existing OP / RP relationship to cover the full spectrum of Account management requirements.
 
 
@@ -92,7 +92,7 @@ This specification defines the following terms:
 
 This specification defines a Command Request containing a Command Token sent from the OP to the RP, and a Command Response returned from the RP to the OP.
 
-```
+```bash
 +------+  Command request       +------+
 |      |---- Command Token ---->|      |
 |  OP  |                        |  RP  | 
@@ -100,15 +100,74 @@ This specification defines a Command Request containing a Command Token sent fro
 +------+      Command response  +------+
 ```
 
-## Command Usage Overview
+The OP may provide a callback endpoint and a callback token for the RP to request a command be sent by the OP such as a metadata or audit_tenant command, or to send the results of an asynchronous command. 
 
-An OP will typically send a Metadata Command at the start of the relationship between a Tenant and an RP to share the OP's capabilities and metadata and to learn the Commands an RP supports, and other RP metadata. The OP will typically send the Metadata Command when there is a change in the OP capabilities or metadata, and periodically to learn of any RP changes. The OP may use the response from the Metadata Command to determine if the RP supports functionality required by the Tenant before issuing ID Tokens or Activate Commands to the RP.
+```bash
++------+             Callback   +------+
+|      |<--- Callback Token ----|      |
+|  OP  |                        |  RP  | 
+|      |----------------------->|      |
++------+  204 or error response +------+
+```
 
-If the RP supports any Account Commands, the OP will send supported Account Commands to synchronize the state of Accounts at the RP with the state at the Tenant. If the RP supports Account Commands, the RP should also support the Audit Tenant Commands. The OP will typically send an Audit Tenant Command at the start of the Tenant and RP relationship, and then periodically, to learn the state of the Tenant's Accounts at the RP and correct any drift between the Account state at the Tenant and the RP.
 
-If the RP supports the Unauthorize Command, the OP will send the Unauthorize Command if the OP suspects an Account has been taken over by a malicious actor.
+## Command Use Cases
 
-A Tenant with Accounts managed by individuals will typically only support the Metadata, Unauthorize, and Delete Commands.
+OpenID Provider Commands support several distinct use cases, each with different command sequences and requirements. Understanding these use cases helps implementers determine which commands to support and how to sequence them effectively.
+
+### Personal Applications
+
+Personal applications serve individual users who manage their own accounts. In this scenario, accounts are created and managed by end-users rather than organizations.
+
+**Supported Commands**: Metadata, Invalidate, Delete
+
+**Typical Command Sequence**:
+1. **Metadata Command** - Establish capabilities between OP and RP
+2. **Invalidate Command** - Invalidate all sessions and tokens if account compromise is suspected  
+3. **Delete Command** - Remove account and data upon user request (e.g., "right to be forgotten")
+
+### Enterprise Application Migration
+
+When organizations implement new identity providers or undergo mergers/acquisitions, they need to migrate authentication responsibility for existing accounts. This commonly occurs when individual users initially create accounts with RP-managed credentials, and organizations later need to centralize authentication under their corporate identity provider.
+
+**Migration from RP-managed to OP-managed Authentication**:
+1. **Metadata Command** - Establish OP capabilities with target RP
+2. **Audit Tenant Command** - Identify accounts requiring migration and establish account resolution
+3. **Migrate Command** - Assume authentication responsibility for existing RP-managed accounts
+4. **Account Lifecycle Commands** - Manage migrated accounts through their lifecycle
+
+**Account Resolution in Migration**: Account Resolution is the process by which an OP and RP establish a bidirectional mapping between their respective account identifiers. When an OP receives an `aud_sub` value from an RP in response to commands such as Audit, the OP learns the RP's internal identifier for that account. This enables the OP to include the `aud_sub` claim in subsequent Command Tokens, allowing the RP to execute commands using its own identifiers rather than maintaining foreign key relationships based on the OP's `iss` and `sub` values. This simplifies RP implementation by eliminating the need to store and manage external identifiers, while still maintaining the ability to correlate accounts across systems.
+
+**Authentication Migration Process**: Authentication Migration enables an OP to become the authentication provider for existing accounts through the Migrate Command. This process is essential during organizational migrations, acquisitions, or when implementing centralized identity governance policies. Account Resolution facilitates an OP becoming the authentication provider for an account with the Migrate Command.
+
+### Enterprise Application Integration
+
+Enterprise applications that are integrated with organizational identity providers need ongoing account management as employees join, change roles, or leave the organization.
+
+**Supported Commands**: Metadata, Audit Tenant, Account Lifecycle Commands (Activate, Maintain, Suspend, Reactivate, Archive, Restore, Delete), Invalidate, Migrate
+
+**Typical Command Sequence**:
+1. **Metadata Command** - Exchange capabilities and establish relationship
+2. **Audit Tenant Command** - Discover existing accounts and establish account resolution
+3. **Account Lifecycle Commands** - Synchronize account states between OP and RP
+4. **Periodic Audit Commands** - Maintain synchronization and correct drift
+
+### Compliance Auditing
+
+Compliance scenarios involve OPs auditing RPs to verify proper account management and regulatory compliance without taking over account management responsibilities.
+
+**Audit-Only Sequence**:
+1. **Metadata Command** - Establish audit capabilities
+2. **Audit Tenant Command** - Review account states and compliance posture
+3. **Periodic Audit Commands** - Ongoing compliance monitoring
+
+### Security Incident Response
+
+When security incidents occur, OPs may need to rapidly revoke access across multiple RPs to contain potential breaches.
+
+**Incident Response**:
+1. **Invalidate Command** - Immediately invalidate all sessions and tokens for a compromised account
+2. **Suspend/Archive Commands** - Temporarily or permanently disable an affected account
 
 # Command Request
 
@@ -173,6 +232,7 @@ Note that the RP may support Commands for some OPs, and not others, and for some
 
 If the RP is unable to process a valid request, the RP MUST respond with a 5xx Server Error status code as defined in RFC 9110 section 15.6.
 
+
 # Command Token
 
 OPs send a JWT similar to an ID Token to RPs called a Command Token
@@ -218,15 +278,24 @@ The following Claims are used within the Command Token:
 
 - **tenant**  
   REQUIRED.  
-  A JSON string. The Tenant identifier. MAY have the value `personal`, `organization` or a stable OP unique value for multi-tenant OPs. The `personal` value is reserved for when Accounts are managed by individuals. The `organization` value is reserved for Accounts are managed by an organization.
+  A JSON string. The OP's identifier for the OP's tenant. See {{OpenID.Enterprise}}.
+  
+  MUST have the value `personal`, `organization` or a stable OP unique value for multi-tenant OPs. The `personal` value is reserved for when Accounts are managed by individuals. The `organization` value is reserved for Accounts that are managed by an organization.
 
   The combination of `iss` and `tenant` uniquely identifies a Tenant. 
 
 - **callback_token**  
   OPTIONAL in an Asynchronous Command and the `metadata` command.  
-  An OP generated unique and opaque token for the RP to use when calling the OP's **callback_endpoint** Asynchronous Command responses and making a metadata refresh request.
+  A JSON String. An OP generated unique and opaque token for the RP to use when calling the OP's **callback_endpoint** Asynchronous Command responses and making a metadata refresh request.
+
+- **aud_sub**  
+  OPTIONAL for Account Commands.  
+  A JSON String. The RP's internal identifier for the Account, as provided by the RP during account resolution. When present, the RP SHOULD use this value to identify the Account rather than the combination of `iss` and `sub`. This claim facilitates more efficient account lookup and management at the RP.
   
-Commands may define additional REQUIRED or OPTIONAL Claims.
+
+
+See command definitions below for which claims are REQUIRED or OPTIONAL for a given request or response.
+
 An OP MAY include additional Claims. Any Claims that are not understood by the RP MUST be ignored.
   
 The following Claim MUST NOT be used within the Command Token:
@@ -274,7 +343,7 @@ A non-normative example JWT Claims Set for the Command Token for an Activate Com
 }
 ```
 
-A non-normative example JWT Claims Set for the Command Token for an Unauthorize Command follows:
+A non-normative example JWT Claims Set for the Command Token for an Invalidate Command follows:
 
 ```json
 {
@@ -284,7 +353,7 @@ A non-normative example JWT Claims Set for the Command Token for an Unauthorize 
   "iat": 1734004000,
   "exp": 1734004060,
   "jti": "bWJr",
-  "command": "unauthorize",
+  "command": "invalidate",
   "sub": "248289761001"
 }
 ```
@@ -293,7 +362,7 @@ A non-normative example JWT Claims Set for the Command Token for an Unauthorize 
 
 # Account Commands
 
-Account Commands that operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified by the `iss` and `sub` Claims in a Command Token. Account Commands include Lifecycle Commands and the Unauthorize Command.
+Account Commands that operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` Claim if provided by the RP during account resolution, or the `iss` and `sub` Claims. Account Commands include Lifecycle Commands, the Invalidate Command, and the Migrate Command.
 
 
 ## Account Lifecycle States
@@ -341,7 +410,11 @@ Following are the potential state transitions:
 
 ## Success Response
 
-When an RP successful processes an Account Command, the RP returns the `HTTP 200 OK` response and a JSON object containing the provided `sub`, and the `account_state` set to the state of the Account after processing. 
+When an RP successfully processes an Account Command, the RP returns the `HTTP 200 OK` response and a JSON object containing the following claims:
+
+-  the provided `sub`
+-  the `account_state` set to the state of the Account after processing
+-  the RP's `aud_sub` if the RP has set `aud_sub_required` in its metadata
 
 Following is a non-normative response body to a successful Activate Command:
 
@@ -426,7 +499,7 @@ The RP MUST update an existing Account in the identity register with the include
 ## Suspend Command
 Identified by the `suspend` or `suspend_async` value in the `command` Claim in a Command Token.
 
-The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account and mark the Account as being temporarily unavailable in the identity register. The Account MUST be in the **active** state. The Account is in the **suspended** state after successful processing.
+The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on the Account and mark the Account as being temporarily unavailable in the identity register. The Account MUST be in the **active** state. The Account is in the **suspended** state after successful processing.
 
 
 ## Reactivate Command
@@ -437,7 +510,7 @@ The RP MUST mark a suspended Account as being active in the identity register. T
 ## Archive Command
 Identified by the `archive` or `archive_async` value in the `command` Claim in a Command Token.
 
-The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account and remove the Account from the identity register. The Account MUST be in either the **active** or **suspended** state. The Account is in the **archived** state after successful processing.
+The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on the Account and remove the Account from the identity register. The Account MUST be in either the **active** or **suspended** state. The Account is in the **archived** state after successful processing.
 
 
 
@@ -449,7 +522,7 @@ The RP MUST restore an archived Account to the identity register and mark it as 
 ## Delete Command
 Identified by the `delete` or `delete_async` value in the `command` Claim in a Command Token.
 
-The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account, and delete all data associated with an Account. The Account can be in any state except **unknown**. The Account is in the **unknown** state after successful processing.
+The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on the Account, and delete all data associated with an Account. The Account can be in any state except **unknown**. The Account is in the **unknown** state after successful processing.
 
 ## Audit Command
 Identified by the `audit` or `audit_async` value in the `command` Claim of a Command Token.
@@ -458,27 +531,53 @@ The RP MUST include the state of the Account and any Claims for an Account that 
 
 The RP MAY include a `last_access` claim, a NumericDate, representing the number of seconds from 1970-01-01T00:00:00Z UTC. The value MUST be an integer and is equivalent to the iat and exp claims as defined in [RFC7519](#RFC7519).
 
-## Unauthorize Command
+The RP MAY include an `authentication_provider` claim that represents which party or parties can authenticate the user:
 
-Identified by the `unauthorize` or `unauthorize_async` value in the `command` Claim in a Command Token.
+- **rp**: The Account can only be authenticated directly by the RP (e.g., username/password, RP-managed MFA)
+- **op**: The Account can only be authenticated by the requesting OP tenant
+- **op_migration**: The Account can be authenticated by either the RP or the OP tenant
+- **external**: The Account is authenticated by a different external authentication provider
+- **unknown**: The RP does not know, or does not want to share who the authentication provider is
 
-The RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on the Account.
+
+## Invalidate Command
+
+Identified by the `invalidate` or `invalidate_async` value in the `command` Claim in a Command Token.
+
+The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on the Account.
 The OP MAY send this Command when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, if the user's device was compromised, or any other security related concern about the account. 
 
 
 The Account MUST be in the **active** state, and remains in the **active** state after executing the Command. If the Account is in any other state, the RP MUST return an [Incompatible State Response](#incompatible-state-response).
 
-The functionality of the Unauthorize Command is also performed by Suspend, Archive, and Delete Commands to ensure an Account in the **suspended**, **archived**, and **unknown** state no longer has access to resources.
+The functionality of the Invalidate Command is also performed by Suspend, Archive, and Delete Commands to ensure an Account in the **suspended**, **archived**, and **unknown** state no longer has access to resources.
 
-## Unauthorize Functionality
+## Invalidate Functionality
 
-The RP MUST revoke all active sessions and MUST reverse all authorization that may have been granted to applications, including `offline_access`, for Account resources identified by the `sub`.
+The RP MUST revoke all sessions and tokens including authorization that may have been granted to applications, including `offline_access`, for Account resources identified by the `sub`.
 
+## Migrate Command
 
+Identified by the `migrate` or `migrate_async` value in the `command` Claim in a Command Token.
 
+The OP sends this Command to request to become the authentication provider for an existing Account. The Command Token MUST include the following additional claim:
 
+- **authentication_provider**  
+  REQUIRED.  
+  A JSON string indicating the requested authentication provider status. MUST be set to `op` if the OP wants to become the sole authentication provider for the Account, or `op_migration` if the OP wants to enable dual authentication where both the OP and existing authentication methods remain valid.
 
+The RP processes the Migrate Command based on the current authentication provider status of the Account and organizational policies:
 
+- If `authentication_provider` is `op` and the RP allows the migration, the RP updates the Account's authentication provider status to `op`, disabling other authentication methods.
+- If `authentication_provider` is `op_migration` and the RP supports dual authentication, the RP adds the OP as an additional authentication provider while maintaining existing authentication methods. Dual authentication with `op_migration` SHOULD be a temporary state used to provide a seamless migration from RP to OP as the authentication provider.
+
+### Access Denied Error
+
+If the RP does not allow the OP to migrate authentication for the Account, the RP MUST return an HTTP 403 Forbidden response and include the `error` parameter with the value of `access_denied`.
+
+### Authentication Not Transferable Error
+
+If the Account's current authentication provider does not allow changes in authentication responsibility (e.g., managed by a different OP or external system with non-transferable policies), the RP MUST return an HTTP 409 Conflict response and include the `error` parameter with the value of `authentication_not_transferable`.
 
 
 # Tenant Commands
@@ -601,6 +700,10 @@ If the Command Token is valid, the RP responds with an `application/json` media 
 
 And MAY include:
 
+- **aud_sub_required**
+  OPTIONAL.
+  A JSON boolean value set to `true`. Indicates the RP requires its `aud_sub` value be provided in account commands.
+
 - **roles**  
   OPTIONAL  
   A JSON array of objects that contain:
@@ -641,7 +744,7 @@ Following is a non-normative example of Command Response for a Metadata Command:
   },
   "command_endpoint": "https://rp.example.net/command",
   "commands_supported":[
-    "describe",
+    "audit_tenant",
     "unauthorize",
     "suspend",
     "reactivate",
@@ -653,7 +756,7 @@ Following is a non-normative example of Command Response for a Metadata Command:
     "email",
     "email_verified",
     "name",
-    "groups"
+    "roles"
   ],
   "roles": [
           {
@@ -671,7 +774,7 @@ Following is a non-normative example of Command Response for a Metadata Command:
         "display": "Reader",
         "description": "Read posts"
       }
-  ]
+  ],
   "client_id": "s6BhdRkqt3",
   "client_name": "Example RP",
   "logo_uri": "https://rp.example.net/logo.png",
@@ -763,7 +866,7 @@ If there are no Accounts for the Tenant at the RP, the RP responds with only the
 
 The following is a non-normative example of a Streaming Response for an Audit Tenant Command:
 
-```text
+```bash
   HTTP/1.1 200 OK
   Content-Type: text/event-stream
   Cache-Control: no-cache
@@ -841,7 +944,8 @@ The following is a non-normative example of the Claims Set in the Command Token 
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJz",
-  "command": "audit_tenant"
+  "command": "audit_tenant",
+  "callback_token": "eyhwixm236djs9shne9sjdnjs9dhbsk"
 }
 ```
 
@@ -853,6 +957,32 @@ The RP sends a Streaming Response if it received a valid Suspend Tenant Command.
 The RP MUST include any Claims for an Account that the RP has retained that were provided by the OP in the event `data` parameter JSON string. If the Claim values have been modified at the RP, the modified values should be returned. 
 
 The RP MAY include a `last_access` claim, a NumericDate, representing the number of seconds from 1970-01-01T00:00:00Z UTC. The value MUST be an integer and is equivalent to the iat and exp claims as defined in [RFC7519](#RFC7519).
+
+
+## Audit Tenant Refresh Request
+
+If the OP provided a `callback_endpoint` and a `callback_token` in its last `audit_tenant` Command, the RP may request the the OP to perform a new `audit_tenant` command. One motivation for the RP to make this request is there have been changes to accounts. 
+
+The RP does an HTTP POST to the **callback_endpoint** passing the `callback_token` as a bearer token in the HTTP `Authorize` header with a `content-type` of `application/json` and a JSON string with `command_requested` set to `audit_tenant`.
+
+Following is a non-normative example:
+
+```
+POST /callback HTTP/1.1
+Host: op.example.org
+Authorization: Bearer eyhwixm236djs9shne9sjdnjs9dhbsk
+Content-Type: application/json
+Accept: application/json
+Cache-Control: no-cache
+
+{ 
+  "command_requested": "audit_tenant"
+}
+```
+
+If the `callback_token` is valid, the OP MUST respond with an HTTP 204 No Content response.
+
+If the `callback_token` is not valid, or the content of the request body is not valid, the OP MUST respond with an error per [RFC6750](#RFC6750).
 
 ## Suspend Tenant Command
 
@@ -876,12 +1006,12 @@ Upon receiving this Command, the RP MUST delete all Accounts for the Tenant iden
 
 The RP sends a Streaming Response if it received a valid Delete Tenant Command. If the Delete Tenant Command was successful, the RP will send only a `command_completed` event with a `data` parameter containing the JSON string `{"total_accounts":0}`.
 
-## Unauthorize Tenant Command
+## Invalidate Tenant Command
 
-Sent in a Streaming Request and identified by the `unauthorize_tenant` value in the `command` Claim in a Command Token.
-Upon receiving this Command, the RP MUST perform the [Unauthorize Functionality](#unauthorize-functionality) on all Accounts in the **active** state for the Tenant identified by the `tenant` Claim in the Command Token.
+Sent in a Streaming Request and identified by the `invalidate_tenant` value in the `command` Claim in a Command Token.
+Upon receiving this Command, the RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on all Accounts in the **active** state for the Tenant identified by the `tenant` Claim in the Command Token.
 
-The RP sends a Streaming Response if it received a valid Unauthorize Tenant Command.
+The RP sends a Streaming Response if it received a valid Invalidate Tenant Command.
 
 # Extensibility
 
@@ -1047,7 +1177,8 @@ This specification registers the `application/command+jwt` media type as per {{!
 - **[RFC8725]** Bromberg, L. “Security Considerations for JSON Web Tokens,” *RFC 8725*, June 2020.
 - **[RFC6838]** IANA. “Media Types,” *RFC 6838*, June 2013.
 - **ISO/IEC 24760-1:2019**, “IT Security – A framework for identity management – Part 1: Terminology and concepts.”
-- **OpenID Connect Core 1.0** – “OpenID Connect Core 1.0 incorporating errata set 1,” available at <https://openid.net/specs/openid-connect-core-1_0.html>.
+- **OpenID.Core** – “OpenID Connect Core 1.0 incorporating errata set 2,” available at <https://openid.net/specs/openid-connect-core-1_0.html>.
+- **OpenID.Enterprise** – "OpenID Connect Enterprise Extensions 1.0," available at <https://openid.net/specs/openid-connect-enterprise-extensions-1_0.html>.
 
 ## Informative References
 
