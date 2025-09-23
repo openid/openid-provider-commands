@@ -517,7 +517,7 @@ The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on
 ## Restore Command
 Identified by the `restore` or `restore_async` value in the `command` Claim in a Command Token.
 
-The RP MUST restore an archived Account to the identity register and mark it as being active. The Account MUST be in the **archived** state. The Account is in the **active** state after successful processing. The RP SHOULD support the Restore Command if it suppSs the chA Comma.
+The RP MUST restore an archived Account to the identity register and mark it as being active. The Account MUST be in the **archived** state. The Account is in the **active** state after successful processing. The RP SHOULD support the Restore Command if it supports the Archive Command.
 
 ## Delete Command
 Identified by the `delete` or `delete_async` value in the `command` Claim in a Command Token.
