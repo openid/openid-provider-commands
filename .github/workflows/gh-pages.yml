@@ -54,6 +54,13 @@ jobs:
         run: |
           mmark openid-provider-commands-1_0.md > openid-provider-commands-1_0.xml
 
+      - name: Upload XML artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-xml
+          path: openid-provider-commands-1_0.xml    
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
