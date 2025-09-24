@@ -45,7 +45,7 @@ OpenID Connect 1.0 is a widely adopted identity protocol that enables client app
 OpenID Connect not only allows an end-user to log in and authorize access to resources at an RP but may also be
 used to implicitly or explicitly create an Account at the RP. However, Account creation is only the beginning of an Account's lifecycle. Throughout the lifecycle, various actions may be required to ensure data integrity, security, and regulatory compliance.
 
-For example, many jurisdictions grant end-users the "right to be forgotten," enabling them to request the deletion of their Accounts and associated data. When such requests arise, OPs may need to notify RPs to fully delete the end-user's Account and remove all related data, respecting both regulatory obligations and end-user privacy preferences.
+For example, many jurisdictions grant end-users the "right to be forgotten", enabling them to request the deletion of their Accounts and associated data. When such requests arise, OPs may need to notify RPs to fully delete the end-user's Account and remove all related data, respecting both regulatory obligations and end-user privacy preferences.
 
 In scenarios where malicious activity is detected or suspected, OPs play a vital role in protecting end-users. They may need to instruct RPs to revoke authorization or delete Accounts created by malicious actors. This helps contain the impact of unauthorized actions and prevent further misuse of compromised Accounts.
 
@@ -432,7 +432,7 @@ Following are the potential state transitions:
   |  |  +--------------------- delete ---+                                       |  |
   |  +------------------------ delete -------------------------------------------+  | 
   +--------------------------- delete ----------------------------------------------+
-```                                             
+```
 
 †The transition from **suspended** to **archived** is an extension to the ISO standard.
 
@@ -893,7 +893,7 @@ If the connection is lost during a Streaming Response, The OP SHOULD generate a 
 
 Following is a non-normative example of a Streaming Request sent after a connection was lost:
 
-```
+```bash
 POST /commands HTTP/1.1
 Host: rp.example.net
 Content-Type: application/x-www-form-urlencoded
@@ -954,7 +954,7 @@ The RP does an HTTP POST to the **callback_endpoint** passing the `callback_toke
 
 Following is a non-normative example:
 
-```
+```bash
 POST /callback HTTP/1.1
 Host: op.example.org
 Authorization: Bearer eyhwixm236djs9shne9sjdnjs9dhbsk
