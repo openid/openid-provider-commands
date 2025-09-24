@@ -315,8 +315,6 @@ The following claims are used in Command Tokens, with requirement levels that va
 A `nonce` Claim MUST NOT be present. Its use is prohibited to prevent misuse of the Command Token. See [Cross-JWT Confusion](#cross-jwt-confusion) for details.
 
 
-### Baseline claim sets
-
 To avoid repetition, commands reference one of the following baseline claim sets. Individual command sections list only command-specific additions or exceptions.
 
 - Account Command baseline claims:
