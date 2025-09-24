@@ -89,56 +89,6 @@ This specification defines the following terms:
 - **Tenant**: A logically isolated entity within an OP that represents a distinct organizational or administrative boundary. An OP may have a single Tenant, or multiple Tenants. The Tenant may contain Accounts managed by individuals, or may contain Accounts managed by an organization.
 
 
-# Claims and Properties
-
-This section defines all claims and properties used in this specification. 
-
-## Claims in Command Tokens
-
-- **`aud_sub`**: The RP’s internal identifier for the Account (learned via account resolution). Enables the RP to use its native identifier rather than the (`iss`,`sub`) pair for lookups.
-- **`aud`**: Audience for the token; the RP Command Endpoint URL.
-- **`authentication_provider`**: A string indicating which party can authenticate the user. Values include:
-    - `rp`: Only the RP authenticates
-    - `op`: Only the OP authenticates
-    - `op_migration`: Both RP and OP can authenticate (temporary migration state)
-    - `external`: Authentication is by an external provider
-    - `unknown`: Authentication provider is unknown or undisclosed
-- **`callback_token`**: An OP-generated, opaque token used by the RP when sending asynchronous results or requesting a metadata refresh.
-- **`client_id`**: The client identifier for the RP.
-- **`command`**: The command name for the RP to execute. Standard values are defined in [Account Commands](#account-commands) and [Tenant Commands](#tenant-commands). Additional values may be defined via [Extensibility](#defining-new-commands).
-- **`exp`**: Expiration time (NumericDate, per RFC 7519).
-- **`iat`**: Issued at time (NumericDate, per RFC 7519).
-- **`iss`**: Issuer Identifier for the OP (see OpenID Connect Core, Section 2).
-- **`jti`**: Unique identifier for the token (per OpenID Connect Core Section 9).
-- **`metadata`**: A JSON object conveying OP-provided metadata to the RP in the Metadata Command. See [OP Metadata Object](#op-metadata-object) for the normative schema.
-- **`sub`**: Subject Identifier for the Account (see OpenID Connect Core, Section 2).
-- **`tenant`**: Identifier of the Tenant within the OP. Values include `personal`, `organization`, or an OP-unique stable identifier for multi-tenant OPs. The combination of `iss` and `tenant` identifies a Tenant.
-
-
-
-## Properties in Responses
-
-- **`account_state`**: The Account’s state after processing. Supported states include `unknown`, `active`, `suspended`, and `archived`.
-- **`aud_sub_required`**: Boolean indicating if the RP requires `aud_sub` in Account Commands.
-- **`aud_sub`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
-- **`authentication_provider`**: See definition and allowed values under [Claims in Command Tokens](#claims-in-command-tokens).
-- **`client_id`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
-- **`command_endpoint`**: The RP’s Command Endpoint URL.
-- **`commands_supported`**: Array of command names supported by the RP.
-- **`context`**: A JSON object containing contextual values for the response (e.g., `iss`, `tenant`).
-- **`error_description`**: Human-readable description of the error.
-- **`error`**: Error code indicating the type of error encountered.
-- **`last_access`**: NumericDate of last account access (seconds since 1970-01-01T00:00:00Z UTC).
-- **`roles`**: Array of role objects with:
-    - `id`: RP-unique role identifier
-    - `display`: Human-readable role name
-    - `description` (optional): Role description
-- **`sub`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
-- **`total_accounts`**: Total number of `account-state` events sent in a streaming response.
-
-
-For requirement levels for each claim/property in a specific command or response, see the corresponding sections in this specification.
-
 
 ## Protocol Overview
 
@@ -220,6 +170,58 @@ When security incidents occur, OPs may need to rapidly revoke access across mult
 **Incident Response**:
 1. **Invalidate Command** - Immediately invalidate all sessions and tokens for a compromised account
 2. **Suspend/Archive Commands** - Temporarily or permanently disable an affected account
+
+
+# Claims and Properties
+
+This section defines all claims and properties used in this specification. 
+
+## Claims in Command Tokens
+
+- **`aud_sub`**: The RP’s internal identifier for the Account (learned via account resolution). Enables the RP to use its native identifier rather than the (`iss`,`sub`) pair for lookups.
+- **`aud`**: Audience for the token; the RP Command Endpoint URL.
+- **`authentication_provider`**: A string indicating which party can authenticate the user. Values include:
+    - `rp`: Only the RP authenticates
+    - `op`: Only the OP authenticates
+    - `op_migration`: Both RP and OP can authenticate (temporary migration state)
+    - `external`: Authentication is by an external provider
+    - `unknown`: Authentication provider is unknown or undisclosed
+- **`callback_token`**: An OP-generated, opaque token used by the RP when sending asynchronous results or requesting a metadata refresh.
+- **`client_id`**: The client identifier for the RP.
+- **`command`**: The command name for the RP to execute. Standard values are defined in [Account Commands](#account-commands) and [Tenant Commands](#tenant-commands). Additional values may be defined via [Extensibility](#defining-new-commands).
+- **`exp`**: Expiration time (NumericDate, per RFC 7519).
+- **`iat`**: Issued at time (NumericDate, per RFC 7519).
+- **`iss`**: Issuer Identifier for the OP (see OpenID Connect Core, Section 2).
+- **`jti`**: Unique identifier for the token (per OpenID Connect Core Section 9).
+- **`metadata`**: A JSON object conveying OP-provided metadata to the RP in the Metadata Command. See [OP Metadata Object](#op-metadata-object) for the normative schema.
+- **`sub`**: Subject Identifier for the Account (see OpenID Connect Core, Section 2).
+- **`tenant`**: Identifier of the Tenant within the OP. Values include `personal`, `organization`, or an OP-unique stable identifier for multi-tenant OPs. The combination of `iss` and `tenant` identifies a Tenant.
+
+
+
+## Properties in Responses
+
+- **`account_state`**: The Account’s state after processing. Supported states include `unknown`, `active`, `suspended`, and `archived`.
+- **`aud_sub_required`**: Boolean indicating if the RP requires `aud_sub` in Account Commands.
+- **`aud_sub`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
+- **`authentication_provider`**: See definition and allowed values under [Claims in Command Tokens](#claims-in-command-tokens).
+- **`client_id`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
+- **`command_endpoint`**: The RP’s Command Endpoint URL.
+- **`commands_supported`**: Array of command names supported by the RP.
+- **`context`**: A JSON object containing contextual values for the response (e.g., `iss`, `tenant`).
+- **`error_description`**: Human-readable description of the error.
+- **`error`**: Error code indicating the type of error encountered.
+- **`last_access`**: NumericDate of last account access (seconds since 1970-01-01T00:00:00Z UTC).
+- **`roles`**: Array of role objects with:
+    - `id`: RP-unique role identifier
+    - `display`: Human-readable role name
+    - `description` (optional): Role description
+- **`sub`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
+- **`total_accounts`**: Total number of `account-state` events sent in a streaming response.
+
+
+For requirement levels for each claim/property in a specific command or response, see the corresponding sections in this specification.
+
 
 # Command Request
 
@@ -1259,3 +1261,4 @@ specification.
    * add error messages for restarting a stream that cannot be restarted
    * add `roles` claims and `roles` metadata
    * add `last_access` claim for RP to communicate last time user accessed the resource off_line 
+  * minor edits and structural cleanup
