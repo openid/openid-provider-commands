@@ -142,7 +142,8 @@ For requirement levels for each claim/property in a specific command or response
 
 This specification defines a Command Request containing a Command Token sent from the OP to the RP, and a Command Response returned from the RP to the OP.
 
-``+  Command request     ---+
+```
++------+  Command request       +------+
 |      |---- Command Token ---->|      |
 |  OP  |                        |  RP  | 
 |      |<-----------------------|      |
