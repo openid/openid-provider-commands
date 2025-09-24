@@ -130,21 +130,19 @@ This section defines all claims and properties used in this specification. Each 
 - **`client_id`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
 - **`aud_sub_required`**: Boolean indicating if the RP requires `aud_sub` in Account Commands.
 - **`roles`**: Array of role objects with:
-  - `id`: RP-unique role identifier
-  - `display`: Human-readable role name
-  - `description` (optional): Role description
+    - `id`: RP-unique role identifier
+    - `display`: Human-readable role name
+    - `description` (optional): Role description
 - **`total_accounts`**: Total number of `account-state` events sent in a streaming response.
 
 For requirement levels for each claim/property in a specific command or response, see the corresponding sections in this specification.
 
----
 
 ## Protocol Overview
 
 This specification defines a Command Request containing a Command Token sent from the OP to the RP, and a Command Response returned from the RP to the OP.
 
-```bash
-+------+  Command request       +------+
+``+  Command request     ---+
 |      |---- Command Token ---->|      |
 |  OP  |                        |  RP  | 
 |      |<-----------------------|      |
@@ -153,7 +151,7 @@ This specification defines a Command Request containing a Command Token sent fro
 
 The OP may provide a callback endpoint and a callback token for the RP to request a command be sent by the OP such as a metadata or audit_tenant command, or to send the results of an asynchronous command. 
 
-```bash
+```
 +------+             Callback   +------+
 |      |<--- Callback Token ----|      |
 |  OP  |                        |  RP  | 
