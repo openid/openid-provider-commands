@@ -1,5 +1,5 @@
 %%%
-title = "OpenID Provider Commands 1.0 - draft 01"
+title = "OpenID Provider Commands 1.0 - draft 02"
 abbrev = "openid-provider-commands"
 ipr = "none"
 workgroup = "OpenID Connect"
@@ -1238,4 +1238,11 @@ specification.
    * add error messages for restarting a stream that cannot be restarted
    * add `roles` claims and `roles` metadata
    * add `last_access` claim for RP to communicate last time user accessed the resource off_line 
-  * minor edits and structural cleanup
+   * minor edits and structural cleanup
+
+  -02
+
+  * added `aud_sub` as claim in commands and property from RP in audit reponses
+  * Metadata Response: Added `aud_sub_required` response property (OPTIONAL) normatively indicating RP requirement to receive `aud_sub` in subsequent Account Commands.
+  * collected all normative claims and properties into new "Claims and Properties" section centralizing definitions of all Command Token claims and response properties
+  * Command Token: Introduced normative baseline claim sets for Account vs Tenant Commands; clarified that only listed claims plus command-specific additions may appear (tightening allowed claims surface).
