@@ -289,33 +289,13 @@ If the RP is unable to process a valid request, the RP MUST respond with a 5xx S
 
 # Command Token
 
-OPs send a JWT similar to an ID Token to RPs called a Command Token
-to issue Commands. ID Tokens are defined in Section 2 of {{OpenID.Core}}.
+OPs issue Commands by sending a JSON Web Token (JWT), the Command Token, to the RP. It is analogous to an OpenID Connect ID Token (see Section 2 of {{OpenID.Core}}) but carries command semantics instead of an authentication assertion.
 
-The Command Token is a JWT containing claims as defined in the [Claims and Properties](#claims-and-properties) section. For each command, the specification lists which claims are REQUIRED, OPTIONAL, or PROHIBITED. See [Claims and Properties](#claims-and-properties) for definitions of each claim.
+All claims that can appear in a Command Token are defined once in the [Claims and Properties](#claims-and-properties) section; that section is normative for their definitions. Each command section in this specification normatively states which of those claims are REQUIRED, OPTIONAL, or PROHIBITED for that command. This section therefore only defines the baseline claim groupings used as shorthand elsewhere.
 
-The following claims are used in Command Tokens, with requirement levels that vary by command. See [Claims and Properties](#claims-and-properties) for definitions.
+**Prohibition of nonce:** A `nonce` Claim MUST NOT be present in a Command Token to prevent cross-JWT confusion. See [Cross-JWT Confusion](#cross-jwt-confusion).
 
-- `iss` — REQUIRED
-- `sub` — REQUIRED for Account Commands; PROHIBITED for Tenant Commands
-- `aud` — REQUIRED (the Command Endpoint)
-- `client_id` — REQUIRED
-- `iat` — REQUIRED
-- `exp` — REQUIRED
-- `jti` — REQUIRED
-- `command` — REQUIRED (see [Account Commands](#account-commands) and [Tenant Commands](#tenant-commands) for allowed values)
-- `tenant` — REQUIRED
-- `callback_token` — OPTIONAL for Asynchronous Commands and the `metadata` command
-- `aud_sub` — OPTIONAL for Account Commands
-- `metadata` — REQUIRED in the `metadata` command; PROHIBITED for all other commands
-- `authentication_provider` — REQUIRED in the `migrate` command; PROHIBITED for all other commands
-
-**Prohibition of nonce:**
-
-A `nonce` Claim MUST NOT be present. Its use is prohibited to prevent misuse of the Command Token. See [Cross-JWT Confusion](#cross-jwt-confusion) for details.
-
-
-To avoid repetition, commands reference one of the following baseline claim sets. Individual command sections list only command-specific additions or exceptions.
+Baseline claim sets (only the listed claims may appear unless a command explicitly allows additional ones):
 
 - Account Command baseline claims:
   - REQUIRED: `iss`, `aud` (Command Endpoint), `client_id`, `iat`, `exp`, `jti`, `command`, `tenant`, `sub`
@@ -327,24 +307,23 @@ To avoid repetition, commands reference one of the following baseline claim sets
   - PROHIBITED: `sub`, `aud_sub`
   - OPTIONAL: `callback_token` — only where explicitly specified by the command
 
-Command-specific additions referenced later in this document include:
-- `metadata` — REQUIRED in the Metadata Command
-- `authentication_provider` — REQUIRED in the Migrate Command
+Command-specific additions referenced later in this document include (non-exhaustive examples):
+- `metadata` — REQUIRED in the Metadata Command; PROHIBITED otherwise
+- `authentication_provider` — REQUIRED in the Migrate Command; PROHIBITED otherwise
 
+A Command Token MUST be signed. The same signing keys the OP uses for ID Tokens are used, enabling key discovery via the normal OpenID Connect mechanisms.
 
-A Command Token MUST be signed.
-The same keys an OP uses to sign ID Tokens are used to sign Command Tokens, allowing key discovery using the same mechanism used for ID Tokens.
+Command Tokens MUST be explicitly typed by including a `typ` (type) JWS Header Parameter with the exact value `command+jwt`. See [Security Considerations](#security-considerations) for rationale.
 
+Example JWS header (non-normative):
 
-Command Tokens MUST be explicitly typed.
-This is accomplished by including a `typ` (type) Header Parameter
-with a value of `command+jwt` in the Command Token.
-See [Security Considerations](#security-considerations) for a discussion of the security and interoperability considerations
-of using explicit typing.
-
->
-> Add example of JWT header to show "typ":"command+jwt"?
->
+```json
+{
+  "alg": "RS256",
+  "kid": "2019-07-01-key",
+  "typ": "command+jwt"
+}
+```
 
 A non-normative example JWT Claims Set for the Command Token for an Activate Command follows:
 
