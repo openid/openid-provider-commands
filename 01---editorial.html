@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>OpenID Provider Commands 1.0 - draft 01</title>
+<title>OpenID Provider Commands 1.0 - draft 02</title>
 <meta content="Dick Hardt" name="author">
 <meta content="Karl McGuinness" name="author">
 <meta content="
@@ -1250,7 +1250,7 @@ li > p:last-of-type:only-child {
 </dd>
 </dl>
 </div>
-<h1 id="title">OpenID Provider Commands 1.0 - draft 01</h1>
+<h1 id="title">OpenID Provider Commands 1.0 - draft 02</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP<a href="#section-abstract-1" class="pilcrow">¶</a></p>
@@ -3071,6 +3071,21 @@ specification.<a href="#appendix-B-3" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-C-5.9">
           <p id="appendix-C-5.9.1">minor edits and structural cleanup<a href="#appendix-C-5.9.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="appendix-C-6">-02<a href="#appendix-C-6" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-C-7.1">
+          <p id="appendix-C-7.1.1">added <code>aud_sub</code> as claim in commands and property from RP in audit reponses<a href="#appendix-C-7.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-7.2">
+          <p id="appendix-C-7.2.1">Metadata Response: Added <code>aud_sub_required</code> response property (OPTIONAL) normatively indicating RP requirement to receive <code>aud_sub</code> in subsequent Account Commands.<a href="#appendix-C-7.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-7.3">
+          <p id="appendix-C-7.3.1">collected all normative claims and properties into new "Claims and Properties" section centralizing definitions of all Command Token claims and response properties<a href="#appendix-C-7.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-7.4">
+          <p id="appendix-C-7.4.1">Command Token: Introduced normative baseline claim sets for Account vs Tenant Commands; clarified that only listed claims plus command-specific additions may appear (tightening allowed claims surface).<a href="#appendix-C-7.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
