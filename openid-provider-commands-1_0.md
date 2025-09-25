@@ -1,5 +1,5 @@
 %%%
-title = "OpenID Provider Commands 1.0 - draft 01"
+title = "OpenID Provider Commands 1.0 - draft 02"
 abbrev = "openid-provider-commands"
 ipr = "none"
 workgroup = "OpenID Connect"
@@ -45,7 +45,7 @@ OpenID Connect 1.0 is a widely adopted identity protocol that enables client app
 OpenID Connect not only allows an end-user to log in and authorize access to resources at an RP but may also be
 used to implicitly or explicitly create an Account at the RP. However, Account creation is only the beginning of an Account's lifecycle. Throughout the lifecycle, various actions may be required to ensure data integrity, security, and regulatory compliance.
 
-For example, many jurisdictions grant end-users the "right to be forgotten," enabling them to request the deletion of their Accounts and associated data. When such requests arise, OPs may need to notify RPs to fully delete the end-user's Account and remove all related data, respecting both regulatory obligations and end-user privacy preferences.
+For example, many jurisdictions grant end-users the "right to be forgotten", enabling them to request the deletion of their Accounts and associated data. When such requests arise, OPs may need to notify RPs to fully delete the end-user's Account and remove all related data, respecting both regulatory obligations and end-user privacy preferences.
 
 In scenarios where malicious activity is detected or suspected, OPs play a vital role in protecting end-users. They may need to instruct RPs to revoke authorization or delete Accounts created by malicious actors. This helps contain the impact of unauthorized actions and prevent further misuse of compromised Accounts.
 
@@ -88,11 +88,13 @@ This specification defines the following terms:
 
 - **Tenant**: A logically isolated entity within an OP that represents a distinct organizational or administrative boundary. An OP may have a single Tenant, or multiple Tenants. The Tenant may contain Accounts managed by individuals, or may contain Accounts managed by an organization.
 
+
+
 ## Protocol Overview
 
 This specification defines a Command Request containing a Command Token sent from the OP to the RP, and a Command Response returned from the RP to the OP.
 
-```bash
+```
 +------+  Command request       +------+
 |      |---- Command Token ---->|      |
 |  OP  |                        |  RP  | 
@@ -102,7 +104,7 @@ This specification defines a Command Request containing a Command Token sent fro
 
 The OP may provide a callback endpoint and a callback token for the RP to request a command be sent by the OP such as a metadata or audit_tenant command, or to send the results of an asynchronous command. 
 
-```bash
+```
 +------+             Callback   +------+
 |      |<--- Callback Token ----|      |
 |  OP  |                        |  RP  | 
@@ -168,6 +170,58 @@ When security incidents occur, OPs may need to rapidly revoke access across mult
 **Incident Response**:
 1. **Invalidate Command** - Immediately invalidate all sessions and tokens for a compromised account
 2. **Suspend/Archive Commands** - Temporarily or permanently disable an affected account
+
+
+# Claims and Properties
+
+This section defines all claims and properties used in this specification. 
+
+## Claims in Command Tokens
+
+- **`aud_sub`**: The RP’s internal identifier for the Account (learned via account resolution). Enables the RP to use its native identifier rather than the (`iss`,`sub`) pair for lookups.
+- **`aud`**: Audience for the token; the RP Command Endpoint URL.
+- **`authentication_provider`**: A string indicating which party can authenticate the user. Values include:
+    - `rp`: Only the RP authenticates
+    - `op`: Only the OP authenticates
+    - `op_migration`: Both RP and OP can authenticate (temporary migration state)
+    - `external`: Authentication is by an external provider
+    - `unknown`: Authentication provider is unknown or undisclosed
+- **`callback_token`**: An OP-generated, opaque token used by the RP when sending asynchronous results or requesting a metadata refresh.
+- **`client_id`**: The client identifier for the RP.
+- **`command`**: The command name for the RP to execute. Standard values are defined in [Account Commands](#account-commands) and [Tenant Commands](#tenant-commands). Additional values may be defined via [Extensibility](#defining-new-commands).
+- **`exp`**: Expiration time (NumericDate, per RFC 7519).
+- **`iat`**: Issued at time (NumericDate, per RFC 7519).
+- **`iss`**: Issuer Identifier for the OP (see OpenID Connect Core, Section 2).
+- **`jti`**: Unique identifier for the token (per OpenID Connect Core Section 9).
+- **`metadata`**: A JSON object conveying OP-provided metadata to the RP in the Metadata Command. See [OP Metadata Object](#op-metadata-object) for the normative schema.
+- **`sub`**: Subject Identifier for the Account (see OpenID Connect Core, Section 2).
+- **`tenant`**: Identifier of the Tenant within the OP. Values include `personal`, `organization`, or an OP-unique stable identifier for multi-tenant OPs. The combination of `iss` and `tenant` identifies a Tenant.
+
+
+
+## Properties in Responses
+
+- **`account_state`**: The Account’s state after processing. Supported states include `unknown`, `active`, `suspended`, and `archived`.
+- **`aud_sub_required`**: Boolean indicating if the RP requires `aud_sub` in Account Commands.
+- **`aud_sub`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
+- **`authentication_provider`**: See definition and allowed values under [Claims in Command Tokens](#claims-in-command-tokens).
+- **`client_id`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
+- **`command_endpoint`**: The RP’s Command Endpoint URL.
+- **`commands_supported`**: Array of command names supported by the RP.
+- **`context`**: A JSON object containing contextual values for the response (e.g., `iss`, `tenant`).
+- **`error_description`**: Human-readable description of the error.
+- **`error`**: Error code indicating the type of error encountered.
+- **`last_access`**: NumericDate of last account access (seconds since 1970-01-01T00:00:00Z UTC).
+- **`roles`**: Array of role objects with:
+    - `id`: RP-unique role identifier
+    - `display`: Human-readable role name
+    - `description` (optional): Role description
+- **`sub`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
+- **`total_accounts`**: Total number of `account-state` events sent in a streaming response.
+
+
+For requirement levels for each claim/property in a specific command or response, see the corresponding sections in this specification.
+
 
 # Command Request
 
@@ -235,90 +289,41 @@ If the RP is unable to process a valid request, the RP MUST respond with a 5xx S
 
 # Command Token
 
-OPs send a JWT similar to an ID Token to RPs called a Command Token
-to issue Commands. ID Tokens are defined in Section 2 of {{OpenID.Core}}.
+OPs issue Commands by sending a JSON Web Token (JWT), the Command Token, to the RP. It is analogous to an OpenID Connect ID Token (see Section 2 of {{OpenID.Core}}) but carries command semantics instead of an authentication assertion.
 
-The following Claims are used within the Command Token:
+All claims that can appear in a Command Token are defined once in the [Claims and Properties](#claims-and-properties) section; that section is normative for their definitions. Each command section in this specification normatively states which of those claims are REQUIRED, OPTIONAL, or PROHIBITED for that command. This section therefore only defines the baseline claim groupings used as shorthand elsewhere.
 
-- **iss**  
-  REQUIRED.  
-  Issuer Identifier, as specified in Section 2 of {{OpenID.Core}}.
+**Prohibition of nonce:** A `nonce` Claim MUST NOT be present in a Command Token to prevent cross-JWT confusion. See [Cross-JWT Confusion](#cross-jwt-confusion).
 
-- **sub**  
-  REQUIRED for Account Commands.    
-  PROHIBITED for Tenant Commands. 
+Baseline claim sets (only the listed claims may appear unless a command explicitly allows additional ones):
 
-  Subject Identifier, as specified in Section 2 of {{OpenID.Core}}. 
-  
-  The combination of the `iss` and `sub` Claim uniquely identifies the Account for the Command.
+- Account Command baseline claims:
+  - REQUIRED: `iss`, `aud` (Command Endpoint), `client_id`, `iat`, `exp`, `jti`, `command`, `tenant`, `sub`
+  - OPTIONAL: `aud_sub`
+  - OPTIONAL: `callback_token` — only for commands whose identifier ends with `_async`
 
-- **aud**  
-  REQUIRED.  
-  The Command Endpoint.
+- Tenant Command baseline claims:
+  - REQUIRED: `iss`, `aud` (Command Endpoint), `client_id`, `iat`, `exp`, `jti`, `command`, `tenant`
+  - PROHIBITED: `sub`, `aud_sub`
+  - OPTIONAL: `callback_token` — only where explicitly specified by the command
 
-- **client_id**  
-  REQUIRED.  
-  The `client_id` of the RP.
+Command-specific additions referenced later in this document include (non-exhaustive examples):
+- `metadata` — REQUIRED in the Metadata Command; PROHIBITED otherwise
+- `authentication_provider` — REQUIRED in the Migrate Command; PROHIBITED otherwise
 
-- **iat**  
-  REQUIRED.  
-  Issued at time, as specified in Section 2 of {{OpenID.Core}}.
+A Command Token MUST be signed. The same signing keys the OP uses for ID Tokens are used, enabling key discovery via the normal OpenID Connect mechanisms.
 
-- **exp**  
-  REQUIRED.  
-  Expiration time, as specified in Section 2 of {{OpenID.Core}}.
+Command Tokens MUST be explicitly typed by including a `typ` (type) JWS Header Parameter with the exact value `command+jwt`. See [Security Considerations](#security-considerations) for rationale.
 
-- **jti**  
-  REQUIRED.  
-  Unique identifier for the token, as specified in Section 9 of {{OpenID.Core}}.
+Example JWS header (non-normative):
 
-- **command**  
-  REQUIRED.  
-  A JSON string. The Command for the RP to execute. See [Account Commands](#account-commands) and [Tenant Commands](#tenant-commands) for standard values defined in this document. Other specifications may define additional values as described in [Extensibility](#defining-new-commands).
-
-- **tenant**  
-  REQUIRED.  
-  A JSON string. The OP's identifier for the OP's tenant. See {{OpenID.Enterprise}}.
-  
-  MUST have the value `personal`, `organization` or a stable OP unique value for multi-tenant OPs. The `personal` value is reserved for when Accounts are managed by individuals. The `organization` value is reserved for Accounts that are managed by an organization.
-
-  The combination of `iss` and `tenant` uniquely identifies a Tenant. 
-
-- **callback_token**  
-  OPTIONAL in an Asynchronous Command and the `metadata` command.  
-  A JSON String. An OP generated unique and opaque token for the RP to use when calling the OP's **callback_endpoint** Asynchronous Command responses and making a metadata refresh request.
-
-- **aud_sub**  
-  OPTIONAL for Account Commands.  
-  A JSON String. The RP's internal identifier for the Account, as provided by the RP during account resolution. When present, the RP SHOULD use this value to identify the Account rather than the combination of `iss` and `sub`. This claim facilitates more efficient account lookup and management at the RP.
-  
-
-
-See command definitions below for which claims are REQUIRED or OPTIONAL for a given request or response.
-
-An OP MAY include additional Claims. Any Claims that are not understood by the RP MUST be ignored.
-  
-The following Claim MUST NOT be used within the Command Token:
-
-- **nonce**  
-  PROHIBITED.  
-  A `nonce` Claim MUST NOT be present.
-  Its use is prohibited to prevent misuse of the Command Token. See [Cross-JWT Confusion](#cross-jwt-confusion) for details.
-
-
-A Command Token MUST be signed.
-The same keys an OP uses to sign ID Tokens are used to sign Command Tokens, allowing key discovery using the same mechanism used for ID Tokens.
-
-
-Command Tokens MUST be explicitly typed.
-This is accomplished by including a `typ` (type) Header Parameter
-with a value of `command+jwt` in the Command Token.
-See [Security Considerations](#security-considerations) for a discussion of the security and interoperability considerations
-of using explicit typing.
-
->
-> Add example of JWT header to show "typ":"command+jwt"?
->
+```json
+{
+  "alg": "RS256",
+  "kid": "2019-07-01-key",
+  "typ": "command+jwt"
+}
+```
 
 A non-normative example JWT Claims Set for the Command Token for an Activate Command follows:
 
@@ -360,9 +365,12 @@ A non-normative example JWT Claims Set for the Command Token for an Invalidate C
 
 
 
+
 # Account Commands
 
-Account Commands that operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` Claim if provided by the RP during account resolution, or the `iss` and `sub` Claims. Account Commands include Lifecycle Commands, the Invalidate Command, and the Migrate Command.
+Account Commands operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` claim if provided by the RP during account resolution, or the `iss` and `sub` claims. Account Commands include Lifecycle Commands, the Invalidate Command, and the Migrate Command.
+
+For each Account Command, the Command Token MUST include the Account Command baseline claims defined in [Command Token](#command-token). Each command section below lists only command-specific additions or exceptions. Only the claims listed as REQUIRED or OPTIONAL for a command may be present; all others are PROHIBITED unless otherwise specified.
 
 
 ## Account Lifecycle States
@@ -404,17 +412,18 @@ Following are the potential state transitions:
   |  |  +--------------------- delete ---+                                       |  |
   |  +------------------------ delete -------------------------------------------+  | 
   +--------------------------- delete ----------------------------------------------+
-```                                             
+```
 
 †The transition from **suspended** to **archived** is an extension to the ISO standard.
 
+
 ## Success Response
 
-When an RP successfully processes an Account Command, the RP returns the `HTTP 200 OK` response and a JSON object containing the following claims:
+When an RP successfully processes an Account Command, the RP returns an `HTTP 200 OK` response and a JSON object containing the following properties:
 
--  the provided `sub`
--  the `account_state` set to the state of the Account after processing
--  the RP's `aud_sub` if the RP has set `aud_sub_required` in its metadata
+- `sub` — REQUIRED — the `sub` provided in the request
+- `account_state` — REQUIRED — the state of the Account after processing
+- `aud_sub` — OPTIONAL — included if the RP has set `aud_sub_required` in its metadata
 
 Following is a non-normative response body to a successful Activate Command:
 
@@ -425,14 +434,16 @@ Following is a non-normative response body to a successful Activate Command:
 }
 ```
 
+
 ## Incompatible State Response
 
 If the Account is in an incompatible state in the identity register for the Account Command, the RP returns an HTTP 409 Conflict and a JSON object containing:
 
-- **account_state** where the value is the current state of the Account in the identity register
-- **error** set to the value `incompatible_state`
+- `account_state` — REQUIRED — the current state of the Account in the identity register
+- `error` — REQUIRED — set to the value `incompatible_state`
+- `sub` — REQUIRED — the `sub` provided in the request
 
-Following is a non-normative response to a unsuccessful Restore Command where the Account was in the **suspended** state:
+Following is a non-normative response to an unsuccessful Restore Command where the Account was in the **suspended** state:
 
 ```json
 {
@@ -466,9 +477,12 @@ Following is a non-normative response to an unsuccessful Maintain Command for a 
 ```
 
 
+
 ## Asynchronous Response
 
-When an RP is provided with a valid Asynchronous Command, and the account is in a compatible state to execute that command, the RP returns the HTTP 202 Accepted response.  When the Asynchronous Command has completed processing, and if the OP provided a `callback_endpoint` in its metadata and a `callback_token` in the command, the RP MUST do an HTTP POST of the result of processing to the `callback_endpoint` and include the `callback_token` as a Bearer token in the HTTP `Authorize` header.
+When an RP is provided with a valid Asynchronous Command, and the account is in a compatible state to execute that command, the RP returns an HTTP 202 Accepted response. When the Asynchronous Command has completed processing, and if the OP provided a `callback_endpoint` in its metadata and a `callback_token` in the command, the RP MUST do an HTTP POST of the result of processing to the `callback_endpoint` and include the `callback_token` as a Bearer token in the HTTP `Authorize` header.
+
+The response body MUST include the properties as specified for a Success Response above.
 
 ```
 POST /callback HTTP/1.1
@@ -491,10 +505,12 @@ Identified by the `activate` or `activate_async` value in the `command` Claim in
 
 The RP MUST create an Account with the included Claims in the identity register. The Account MUST be in the **unknown** state. The Account is in the **active** state after successful processing.
 
+
 ## Maintain Command
 Identified by the `maintain` or `maintain_async` value in the `command` Claim in a Command Token.
 
 The RP MUST update an existing Account in the identity register with the included Claims. The Account MUST be in the **active** state. The Account remains in the **active** state after successful processing.
+
 
 ## Suspend Command
 Identified by the `suspend` or `suspend_async` value in the `command` Claim in a Command Token.
@@ -502,10 +518,12 @@ Identified by the `suspend` or `suspend_async` value in the `command` Claim in a
 The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on the Account and mark the Account as being temporarily unavailable in the identity register. The Account MUST be in the **active** state. The Account is in the **suspended** state after successful processing.
 
 
+
 ## Reactivate Command
 Identified by the `reactivate` or `reactivate_async` value in the `command` Claim in a Command Token.
 
 The RP MUST mark a suspended Account as being active in the identity register. The Account MUST be in the **suspended** state. The Account is in the **active** state after successful processing. The RP SHOULD support the Reactivate Command if it supports the Suspend Command.
+
 
 ## Archive Command
 Identified by the `archive` or `archive_async` value in the `command` Claim in a Command Token.
@@ -514,30 +532,27 @@ The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on
 
 
 
+
 ## Restore Command
 Identified by the `restore` or `restore_async` value in the `command` Claim in a Command Token.
 
-The RP MUST restore an archived Account to the identity register and mark it as being active. The Account MUST be in the **archived** state. The Account is in the **active** state after successful processing. The RP SHOULD support the Restore Command if it suppSs the chA Comma.
+The RP MUST restore an archived Account to the identity register and mark it as being active. The Account MUST be in the **archived** state. The Account is in the **active** state after successful processing. The RP SHOULD support the Restore Command if it supports the Archive Command.
+
 
 ## Delete Command
 Identified by the `delete` or `delete_async` value in the `command` Claim in a Command Token.
 
 The RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on the Account, and delete all data associated with an Account. The Account can be in any state except **unknown**. The Account is in the **unknown** state after successful processing.
 
+
 ## Audit Command
 Identified by the `audit` or `audit_async` value in the `command` Claim of a Command Token.
 
-The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns `unknown` state. 
+The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns `unknown` state.
 
-The RP MAY include a `last_access` claim, a NumericDate, representing the number of seconds from 1970-01-01T00:00:00Z UTC. The value MUST be an integer and is equivalent to the iat and exp claims as defined in [RFC7519](#RFC7519).
-
-The RP MAY include an `authentication_provider` claim that represents which party or parties can authenticate the user:
-
-- **rp**: The Account can only be authenticated directly by the RP (e.g., username/password, RP-managed MFA)
-- **op**: The Account can only be authenticated by the requesting OP tenant
-- **op_migration**: The Account can be authenticated by either the RP or the OP tenant
-- **external**: The Account is authenticated by a different external authentication provider
-- **unknown**: The RP does not know, or does not want to share who the authentication provider is
+The response MAY also include:
+- `last_access` — OPTIONAL
+- `authentication_provider` — OPTIONAL
 
 
 ## Invalidate Command
@@ -552,13 +567,15 @@ The Account MUST be in the **active** state, and remains in the **active** state
 
 The functionality of the Invalidate Command is also performed by Suspend, Archive, and Delete Commands to ensure an Account in the **suspended**, **archived**, and **unknown** state no longer has access to resources.
 
+
 ## Invalidate Functionality
 
 The RP MUST revoke all sessions and tokens including authorization that may have been granted to applications, including `offline_access`, for Account resources identified by the `sub`.
 
+
 ## Migrate Command
 
-Identified by the `migrate` or `migrate_async` value in the `command` Claim in a Command Token.
+Identified by the `migrate` or `migrate_async` value in the `command` claim in a Command Token.
 
 The OP sends this Command to request to become the authentication provider for an existing Account. The Command Token MUST include the following additional claim:
 
@@ -580,53 +597,37 @@ If the RP does not allow the OP to migrate authentication for the Account, the R
 If the Account's current authentication provider does not allow changes in authentication responsibility (e.g., managed by a different OP or external system with non-transferable policies), the RP MUST return an HTTP 409 Conflict response and include the `error` parameter with the value of `authentication_not_transferable`.
 
 
+
 # Tenant Commands
 
-Tenant Commands are executed in the context of a Tenant. The RP MUST support the Metadata Command. Support for other Tenant Commands is optional. Command Tokens for Tenant Commands MUST contain the `tenant` Claim, and are PROHIBITED from containing the `sub` Claim.
+Tenant Commands are executed in the context of a Tenant. The RP MUST support the Metadata Command. Support for other Tenant Commands is optional. Command Tokens for Tenant Commands MUST contain the `tenant` claim, and are PROHIBITED from containing the `sub` claim. See [Claims and Properties](#claims-and-properties) for definitions.
 
 Note that no Asynchronous Commands are defined to execute in the context of a Tenant.
 
+
 ## Metadata Command
 
-Identified by the `metadata` value in the `command` Claim in a Command Token.
+Identified by the `metadata` value in the `command` claim in a Command Token.
 
-The OP sends this Command to exchange metadata with the RP. The OP sends its metadata in the Command Request, and the RP sends its metadata in the Command Response.
+Additional Command Token claims:
+- `metadata` — REQUIRED — OP-provided metadata object
+- `callback_token` — OPTIONAL
 
-The OP sends this Command to inform the RP of any domains or groups for a Tenant, and any other Tenant metadata the OP wants to share with the RP.
+The OP sends this Command to exchange metadata with the RP. The OP sends its metadata in the Command Request, and the RP sends its metadata in the Command Response. A Metadata Command replaces any previous metadata provided by the OP to the RP in the Command Request, and any metadata provided by the RP to the OP in the Command Response.
 
-A Metadata Command replaces any previous metadata provided by the OP to the RP in the Command Request, and any metadata provided by the RP to the OP in the Command Response. 
+### OP Metadata Object
 
+The `metadata` claim in the Metadata Command contains a JSON object with the following fields:
 
-The Claims set in a Metadata Command Token MUST include the following claim:
-
-- **metadata**   
-  REQUIRED   
-  A JSON object that MAY include the following Claims:
-
-  - **callback_endpoint**
-    OPTIONAL  
-    A URL that the RP may use to send Asynchronous Command responses and metadata refresh requests. The value may be tenant specific. 
-
-  - **domains**   
-    OPTIONAL   
-    A JSON array of one or more domain names the OP has verified the Tenant controls.
-
-  - **groups**  
-    OPTIONAL  
-    A JSON array of objects that MUST contain:
-    - **id**  
-      REQUIRED.  
-      The OP unique value for the group.
-
-    - **display**   
-      REQUIRED.   
-      The Tenant unique human readable name for the group.
-
-The OP sends the `domains` array for the RP to link any data the RP has to the OP Tenant.
-
-The OP sends the `groups` array to provide the display and optional description values for each identifier that the OP MAY include in a `groups` Claim in an ID Token or a Command Token for the Activate and Maintain Commands. This allows an admin at the RP to map centrally managed `groups` from an OP to roles or entitlements at an RP.
-
-The OP MAY include any other metadata in the `metadata` Claim, including metadata defined in OAuth Authorization Server Metadata. **add reference**
+- `callback_endpoint` — OPTIONAL — HTTPS URL for the OP callback endpoint that RPs can use to request a new command (for example, metadata or audit_tenant) or to deliver async results.
+- `domains` — OPTIONAL — Array of strings. Email or DNS domains associated with the Tenant (for discovery, correlation, or scoping at the RP).
+- `claims_supported` — OPTIONAL — Array of strings. Claim names the OP may include in Account Commands or expect back in responses.
+- `groups` — OPTIONAL — Array of group objects. Each object has:
+  - `id` — REQUIRED — OP-unique group identifier
+  - `display` — REQUIRED — Human-readable group name
+  - `description` — OPTIONAL — Group description
+ 
+Additional fields MAY be included, including those defined in OAuth 2.0 Authorization Server Metadata [RFC8414](#RFC8414). Unknown fields MUST be ignored by recipients.
 
 Following is a non-normative example of a Claim set in a Command Token for the Metadata Command:
 
@@ -670,63 +671,25 @@ Following is a non-normative example of a Claim set in a Command Token for the M
 ```
 
 
+
 ## Metadata Response
 
 If the Command Token is valid, the RP responds with an `application/json` media type that MUST include:
 
-- **context**  
-  REQUIRED  
-  A JSON object containing:
+- `context` (REQUIRED): A JSON object containing `iss` and `tenant` values from the Command Token.
+- `commands_supported` (REQUIRED): A JSON array of Commands the RP supports. The `metadata` value MUST be included.
+- `command_endpoint` (REQUIRED): The RP's Command Endpoint. This is the URL the Command Token was sent to.
+- `client_id` (REQUIRED): The `client_id` for the RP.
 
-  - **iss**  
-    REQUIRED  
-    The `iss` value from the Command Token.
+The response MAY also include:
+- `aud_sub_required` (OPTIONAL): Indicates the RP requires its `aud_sub` value be provided in account commands.
+- `roles` (OPTIONAL): A JSON array of objects describing roles supported by the RP.
 
-  - **tenant**  
-    REQUIRED   
-    The `tenant` value from the Command Token.
-  
-- **commands_supported**   
-  REQUIRED  
-  A JSON array of Commands the RP supports. The `metadata` value MUST be included.
-
-- **command_endpoint**  
-  REQUIRED  
-  The RP's Command Endpoint. This is the URL the Command Token was sent to.
-
-- **client_id**  
-  REQUIRED  
-  The `client_id` for the RP.
-
-And MAY include:
-
-- **aud_sub_required**
-  OPTIONAL.
-  A JSON boolean value set to `true`. Indicates the RP requires its `aud_sub` value be provided in account commands.
-
-- **roles**  
-  OPTIONAL  
-  A JSON array of objects that contain:
-
-  - **id**  
-    REQUIRED  
-    The RP unique value for the role.
-
-  - **display**  
-    REQUIRED   
-    The Tenant unique human readable name for the role.
-
-  - **description**  
-    OPTIONAL  
-    A description of the role.
-
-
-The RP sends the `roles` array to provide the display and optional description values for each role identifier that the RP supports. The OP MAY include the role identifiers in a `roles` claim in an ID Token or a Command Token for the Activate and Maintain Commands. This allows an admin at the OP to map centrally managed attributes to the RP `roles`.
-
+ 
 
 The response MAY also include any OAuth Dynamic Client Registration Metadata *TBD [IANA reference](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata)*
 
-The RP MAY provide a different response for different **iss** Claim values, and for different `tenant` Claim values.
+The RP MAY provide a different response for different `iss` or `tenant` values.
 
 Following is a non-normative example of Command Response for a Metadata Command:
 
@@ -850,16 +813,13 @@ The RP sends a Streaming Response to a Streaming Request. In a Streaming Respons
 
 If the OP sent a `Content-Encoding` header in the request with a compression the RP understands, the RP MAY include a `Content-Encoding` header with one of the OP provided values.
 
-Per SSE, the body of the response is a series of events. In addition to the required field name `data`, each event MUST include the `id` field with a unique value for each event, and the `event` field with a value of either `account-state`, `command-complete`, or `error`. The RP sends an `account-state` event for each Account at the RP for the `iss`, and `org` if sent, in the Audit Tenant Command. When all `account-state` events have been sent, the RP sends an `command-complete` event. If an unrecoverable error occurs during processing, the RP SHOULD sent an `error` event where the `data` field is JSON with the JSON string property `error_description` set to a value determined by the RP.
+Per SSE, the body of the response is a series of events. In addition to the required field name `data`, each event MUST include the `id` field with a unique value for each event, and the `event` field with a value of either `account-state`, `command-complete`, or `error`. The RP sends an `account-state` event for each Account at the RP for the `iss`, and `org` if sent, in the Audit Tenant Command. When all `account-state` events have been sent, the RP sends a `command-complete` event. If an unrecoverable error occurs during processing, the RP SHOULD send an `error` event where the `data` field is JSON with the JSON string property `error_description` set to a value determined by the RP.
 
-The `data` parameter of the `account-state` event MUST contain the following:
-
-- `sub` representing the Account
-- `account_state` representing the current state for the Account from the states supported by the RP.
+The `data` parameter of the `account-state` event MUST contain: `sub`, `account_state`.
 
 The `data` parameter MAY include other Claims as defined by the Tenant Command.
 
-The `data` parameter of the `command-complete` event MUST include the `total_accounts` property with a value for the total number of `account-state` events the RP has sent.
+The `data` parameter of the `command-complete` event MUST include `total_accounts` with the total number of `account-state` events the RP has sent.
 
 If there are no Accounts for the Tenant at the RP, the RP responds with only the `command-complete` event with `total-accounts` having a value of `0`.
 
@@ -909,11 +869,11 @@ The following is a non-normative example of a Streaming Response for an Audit Te
 ```
 
 
-If the connection is lost during a Streaming Response, The OP SHOULD generate a new Command Token and send a Streaming Request include the HTTP header `Last-Event-Id` with the last event `id` property received per SSE. 
+If the connection is lost during a Streaming Response, The OP SHOULD generate a new Command Token and send a Streaming Request including the HTTP header `Last-Event-Id` with the last event `id` property received per SSE. 
 
 Following is a non-normative example of a Streaming Request sent after a connection was lost:
 
-```
+```bash
 POST /commands HTTP/1.1
 Host: rp.example.net
 Content-Type: application/x-www-form-urlencoded
@@ -933,6 +893,8 @@ If the RP is unable to resume a Streaming Response when provided a `Last-Event-I
 Sent in a Streaming Request and identified by the `audit_tenant` value in the `command` Claim in a Command Token.
 
 The OP sends the Audit Tenant Command to learn the state of Accounts for a Tenant at an RP. 
+Additional Command Token claims:
+- `callback_token` — OPTIONAL
 
 The following is a non-normative example of the Claims Set in the Command Token of an Audit Tenant Command:
 
@@ -952,11 +914,16 @@ The following is a non-normative example of the Claims Set in the Command Token 
 
 ## Audit Tenant Response
 
-The RP sends a Streaming Response if it received a valid Suspend Tenant Command.
+The RP sends a Streaming Response if it received a valid Audit Tenant Command.
 
 The RP MUST include any Claims for an Account that the RP has retained that were provided by the OP in the event `data` parameter JSON string. If the Claim values have been modified at the RP, the modified values should be returned. 
 
 The RP MAY include a `last_access` claim, a NumericDate, representing the number of seconds from 1970-01-01T00:00:00Z UTC. The value MUST be an integer and is equivalent to the iat and exp claims as defined in [RFC7519](#RFC7519).
+
+Streaming Response Events:
+- `account-state` events MUST include: `sub` (REQUIRED), `account_state` (REQUIRED)
+- `account-state` events MAY include: `last_access`, `authentication_provider`, other retained Claims
+- A final `command-complete` event MUST include: `total_accounts` (REQUIRED)
 
 
 ## Audit Tenant Refresh Request
@@ -967,7 +934,7 @@ The RP does an HTTP POST to the **callback_endpoint** passing the `callback_toke
 
 Following is a non-normative example:
 
-```
+```bash
 POST /callback HTTP/1.1
 Host: op.example.org
 Authorization: Bearer eyhwixm236djs9shne9sjdnjs9dhbsk
@@ -991,6 +958,11 @@ Upon receiving this Command, the RP MUST suspend all Accounts in the active stat
 
 The RP sends a Streaming Response if it received a valid Suspend Tenant Command.
 
+
+Streaming Response Events:
+- `account-state` events MUST include: `sub` (REQUIRED), `account_state` (value `suspended`)
+- A final `command-complete` event MUST include: `total_accounts` (REQUIRED)
+
 ## Archive Tenant Command
 
 Sent in a Streaming Request and identified by the `archive_tenant` value in the `command` Claim in a Command Token.
@@ -999,12 +971,21 @@ Upon receiving this Command, the RP MUST suspend all Accounts in the active and 
 The RP sends a Streaming Response if it received a valid Archive Tenant Command.
 
 
+Streaming Response Events:
+- `account-state` events MUST include: `sub` (REQUIRED), `account_state` (value `archived`)
+- A final `command-complete` event MUST include: `total_accounts` (REQUIRED)
+
+
 ## Delete Tenant Command
 
 Sent in a Streaming Request and identified by the `delete_tenant` value in the `command` Claim in a Command Token.
 Upon receiving this Command, the RP MUST delete all Accounts for the Tenant identified by the `tenant` Claim in the Command Token.
 
-The RP sends a Streaming Response if it received a valid Delete Tenant Command. If the Delete Tenant Command was successful, the RP will send only a `command_completed` event with a `data` parameter containing the JSON string `{"total_accounts":0}`.
+The RP sends a Streaming Response if it received a valid Delete Tenant Command. If the Delete Tenant Command was successful, the RP will send only a `command-complete` event with a `data` parameter containing the JSON string `{"total_accounts":0}`.
+
+
+Streaming Response Events:
+- A final `command-complete` event MUST include: `total_accounts` (REQUIRED). No `account-state` events are sent upon successful deletion of all Accounts.
 
 ## Invalidate Tenant Command
 
@@ -1012,6 +993,11 @@ Sent in a Streaming Request and identified by the `invalidate_tenant` value in t
 Upon receiving this Command, the RP MUST perform the [Invalidate Functionality](#invalidate-functionality) on all Accounts in the **active** state for the Tenant identified by the `tenant` Claim in the Command Token.
 
 The RP sends a Streaming Response if it received a valid Invalidate Tenant Command.
+
+
+Streaming Response Events:
+- `account-state` events MUST include: `sub` (REQUIRED), `account_state` (value `active`)
+- A final `command-complete` event MUST include: `total_accounts` (REQUIRED)
 
 # Extensibility
 
@@ -1173,6 +1159,7 @@ This specification registers the `application/command+jwt` media type as per {{!
 - **[RFC6750]** Jones, M., and Hardt, D., “The OAuth 2.0 Authorization Framework: Bearer Token Usage,” *RFC 6750*, October 2012
 - **[RFC7519]** Jones, M., Bradley, J., and Sakimura, N. “JSON Web Token (JWT),” *RFC 7519*, May 2015.
 - **[RFC7591]** Jones, M., Bradley, J., and Sakimura, N. “OAuth 2.0 Dynamic Client Registration Protocol,” *RFC 7591*, March 2015.
+- **[RFC8414]** Jones, M., and Sakimura, N., “OAuth 2.0 Authorization Server Metadata,” *RFC 8414*, June 2018.
 - **[RFC9110]** Fielding, R. “HTTP Semantics,” *RFC 9110*, June 2022.
 - **[RFC8725]** Bromberg, L. “Security Considerations for JSON Web Tokens,” *RFC 8725*, June 2020.
 - **[RFC6838]** IANA. “Media Types,” *RFC 6838*, June 2013.
@@ -1251,3 +1238,11 @@ specification.
    * add error messages for restarting a stream that cannot be restarted
    * add `roles` claims and `roles` metadata
    * add `last_access` claim for RP to communicate last time user accessed the resource off_line 
+   * minor edits and structural cleanup
+
+  -02
+
+  * added `aud_sub` as claim in commands and property from RP in audit reponses
+  * Metadata Response: Added `aud_sub_required` response property (OPTIONAL) normatively indicating RP requirement to receive `aud_sub` in subsequent Account Commands.
+  * collected all normative claims and properties into new "Claims and Properties" section centralizing definitions of all Command Token claims and response properties
+  * Command Token: Introduced normative baseline claim sets for Account vs Tenant Commands; clarified that only listed claims plus command-specific additions may appear (tightening allowed claims surface).
