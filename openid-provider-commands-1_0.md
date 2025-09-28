@@ -1296,7 +1296,7 @@ specification.
    * added `audit` account command
    * change `aud` to be the `commands_endpoint` and add `client_id` as a separate claim
    * add `error` as another event type in tenant SSE response
-   * add async commands, `notification_endpoint` to OP metadata, and `callback_token` for async response and `metadata` request 
+   * add async commands, `callback_endpoint` to OP metadata, and `callback_token` for async response and `metadata` request 
    * add error messages for restarting a stream that cannot be restarted
    * add `roles` claims and `roles` metadata
    * add `last_access` claim for RP to communicate last time user accessed the resource off_line 
