@@ -80,11 +80,16 @@ This specification defines the following terms:
 
 - **Synchronous Command**: A Command where the response from the RP is provided synchronously to the OP with an HTTP 200 Success response.
 
-- **Asynchronous Command**: A Command where the response from the RP is provided asynchronously to the OP with an initial HTTP 202 Accepted response. The RP sends the final response of an Asynchronous Command to the OP **callback_endpoint**. Command identifiers for Asynchronous Commands end with the string `_async`. 
+- **Asynchronous Command**: A Command where the response from the RP is provided asynchronously to the OP with an initial HTTP 202 Accepted response. The RP sends the final response of an Asynchronous Command to the OP **notification_endpoint**. Command identifiers for Asynchronous Commands end with the string `_async`. 
 
-- **Command Token**: A JSON Web Token (JWT) signed by the OP that contains Claims about the Command being issued.
+- **Command Token**: A JSON Web Token (JWT) signed by the OP that contains Claims about the Command being issued by the OP.
 
 - **Command Endpoint**: The URL at the RP where OPs post Command Tokens.
+
+- **Notification**: A message sent from the RP to an OP to notify the OP of a change in RP state or to send async command responses.
+
+- **Notification Token**: An JSON Web Token (JWT) signed by the RP that contains Claims about the Notification from the RP.
+
 
 - **Tenant**: A logically isolated entity within an OP that represents a distinct organizational or administrative boundary. An OP may have a single Tenant, or multiple Tenants. The Tenant may contain Accounts managed by individuals, or may contain Accounts managed by an organization.
 
@@ -102,11 +107,11 @@ This specification defines a Command Request containing a Command Token sent fro
 +------+      Command response  +------+
 ```
 
-The OP may provide a callback endpoint and a callback token for the RP to request a command be sent by the OP such as a metadata or audit_tenant command, or to send the results of an asynchronous command. 
+The OP may provide a notification endpoint for the RP to send Notification Tokens to notify the OP that the RP's state has changed or to send the results of an asynchronous command. 
 
 ```
-+------+             Callback   +------+
-|      |<--- Callback Token ----|      |
++------+          Notification  +------+
+|      |<- Notification Token --|      |
 |  OP  |                        |  RP  | 
 |      |----------------------->|      |
 +------+  204 or error response +------+
@@ -186,7 +191,7 @@ This section defines all claims and properties used in this specification.
     - `op_migration`: Both RP and OP can authenticate (temporary migration state)
     - `external`: Authentication is by an external provider
     - `unknown`: Authentication provider is unknown or undisclosed
-- **`callback_token`**: An OP-generated, opaque token used by the RP when sending asynchronous results or requesting a metadata refresh.
+ 
 - **`client_id`**: The client identifier for the RP.
 - **`command`**: The command name for the RP to execute. Standard values are defined in [Account Commands](#account-commands) and [Tenant Commands](#tenant-commands). Additional values may be defined via [Extensibility](#defining-new-commands).
 - **`exp`**: Expiration time (NumericDate, per RFC 7519).
@@ -300,12 +305,12 @@ Baseline claim sets (only the listed claims may appear unless a command explicit
 - Account Command baseline claims:
   - REQUIRED: `iss`, `aud` (Command Endpoint), `client_id`, `iat`, `exp`, `jti`, `command`, `tenant`, `sub`
   - OPTIONAL: `aud_sub`
-  - OPTIONAL: `callback_token` — only for commands whose identifier ends with `_async`
+ 
 
 - Tenant Command baseline claims:
   - REQUIRED: `iss`, `aud` (Command Endpoint), `client_id`, `iat`, `exp`, `jti`, `command`, `tenant`
   - PROHIBITED: `sub`, `aud_sub`
-  - OPTIONAL: `callback_token` — only where explicitly specified by the command
+ 
 
 Command-specific additions referenced later in this document include (non-exhaustive examples):
 - `metadata` — REQUIRED in the Metadata Command; PROHIBITED otherwise
@@ -416,6 +421,23 @@ Following are the potential state transitions:
 
 †The transition from **suspended** to **archived** is an extension to the ISO standard.
 
+### Temporary States for Asynchronous Processing
+
+When the RP accepts an Asynchronous Command (responding with HTTP 202 Accepted), the Account MAY enter a temporary “pending” state to indicate that processing is in progress. These temporary states are not steady states in the identity register; they exist only while work is ongoing and are cleared upon completion. The following temporary states are defined:
+
+- `activate_pending`
+- `maintain_pending`
+- `suspend_pending`
+- `reactivate_pending`
+- `archive_pending`
+- `restore_pending`
+- `delete_pending`
+
+Semantics:
+- Entry: Upon accepting the corresponding `*_async` command, the RP SHOULD reflect the Account in the matching `*_pending` state.
+- Visibility: Pending states MAY be returned wherever `account_state` is surfaced (for example, in Audit responses) to communicate that an operation is in flight.
+- Exit (success): When the RP completes processing successfully and sends the asynchronous result to the OP, the Account transitions from `*_pending` to the steady-state outcome of that command (respectively: `active`, `active`, `suspended`, `active`, `archived`, `active`, `unknown`).
+- Exit (failure): If the RP cannot complete the operation, the RP MUST clear the pending state and return the Account to its last steady state prior to entering `*_pending`.
 
 ## Success Response
 
@@ -477,28 +499,6 @@ Following is a non-normative response to an unsuccessful Maintain Command for a 
 ```
 
 
-
-## Asynchronous Response
-
-When an RP is provided with a valid Asynchronous Command, and the account is in a compatible state to execute that command, the RP returns an HTTP 202 Accepted response. When the Asynchronous Command has completed processing, and if the OP provided a `callback_endpoint` in its metadata and a `callback_token` in the command, the RP MUST do an HTTP POST of the result of processing to the `callback_endpoint` and include the `callback_token` as a Bearer token in the HTTP `Authorize` header.
-
-The response body MUST include the properties as specified for a Success Response above.
-
-```
-POST /callback HTTP/1.1
-Host: op.example.org
-Authorization: Bearer eyjesudyxhjsjshjedshjdsaajhdsa
-Content-Type: application/json
-Accept: application/json
-Cache-Control: no-cache
-
-{
-  "account_state": "active",
-  "sub": "248289761001"
-}
-```
-
-If the request is invalid or the `callback_token` is invalid, the OP MUST respond with an error per [RFC6750](#RFC6750).
 
 ## Activate Command
 Identified by the `activate` or `activate_async` value in the `command` Claim in a Command Token.
@@ -611,7 +611,6 @@ Identified by the `metadata` value in the `command` claim in a Command Token.
 
 Additional Command Token claims:
 - `metadata` — REQUIRED — OP-provided metadata object
-- `callback_token` — OPTIONAL
 
 The OP sends this Command to exchange metadata with the RP. The OP sends its metadata in the Command Request, and the RP sends its metadata in the Command Response. A Metadata Command replaces any previous metadata provided by the OP to the RP in the Command Request, and any metadata provided by the RP to the OP in the Command Response.
 
@@ -619,7 +618,7 @@ The OP sends this Command to exchange metadata with the RP. The OP sends its met
 
 The `metadata` claim in the Metadata Command contains a JSON object with the following fields:
 
-- `callback_endpoint` — OPTIONAL — HTTPS URL for the OP callback endpoint that RPs can use to request a new command (for example, metadata or audit_tenant) or to deliver async results.
+- `notification_endpoint` — OPTIONAL — HTTPS URL for the OP notification endpoint that RPs can use to send notifications.
 - `domains` — OPTIONAL — Array of strings. Email or DNS domains associated with the Tenant (for discovery, correlation, or scoping at the RP).
 - `claims_supported` — OPTIONAL — Array of strings. Claim names the OP may include in Account Commands or expect back in responses.
 - `groups` — OPTIONAL — Array of group objects. Each object has:
@@ -641,9 +640,8 @@ Following is a non-normative example of a Claim set in a Command Token for the M
   "jti": "bWJt",
   "command": "metadata",
   "tenant": "ff6e7c96",
-  "callback_token": "eyhwixm236djs9shne9sjdnjs9dhbsk",
   "metadata": {
-    "callback_endpoint": "https://op.example.org/callback",
+    "notification_endpoint": "https://op.example.org/callback",
     "groups": [
       {
         "id": "b0f4861d",
@@ -684,7 +682,7 @@ If the Command Token is valid, the RP responds with an `application/json` media 
 The response MAY also include:
 - `aud_sub_required` (OPTIONAL): Indicates the RP requires its `aud_sub` value be provided in account commands.
 - `roles` (OPTIONAL): A JSON array of objects describing roles supported by the RP.
-
+- `jwks_uri` (OPTIONAL): A URL pointing to a set of JSON-encoded public keys, represented as a JWK Set [RFC7517], which the RP may use for signing notifications sent to the OP. 
  
 
 The response MAY also include any OAuth Dynamic Client Registration Metadata *TBD [IANA reference](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata)*
@@ -750,31 +748,6 @@ Following is a non-normative example of Command Response for a Metadata Command:
   ]
 }
 ```
-
-## Metadata Refresh Request
-
-If the OP provided a `callback_endpoint` and `callback_token` in its last `metadata` Command, the RP may request the the OP to perform a new `metadata` command. One motivation for the RP to make this request is if it's metadata has changed. 
-
-The RP does an HTTP POST to the **callback_endpoint** passing the `callback_token` as a bearer token in the HTTP `Authorize` header with a `content-type` of `application/json` and a JSON string with `command_requested` set to `metadata`.
-
-Following is a non-normative example:
-
-```
-POST /callback HTTP/1.1
-Host: op.example.org
-Authorization: Bearer eyhwixm236djs9shne9sjdnjs9dhbsk
-Content-Type: application/json
-Accept: application/json
-Cache-Control: no-cache
-
-{ 
-  "command_requested": "metadata"
-}
-```
-
-If the `callback_token` is valid, the OP MUST respond with an HTTP 204 No Content response.
-
-If the `callback_token` is not valid, or the content of the request body is not valid, the OP MUST respond with an error per [RFC6750](#RFC6750).
 
 ## Streaming Request
 
@@ -893,8 +866,6 @@ If the RP is unable to resume a Streaming Response when provided a `Last-Event-I
 Sent in a Streaming Request and identified by the `audit_tenant` value in the `command` Claim in a Command Token.
 
 The OP sends the Audit Tenant Command to learn the state of Accounts for a Tenant at an RP. 
-Additional Command Token claims:
-- `callback_token` — OPTIONAL
 
 The following is a non-normative example of the Claims Set in the Command Token of an Audit Tenant Command:
 
@@ -906,8 +877,7 @@ The following is a non-normative example of the Claims Set in the Command Token 
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJz",
-  "command": "audit_tenant",
-  "callback_token": "eyhwixm236djs9shne9sjdnjs9dhbsk"
+  "command": "audit_tenant"
 }
 ```
 
@@ -925,31 +895,6 @@ Streaming Response Events:
 - `account-state` events MAY include: `last_access`, `authentication_provider`, other retained Claims
 - A final `command-complete` event MUST include: `total_accounts` (REQUIRED)
 
-
-## Audit Tenant Refresh Request
-
-If the OP provided a `callback_endpoint` and a `callback_token` in its last `audit_tenant` Command, the RP may request the the OP to perform a new `audit_tenant` command. One motivation for the RP to make this request is there have been changes to accounts. 
-
-The RP does an HTTP POST to the **callback_endpoint** passing the `callback_token` as a bearer token in the HTTP `Authorize` header with a `content-type` of `application/json` and a JSON string with `command_requested` set to `audit_tenant`.
-
-Following is a non-normative example:
-
-```bash
-POST /callback HTTP/1.1
-Host: op.example.org
-Authorization: Bearer eyhwixm236djs9shne9sjdnjs9dhbsk
-Content-Type: application/json
-Accept: application/json
-Cache-Control: no-cache
-
-{ 
-  "command_requested": "audit_tenant"
-}
-```
-
-If the `callback_token` is valid, the OP MUST respond with an HTTP 204 No Content response.
-
-If the `callback_token` is not valid, or the content of the request body is not valid, the OP MUST respond with an error per [RFC6750](#RFC6750).
 
 ## Suspend Tenant Command
 
@@ -999,6 +944,119 @@ Streaming Response Events:
 - `account-state` events MUST include: `sub` (REQUIRED), `account_state` (value `active`)
 - A final `command-complete` event MUST include: `total_accounts` (REQUIRED)
 
+
+# Notifications
+
+
+Notifications enable an RP to notify an OP of a change in the RP state or the completion of an asynchronous command. Notifications are authenticated using a Notification Token issued and signed by the RP.
+
+## Notification Token
+
+A Notification Token is a JSON Web Token (JWT) signed by the RP. The OP validates the signature using the RP's published keys (e.g., via the `jwks_uri` value that the RP provided in the Metadata Response). To avoid cross-JWT confusion, Notification Tokens MUST include a `typ` JWS header of `notification+jwt`.
+
+Non-normative JWS header example:
+
+```json
+{
+  "alg": "RS256",
+  "kid": "2025-09-01",
+  "typ": "notification+jwt"
+}
+```
+
+Notification Tokens are posted to the OP's `notification_endpoint` using `application/x-www-form-urlencoded` as the HTTP request body and MUST include a parameter named `notification_token` whose value is the JWS Compact Serialization of the token.
+The OP MUST respond with HTTP 204 No Content on success. Error responses use standard error status codes and MAY include a JSON body with `error` and `error_description`.
+
+```
+POST /notifications HTTP/1.1
+Host: op.example.org
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+Cache-Control: no-cache
+
+notification_token=eyJhbGciOiJS...
+```
+
+
+## Notification Claims
+
+
+All Notification Tokens MUST include the following claims in the payload:
+
+- `iss` - the RP 
+- `aud` - the OP issuer value
+- `client_id` - the RP's client_id
+- `iat` - 
+- `jti` -
+- `tenant` - the OP tenant
+- `notification` - the type of notification (see Notification Types)
+
+
+If the notification is for the result of an async command, the properties of the async command will also be included as claims.
+
+### Notification Types
+
+The `notification` claim in the Notification Token payload indicates the type of notification. This specification defines the following values:
+
+- `metadata_change` — RP indicates its metadata has changed. The OP SHOULD initiate a new Metadata Command.
+- `audit_tenant_change` — RP indicates there have been changes to the tenant’s accounts. The OP SHOULD initiate a new Audit Tenant Command.
+- `*_async_response` — RP is sending the final result for an asynchronous command. The asterisk form is a placeholder for the command name (for example: `activate_async_response`, `suspend_async_response`). 
+
+Additional values MAY be defined by future extensions. The OP MUST ignore unknown notification values.
+
+### Examples
+
+Non-normative examples of Notification Token payloads (JWT Claims Sets):
+
+- metadata_change
+
+```json
+{
+  "iss": "https://rp.example.net",
+  "aud": "https://op.example.org",
+  "client_id": "s6BhdRkqt3",
+  "iat": 1734007000,
+  "jti": "nt-001",
+  "tenant": "ff6e7c96",
+  "notification": "metadata_change"
+}
+```
+
+- activate_async_response (successful)
+
+```json
+{
+  "iss": "https://rp.example.net",
+  "aud": "https://op.example.org",
+  "client_id": "s6BhdRkqt3",
+  "iat": 1734007100,
+  "jti": "nt-002",
+  "tenant": "ff6e7c96",
+  "notification": "activate_async_response",
+  "sub": "248289761001",
+  "account_state": "active"
+}
+```
+
+- suspend_async_response (unsuccessful)
+
+```json
+{
+  "iss": "https://rp.example.net",
+  "aud": "https://op.example.org",
+  "client_id": "s6BhdRkqt3",
+  "iat": 1734007200,
+  "jti": "nt-003",
+  "tenant": "ff6e7c96",
+  "notification": "suspend_async_response",
+  "sub": "248289761001",
+  "account_state": "archived",
+  "error": "incompatible_state",
+  "error_description": "Account is archived and cannot be suspended"
+}
+```
+
+
 # Extensibility
 
 
@@ -1018,6 +1076,10 @@ used.
 
 
 ## Defining New Relying Party Metadata
+
+*To be completed.*
+
+## Defining New Notifications
 
 *To be completed.*
 
@@ -1234,7 +1296,7 @@ specification.
    * added `audit` account command
    * change `aud` to be the `commands_endpoint` and add `client_id` as a separate claim
    * add `error` as another event type in tenant SSE response
-   * add async commands, `callback_endpoint` to OP metadata, and `callback_token` for async response and `metadata` request 
+   * add async commands, `notification_endpoint` to OP metadata, and `callback_token` for async response and `metadata` request 
    * add error messages for restarting a stream that cannot be restarted
    * add `roles` claims and `roles` metadata
    * add `last_access` claim for RP to communicate last time user accessed the resource off_line 
