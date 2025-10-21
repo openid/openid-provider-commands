@@ -11,24 +11,23 @@
        OpenID Connect defines a protocol for an end-user to use an OpenID Provider (OP) to log in to a Relying Party (RP) and assert Claims about the end-user using an ID Token. RPs will often use the identity Claims about the user to implicitly (or explicitly) establish an Account for the user at the RP 
        OpenID Provider Commands complements OpenID Connect by introducing a set of Commands for an OP to directly manage an end-user Account at an RP. These Commands enable an OP to activate, maintain, suspend, reactivate, archive, restore, delete, audit, invalidate an end-user Account, and migrate authentication of an existing account. Command Tokens build on the OpenID Connect ID Token schema and verification, simplifying adoption by RPs. 
     " name="description">
-<meta content="xml2rfc 3.30.2" name="generator">
+<meta content="xml2rfc 3.31.0" name="generator">
 <meta content="security" name="keyword">
 <meta content="openid" name="keyword">
 <meta content="lifecycle" name="keyword">
 <meta name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.30.2
+  xml2rfc 3.31.0
     Python 3.10.18
     ConfigArgParse 1.7.1
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
     lxml 6.0.2
-    platformdirs 4.4.0
+    platformdirs 4.5.0
     pycountry 24.6.1
-    PyYAML 6.0.2
+    PyYAML 6.0.3
     requests 2.32.5
-    setuptools 65.5.0
     wcwidth 0.2.14
 -->
 <link href="openid-provider-commands-1_0.xml" rel="alternate" type="application/rfc+xml">
@@ -47,9 +46,9 @@
 */
 
 /* fonts */
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans'); /* Sans-serif */
-@import url('https://fonts.googleapis.com/css?family=Noto+Serif'); /* Serif (print) */
-@import url('https://fonts.googleapis.com/css?family=Roboto+Mono'); /* Monospace */
+@import url('https://static.ietf.org/fonts/noto-sans/import.css'); /* Sans-serif */
+@import url('https://static.ietf.org/fonts/noto-serif/import.css'); /* Serif (print) */
+@import url('https://static.ietf.org/fonts/roboto-mono/import.css'); /* Monospace */
 
 :root {
   --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
@@ -1220,7 +1219,7 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left"></td>
 <td class="center">openid-provider-commands</td>
-<td class="right">September 2025</td>
+<td class="right">October 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Hardt &amp; McGuinness</td>
@@ -1235,7 +1234,7 @@ li > p:last-of-type:only-child {
 <dd class="workgroup">OpenID Connect</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-09-25" class="published">25 September 2025</time>
+<time datetime="2025-10-21" class="published">21 October 2025</time>
     </dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
@@ -1335,6 +1334,11 @@ li > p:last-of-type:only-child {
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
                 <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-account-lifecycle-states" class="internal xref">Account Lifecycle States</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1.2.1">
+                    <p id="section-toc.1-1.6.2.1.2.1.1"><a href="#section-6.1.1" class="auto internal xref">6.1.1</a>.  <a href="#name-temporary-states-for-asynch" class="internal xref">Temporary States for Asynchronous Processing</a></p>
+</li>
+                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
                 <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-success-response" class="internal xref">Success Response</a></p>
@@ -1343,46 +1347,43 @@ li > p:last-of-type:only-child {
                 <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-incompatible-state-response" class="internal xref">Incompatible State Response</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
-                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-asynchronous-response" class="internal xref">Asynchronous Response</a></p>
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-activate-command" class="internal xref">Activate Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5">
-                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-activate-command" class="internal xref">Activate Command</a></p>
+                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-maintain-command" class="internal xref">Maintain Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.6">
-                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-maintain-command" class="internal xref">Maintain Command</a></p>
+                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-suspend-command" class="internal xref">Suspend Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.7">
-                <p id="section-toc.1-1.6.2.7.1"><a href="#section-6.7" class="auto internal xref">6.7</a>.  <a href="#name-suspend-command" class="internal xref">Suspend Command</a></p>
+                <p id="section-toc.1-1.6.2.7.1"><a href="#section-6.7" class="auto internal xref">6.7</a>.  <a href="#name-reactivate-command" class="internal xref">Reactivate Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.8">
-                <p id="section-toc.1-1.6.2.8.1"><a href="#section-6.8" class="auto internal xref">6.8</a>.  <a href="#name-reactivate-command" class="internal xref">Reactivate Command</a></p>
+                <p id="section-toc.1-1.6.2.8.1"><a href="#section-6.8" class="auto internal xref">6.8</a>.  <a href="#name-archive-command" class="internal xref">Archive Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.9">
-                <p id="section-toc.1-1.6.2.9.1"><a href="#section-6.9" class="auto internal xref">6.9</a>.  <a href="#name-archive-command" class="internal xref">Archive Command</a></p>
+                <p id="section-toc.1-1.6.2.9.1"><a href="#section-6.9" class="auto internal xref">6.9</a>.  <a href="#name-restore-command" class="internal xref">Restore Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.10">
-                <p id="section-toc.1-1.6.2.10.1"><a href="#section-6.10" class="auto internal xref">6.10</a>. <a href="#name-restore-command" class="internal xref">Restore Command</a></p>
+                <p id="section-toc.1-1.6.2.10.1"><a href="#section-6.10" class="auto internal xref">6.10</a>. <a href="#name-delete-command" class="internal xref">Delete Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.11">
-                <p id="section-toc.1-1.6.2.11.1"><a href="#section-6.11" class="auto internal xref">6.11</a>. <a href="#name-delete-command" class="internal xref">Delete Command</a></p>
+                <p id="section-toc.1-1.6.2.11.1"><a href="#section-6.11" class="auto internal xref">6.11</a>. <a href="#name-audit-command" class="internal xref">Audit Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.12">
-                <p id="section-toc.1-1.6.2.12.1"><a href="#section-6.12" class="auto internal xref">6.12</a>. <a href="#name-audit-command" class="internal xref">Audit Command</a></p>
+                <p id="section-toc.1-1.6.2.12.1"><a href="#section-6.12" class="auto internal xref">6.12</a>. <a href="#name-invalidate-command" class="internal xref">Invalidate Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.13">
-                <p id="section-toc.1-1.6.2.13.1"><a href="#section-6.13" class="auto internal xref">6.13</a>. <a href="#name-invalidate-command" class="internal xref">Invalidate Command</a></p>
+                <p id="section-toc.1-1.6.2.13.1"><a href="#section-6.13" class="auto internal xref">6.13</a>. <a href="#name-invalidate-functionality" class="internal xref">Invalidate Functionality</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.14">
-                <p id="section-toc.1-1.6.2.14.1"><a href="#section-6.14" class="auto internal xref">6.14</a>. <a href="#name-invalidate-functionality" class="internal xref">Invalidate Functionality</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.15">
-                <p id="section-toc.1-1.6.2.15.1"><a href="#section-6.15" class="auto internal xref">6.15</a>. <a href="#name-migrate-command" class="internal xref">Migrate Command</a></p>
+                <p id="section-toc.1-1.6.2.14.1"><a href="#section-6.14" class="auto internal xref">6.14</a>. <a href="#name-migrate-command" class="internal xref">Migrate Command</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.15.2.1">
-                    <p id="section-toc.1-1.6.2.15.2.1.1"><a href="#section-6.15.1" class="auto internal xref">6.15.1</a>.  <a href="#name-access-denied-error" class="internal xref">Access Denied Error</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.14.2.1">
+                    <p id="section-toc.1-1.6.2.14.2.1.1"><a href="#section-6.14.1" class="auto internal xref">6.14.1</a>.  <a href="#name-access-denied-error" class="internal xref">Access Denied Error</a></p>
 </li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.15.2.2">
-                    <p id="section-toc.1-1.6.2.15.2.2.1"><a href="#section-6.15.2" class="auto internal xref">6.15.2</a>.  <a href="#name-authentication-not-transfer" class="internal xref">Authentication Not Transferable Error</a></p>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.14.2.2">
+                    <p id="section-toc.1-1.6.2.14.2.2.1"><a href="#section-6.14.2" class="auto internal xref">6.14.2</a>.  <a href="#name-authentication-not-transfer" class="internal xref">Authentication Not Transferable Error</a></p>
 </li>
                 </ul>
 </li>
@@ -1403,114 +1404,130 @@ li > p:last-of-type:only-child {
                 <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-metadata-response" class="internal xref">Metadata Response</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-metadata-refresh-request" class="internal xref">Metadata Refresh Request</a></p>
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-streaming-request" class="internal xref">Streaming Request</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
-                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-streaming-request" class="internal xref">Streaming Request</a></p>
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-streaming-response" class="internal xref">Streaming Response</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
-                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-streaming-response" class="internal xref">Streaming Response</a></p>
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-audit-tenant-command" class="internal xref">Audit Tenant Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.6">
-                <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="auto internal xref">7.6</a>.  <a href="#name-audit-tenant-command" class="internal xref">Audit Tenant Command</a></p>
+                <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="auto internal xref">7.6</a>.  <a href="#name-audit-tenant-response" class="internal xref">Audit Tenant Response</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.7">
-                <p id="section-toc.1-1.7.2.7.1"><a href="#section-7.7" class="auto internal xref">7.7</a>.  <a href="#name-audit-tenant-response" class="internal xref">Audit Tenant Response</a></p>
+                <p id="section-toc.1-1.7.2.7.1"><a href="#section-7.7" class="auto internal xref">7.7</a>.  <a href="#name-suspend-tenant-command" class="internal xref">Suspend Tenant Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.8">
-                <p id="section-toc.1-1.7.2.8.1"><a href="#section-7.8" class="auto internal xref">7.8</a>.  <a href="#name-audit-tenant-refresh-reques" class="internal xref">Audit Tenant Refresh Request</a></p>
+                <p id="section-toc.1-1.7.2.8.1"><a href="#section-7.8" class="auto internal xref">7.8</a>.  <a href="#name-archive-tenant-command" class="internal xref">Archive Tenant Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.9">
-                <p id="section-toc.1-1.7.2.9.1"><a href="#section-7.9" class="auto internal xref">7.9</a>.  <a href="#name-suspend-tenant-command" class="internal xref">Suspend Tenant Command</a></p>
+                <p id="section-toc.1-1.7.2.9.1"><a href="#section-7.9" class="auto internal xref">7.9</a>.  <a href="#name-delete-tenant-command" class="internal xref">Delete Tenant Command</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.10">
-                <p id="section-toc.1-1.7.2.10.1"><a href="#section-7.10" class="auto internal xref">7.10</a>. <a href="#name-archive-tenant-command" class="internal xref">Archive Tenant Command</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.11">
-                <p id="section-toc.1-1.7.2.11.1"><a href="#section-7.11" class="auto internal xref">7.11</a>. <a href="#name-delete-tenant-command" class="internal xref">Delete Tenant Command</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.12">
-                <p id="section-toc.1-1.7.2.12.1"><a href="#section-7.12" class="auto internal xref">7.12</a>. <a href="#name-invalidate-tenant-command" class="internal xref">Invalidate Tenant Command</a></p>
+                <p id="section-toc.1-1.7.2.10.1"><a href="#section-7.10" class="auto internal xref">7.10</a>. <a href="#name-invalidate-tenant-command" class="internal xref">Invalidate Tenant Command</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-extensibility" class="internal xref">Extensibility</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-notifications" class="internal xref">Notifications</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
-                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-defining-new-commands" class="internal xref">Defining New Commands</a></p>
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-notification-token" class="internal xref">Notification Token</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
-                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-defining-new-tenant-metadat" class="internal xref">Defining New Tenant Metadata</a></p>
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-notification-claims" class="internal xref">Notification Claims</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2.2.1">
+                    <p id="section-toc.1-1.8.2.2.2.1.1"><a href="#section-8.2.1" class="auto internal xref">8.2.1</a>.  <a href="#name-notification-types" class="internal xref">Notification Types</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
-                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-defining-new-relying-party-" class="internal xref">Defining New Relying Party Metadata</a></p>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2.2.2">
+                    <p id="section-toc.1-1.8.2.2.2.2.1"><a href="#section-8.2.2" class="auto internal xref">8.2.2</a>.  <a href="#name-examples" class="internal xref">Examples</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-openid-provider-command-sup" class="internal xref">OpenID Provider Command Support</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-extensibility" class="internal xref">Extensibility</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-defining-new-commands" class="internal xref">Defining New Commands</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-defining-new-tenant-metadat" class="internal xref">Defining New Tenant Metadata</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
+                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-defining-new-relying-party-" class="internal xref">Defining New Relying Party Metadata</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.4">
+                <p id="section-toc.1-1.9.2.4.1"><a href="#section-9.4" class="auto internal xref">9.4</a>.  <a href="#name-defining-new-notifications" class="internal xref">Defining New Notifications</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-implementation-consideratio" class="internal xref">Implementation Considerations</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-openid-provider-command-sup" class="internal xref">OpenID Provider Command Support</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
-                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-cross-jwt-confusion" class="internal xref">Cross-JWT Confusion</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-implementation-consideratio" class="internal xref">Implementation Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
-                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-json-web-token-claims" class="internal xref">JSON Web Token Claims</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1.2.1">
-                    <p id="section-toc.1-1.13.2.1.2.1.1"><a href="#section-13.1.1" class="auto internal xref">13.1.1</a>.  <a href="#name-registry-contents" class="internal xref">Registry Contents</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
-                <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-oauth-dynamic-client-regist" class="internal xref">OAuth Dynamic Client Registration Metadata Registration</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2.2.1">
-                    <p id="section-toc.1-1.13.2.2.2.1.1"><a href="#section-13.2.1" class="auto internal xref">13.2.1</a>.  <a href="#name-registry-contents-2" class="internal xref">Registry Contents</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.3">
-                <p id="section-toc.1-1.13.2.3.1"><a href="#section-13.3" class="auto internal xref">13.3</a>.  <a href="#name-media-type-registration" class="internal xref">Media Type Registration</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
+                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="auto internal xref">12.1</a>.  <a href="#name-cross-jwt-confusion" class="internal xref">Cross-JWT Confusion</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-references" class="internal xref">References</a></p>
+            <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
-                <p id="section-toc.1-1.14.2.1.1"><a href="#section-14.1" class="auto internal xref">14.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+                <p id="section-toc.1-1.14.2.1.1"><a href="#section-14.1" class="auto internal xref">14.1</a>.  <a href="#name-json-web-token-claims" class="internal xref">JSON Web Token Claims</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1.2.1">
+                    <p id="section-toc.1-1.14.2.1.2.1.1"><a href="#section-14.1.1" class="auto internal xref">14.1.1</a>.  <a href="#name-registry-contents" class="internal xref">Registry Contents</a></p>
+</li>
+                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2">
-                <p id="section-toc.1-1.14.2.2.1"><a href="#section-14.2" class="auto internal xref">14.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+                <p id="section-toc.1-1.14.2.2.1"><a href="#section-14.2" class="auto internal xref">14.2</a>.  <a href="#name-oauth-dynamic-client-regist" class="internal xref">OAuth Dynamic Client Registration Metadata Registration</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2.2.1">
+                    <p id="section-toc.1-1.14.2.2.2.1.1"><a href="#section-14.2.1" class="auto internal xref">14.2.1</a>.  <a href="#name-registry-contents-2" class="internal xref">Registry Contents</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.3">
+                <p id="section-toc.1-1.14.2.3.1"><a href="#section-14.3" class="auto internal xref">14.3</a>.  <a href="#name-media-type-registration" class="internal xref">Media Type Registration</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
+            <p id="section-toc.1-1.15.1"><a href="#section-15" class="auto internal xref">15</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.1">
+                <p id="section-toc.1-1.15.2.1.1"><a href="#section-15.1" class="auto internal xref">15.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.2">
+                <p id="section-toc.1-1.15.2.2.1"><a href="#section-15.2" class="auto internal xref">15.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
-            <p id="section-toc.1-1.16.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-notices" class="internal xref">Notices</a></p>
+            <p id="section-toc.1-1.16.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
-            <p id="section-toc.1-1.17.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-document-history" class="internal xref">Document History</a></p>
+            <p id="section-toc.1-1.17.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-notices" class="internal xref">Notices</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18">
-            <p id="section-toc.1-1.18.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.18.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-document-history" class="internal xref">Document History</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.19">
+            <p id="section-toc.1-1.19.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1563,16 +1580,22 @@ the use of <em>this fixed-width font</em>.<a href="#section-1.1-3" class="pilcro
             <p id="section-1.2-2.3.1"><strong>Synchronous Command</strong>: A Command where the response from the RP is provided synchronously to the OP with an HTTP 200 Success response.<a href="#section-1.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.2-2.4">
-            <p id="section-1.2-2.4.1"><strong>Asynchronous Command</strong>: A Command where the response from the RP is provided asynchronously to the OP with an initial HTTP 202 Accepted response. The RP sends the final response of an Asynchronous Command to the OP <strong>callback_endpoint</strong>. Command identifiers for Asynchronous Commands end with the string <code>_async</code>.<a href="#section-1.2-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-1.2-2.4.1"><strong>Asynchronous Command</strong>: A Command where the response from the RP is provided asynchronously to the OP with an initial HTTP 202 Accepted response. The RP sends the final response of an Asynchronous Command to the OP <strong>notification_endpoint</strong>. Command identifiers for Asynchronous Commands end with the string <code>_async</code>.<a href="#section-1.2-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.2-2.5">
-            <p id="section-1.2-2.5.1"><strong>Command Token</strong>: A JSON Web Token (JWT) signed by the OP that contains Claims about the Command being issued.<a href="#section-1.2-2.5.1" class="pilcrow">¶</a></p>
+            <p id="section-1.2-2.5.1"><strong>Command Token</strong>: A JSON Web Token (JWT) signed by the OP that contains Claims about the Command being issued by the OP.<a href="#section-1.2-2.5.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.2-2.6">
             <p id="section-1.2-2.6.1"><strong>Command Endpoint</strong>: The URL at the RP where OPs post Command Tokens.<a href="#section-1.2-2.6.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.2-2.7">
-            <p id="section-1.2-2.7.1"><strong>Tenant</strong>: A logically isolated entity within an OP that represents a distinct organizational or administrative boundary. An OP may have a single Tenant, or multiple Tenants. The Tenant may contain Accounts managed by individuals, or may contain Accounts managed by an organization.<a href="#section-1.2-2.7.1" class="pilcrow">¶</a></p>
+            <p id="section-1.2-2.7.1"><strong>Notification</strong>: A message sent from the RP to an OP to notify the OP of a change in RP state or to send async command responses.<a href="#section-1.2-2.7.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-1.2-2.8">
+            <p id="section-1.2-2.8.1"><strong>Notification Token</strong>: An JSON Web Token (JWT) signed by the RP that contains Claims about the Notification from the RP.<a href="#section-1.2-2.8.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-1.2-2.9">
+            <p id="section-1.2-2.9.1"><strong>Tenant</strong>: A logically isolated entity within an OP that represents a distinct organizational or administrative boundary. An OP may have a single Tenant, or multiple Tenants. The Tenant may contain Accounts managed by individuals, or may contain Accounts managed by an organization.<a href="#section-1.2-2.9.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -1591,10 +1614,10 @@ the use of <em>this fixed-width font</em>.<a href="#section-1.1-3" class="pilcro
 +------+      Command response  +------+
 </pre><a href="#section-1.3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-1.3-3">The OP may provide a callback endpoint and a callback token for the RP to request a command be sent by the OP such as a metadata or audit_tenant command, or to send the results of an asynchronous command.<a href="#section-1.3-3" class="pilcrow">¶</a></p>
+<p id="section-1.3-3">The OP may provide a notification endpoint for the RP to send Notification Tokens to notify the OP that the RP's state has changed or to send the results of an asynchronous command.<a href="#section-1.3-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-1.3-4">
-<pre>+------+             Callback   +------+
-|      |&lt;--- Callback Token ----|      |
+<pre>+------+          Notification  +------+
+|      |&lt;- Notification Token --|      |
 |  OP  |                        |  RP  |
 |      |-----------------------&gt;|      |
 +------+  204 or error response +------+
@@ -1716,34 +1739,31 @@ the use of <em>this fixed-width font</em>.<a href="#section-1.1-3" class="pilcro
             </ul>
 </li>
           <li class="normal" id="section-2.1-1.4">
-            <p id="section-2.1-1.4.1"><strong><code>callback_token</code></strong>: An OP-generated, opaque token used by the RP when sending asynchronous results or requesting a metadata refresh.<a href="#section-2.1-1.4.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-1.4.1"><strong><code>client_id</code></strong>: The client identifier for the RP.<a href="#section-2.1-1.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-1.5">
-            <p id="section-2.1-1.5.1"><strong><code>client_id</code></strong>: The client identifier for the RP.<a href="#section-2.1-1.5.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-1.5.1"><strong><code>command</code></strong>: The command name for the RP to execute. Standard values are defined in <a href="#account-commands">Account Commands</a> and <a href="#tenant-commands">Tenant Commands</a>. Additional values may be defined via <a href="#defining-new-commands">Extensibility</a>.<a href="#section-2.1-1.5.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-1.6">
-            <p id="section-2.1-1.6.1"><strong><code>command</code></strong>: The command name for the RP to execute. Standard values are defined in <a href="#account-commands">Account Commands</a> and <a href="#tenant-commands">Tenant Commands</a>. Additional values may be defined via <a href="#defining-new-commands">Extensibility</a>.<a href="#section-2.1-1.6.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-1.6.1"><strong><code>exp</code></strong>: Expiration time (NumericDate, per RFC 7519).<a href="#section-2.1-1.6.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-1.7">
-            <p id="section-2.1-1.7.1"><strong><code>exp</code></strong>: Expiration time (NumericDate, per RFC 7519).<a href="#section-2.1-1.7.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-1.7.1"><strong><code>iat</code></strong>: Issued at time (NumericDate, per RFC 7519).<a href="#section-2.1-1.7.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-1.8">
-            <p id="section-2.1-1.8.1"><strong><code>iat</code></strong>: Issued at time (NumericDate, per RFC 7519).<a href="#section-2.1-1.8.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-1.8.1"><strong><code>iss</code></strong>: Issuer Identifier for the OP (see OpenID Connect Core, Section 2).<a href="#section-2.1-1.8.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-1.9">
-            <p id="section-2.1-1.9.1"><strong><code>iss</code></strong>: Issuer Identifier for the OP (see OpenID Connect Core, Section 2).<a href="#section-2.1-1.9.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-1.9.1"><strong><code>jti</code></strong>: Unique identifier for the token (per OpenID Connect Core Section 9).<a href="#section-2.1-1.9.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-1.10">
-            <p id="section-2.1-1.10.1"><strong><code>jti</code></strong>: Unique identifier for the token (per OpenID Connect Core Section 9).<a href="#section-2.1-1.10.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-1.10.1"><strong><code>metadata</code></strong>: A JSON object conveying OP-provided metadata to the RP in the Metadata Command. See <a href="#op-metadata-object">OP Metadata Object</a> for the normative schema.<a href="#section-2.1-1.10.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-1.11">
-            <p id="section-2.1-1.11.1"><strong><code>metadata</code></strong>: A JSON object conveying OP-provided metadata to the RP in the Metadata Command. See <a href="#op-metadata-object">OP Metadata Object</a> for the normative schema.<a href="#section-2.1-1.11.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-1.11.1"><strong><code>sub</code></strong>: Subject Identifier for the Account (see OpenID Connect Core, Section 2).<a href="#section-2.1-1.11.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-1.12">
-            <p id="section-2.1-1.12.1"><strong><code>sub</code></strong>: Subject Identifier for the Account (see OpenID Connect Core, Section 2).<a href="#section-2.1-1.12.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-2.1-1.13">
-            <p id="section-2.1-1.13.1"><strong><code>tenant</code></strong>: Identifier of the Tenant within the OP. Values include <code>personal</code>, <code>organization</code>, or an OP-unique stable identifier for multi-tenant OPs. The combination of <code>iss</code> and <code>tenant</code> identifies a Tenant.<a href="#section-2.1-1.13.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-1.12.1"><strong><code>tenant</code></strong>: Identifier of the Tenant within the OP. Values include <code>personal</code>, <code>organization</code>, or an OP-unique stable identifier for multi-tenant OPs. The combination of <code>iss</code> and <code>tenant</code> identifies a Tenant.<a href="#section-2.1-1.12.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -1911,9 +1931,6 @@ to trigger different runtime behaviors.<a href="#section-4-5" class="pilcrow">¶
             <li class="normal" id="section-5-5.1.2.2">
               <p id="section-5-5.1.2.2.1">OPTIONAL: <code>aud_sub</code><a href="#section-5-5.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-5-5.1.2.3">
-              <p id="section-5-5.1.2.3.1">OPTIONAL: <code>callback_token</code> — only for commands whose identifier ends with <code>_async</code><a href="#section-5-5.1.2.3.1" class="pilcrow">¶</a></p>
-</li>
           </ul>
 </li>
         <li class="normal" id="section-5-5.2">
@@ -1924,9 +1941,6 @@ to trigger different runtime behaviors.<a href="#section-4-5" class="pilcrow">¶
 </li>
             <li class="normal" id="section-5-5.2.2.2">
               <p id="section-5-5.2.2.2.1">PROHIBITED: <code>sub</code>, <code>aud_sub</code><a href="#section-5-5.2.2.2.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-5-5.2.2.3">
-              <p id="section-5-5.2.2.3.1">OPTIONAL: <code>callback_token</code> — only where explicitly specified by the command<a href="#section-5-5.2.2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </li>
@@ -2038,6 +2052,42 @@ to trigger different runtime behaviors.<a href="#section-4-5" class="pilcrow">¶
 </pre><a href="#section-6.1-5" class="pilcrow">¶</a>
 </div>
 <p id="section-6.1-6">†The transition from <strong>suspended</strong> to <strong>archived</strong> is an extension to the ISO standard.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
+<div id="temporary-states-for-asynchronous-processing">
+<section id="section-6.1.1">
+          <h4 id="name-temporary-states-for-asynch">
+<a href="#section-6.1.1" class="section-number selfRef">6.1.1. </a><a href="#name-temporary-states-for-asynch" class="section-name selfRef">Temporary States for Asynchronous Processing</a>
+          </h4>
+<p id="section-6.1.1-1">When the RP accepts an Asynchronous Command (responding with HTTP 202 Accepted), the Account MAY enter a temporary “pending” state to indicate that processing is in progress. These temporary states are not steady states in the identity register; they exist only while work is ongoing and are cleared upon completion. The following temporary states are defined:<a href="#section-6.1.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.1.1-2.1">
+              <p id="section-6.1.1-2.1.1"><code>activate_pending</code><a href="#section-6.1.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.1-2.2">
+              <p id="section-6.1.1-2.2.1"><code>maintain_pending</code><a href="#section-6.1.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.1-2.3">
+              <p id="section-6.1.1-2.3.1"><code>suspend_pending</code><a href="#section-6.1.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.1-2.4">
+              <p id="section-6.1.1-2.4.1"><code>reactivate_pending</code><a href="#section-6.1.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.1-2.5">
+              <p id="section-6.1.1-2.5.1"><code>archive_pending</code><a href="#section-6.1.1-2.5.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.1-2.6">
+              <p id="section-6.1.1-2.6.1"><code>restore_pending</code><a href="#section-6.1.1-2.6.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-6.1.1-2.7">
+              <p id="section-6.1.1-2.7.1"><code>delete_pending</code><a href="#section-6.1.1-2.7.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-6.1.1-3">Semantics:
+- Entry: Upon accepting the corresponding <code>*_async</code> command, the RP SHOULD reflect the Account in the matching <code>*_pending</code> state.
+- Visibility: Pending states MAY be returned wherever <code>account_state</code> is surfaced (for example, in Audit responses) to communicate that an operation is in flight.
+- Exit (success): When the RP completes processing successfully and sends the asynchronous result to the OP, the Account transitions from <code>*_pending</code> to the steady-state outcome of that command (respectively: <code>active</code>, <code>active</code>, <code>suspended</code>, <code>active</code>, <code>archived</code>, <code>active</code>, <code>unknown</code>).
+- Exit (failure): If the RP cannot complete the operation, the RP MUST clear the pending state and return the Account to its last steady state prior to entering <code>*_pending</code>.<a href="#section-6.1.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="success-response">
@@ -2115,162 +2165,138 @@ the Account is incompatible state.<a href="#section-6.3-5" class="pilcrow">¶</a
 </div>
 </section>
 </div>
-<div id="asynchronous-response">
-<section id="section-6.4">
-        <h3 id="name-asynchronous-response">
-<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-asynchronous-response" class="section-name selfRef">Asynchronous Response</a>
-        </h3>
-<p id="section-6.4-1">When an RP is provided with a valid Asynchronous Command, and the account is in a compatible state to execute that command, the RP returns an HTTP 202 Accepted response. When the Asynchronous Command has completed processing, and if the OP provided a <code>callback_endpoint</code> in its metadata and a <code>callback_token</code> in the command, the RP MUST do an HTTP POST of the result of processing to the <code>callback_endpoint</code> and include the <code>callback_token</code> as a Bearer token in the HTTP <code>Authorize</code> header.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
-<p id="section-6.4-2">The response body MUST include the properties as specified for a Success Response above.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6.4-3">
-<pre>POST /callback HTTP/1.1
-Host: op.example.org
-Authorization: Bearer eyjesudyxhjsjshjedshjdsaajhdsa
-Content-Type: application/json
-Accept: application/json
-Cache-Control: no-cache
-
-{
-  "account_state": "active",
-  "sub": "248289761001"
-}
-</pre><a href="#section-6.4-3" class="pilcrow">¶</a>
-</div>
-<p id="section-6.4-4">If the request is invalid or the <code>callback_token</code> is invalid, the OP MUST respond with an error per <a href="#RFC6750">RFC6750</a>.<a href="#section-6.4-4" class="pilcrow">¶</a></p>
-</section>
-</div>
 <div id="activate-command">
-<section id="section-6.5">
+<section id="section-6.4">
         <h3 id="name-activate-command">
-<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-activate-command" class="section-name selfRef">Activate Command</a>
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-activate-command" class="section-name selfRef">Activate Command</a>
         </h3>
-<p id="section-6.5-1">Identified by the <code>activate</code> or <code>activate_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
-<p id="section-6.5-2">The RP MUST create an Account with the included Claims in the identity register. The Account MUST be in the <strong>unknown</strong> state. The Account is in the <strong>active</strong> state after successful processing.<a href="#section-6.5-2" class="pilcrow">¶</a></p>
+<p id="section-6.4-1">Identified by the <code>activate</code> or <code>activate_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-2">The RP MUST create an Account with the included Claims in the identity register. The Account MUST be in the <strong>unknown</strong> state. The Account is in the <strong>active</strong> state after successful processing.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="maintain-command">
-<section id="section-6.6">
+<section id="section-6.5">
         <h3 id="name-maintain-command">
-<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-maintain-command" class="section-name selfRef">Maintain Command</a>
+<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-maintain-command" class="section-name selfRef">Maintain Command</a>
         </h3>
-<p id="section-6.6-1">Identified by the <code>maintain</code> or <code>maintain_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
-<p id="section-6.6-2">The RP MUST update an existing Account in the identity register with the included Claims. The Account MUST be in the <strong>active</strong> state. The Account remains in the <strong>active</strong> state after successful processing.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
+<p id="section-6.5-1">Identified by the <code>maintain</code> or <code>maintain_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
+<p id="section-6.5-2">The RP MUST update an existing Account in the identity register with the included Claims. The Account MUST be in the <strong>active</strong> state. The Account remains in the <strong>active</strong> state after successful processing.<a href="#section-6.5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="suspend-command">
-<section id="section-6.7">
+<section id="section-6.6">
         <h3 id="name-suspend-command">
-<a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-suspend-command" class="section-name selfRef">Suspend Command</a>
+<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-suspend-command" class="section-name selfRef">Suspend Command</a>
         </h3>
-<p id="section-6.7-1">Identified by the <code>suspend</code> or <code>suspend_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.7-1" class="pilcrow">¶</a></p>
-<p id="section-6.7-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account and mark the Account as being temporarily unavailable in the identity register. The Account MUST be in the <strong>active</strong> state. The Account is in the <strong>suspended</strong> state after successful processing.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
+<p id="section-6.6-1">Identified by the <code>suspend</code> or <code>suspend_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
+<p id="section-6.6-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account and mark the Account as being temporarily unavailable in the identity register. The Account MUST be in the <strong>active</strong> state. The Account is in the <strong>suspended</strong> state after successful processing.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="reactivate-command">
-<section id="section-6.8">
+<section id="section-6.7">
         <h3 id="name-reactivate-command">
-<a href="#section-6.8" class="section-number selfRef">6.8. </a><a href="#name-reactivate-command" class="section-name selfRef">Reactivate Command</a>
+<a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-reactivate-command" class="section-name selfRef">Reactivate Command</a>
         </h3>
-<p id="section-6.8-1">Identified by the <code>reactivate</code> or <code>reactivate_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.8-1" class="pilcrow">¶</a></p>
-<p id="section-6.8-2">The RP MUST mark a suspended Account as being active in the identity register. The Account MUST be in the <strong>suspended</strong> state. The Account is in the <strong>active</strong> state after successful processing. The RP SHOULD support the Reactivate Command if it supports the Suspend Command.<a href="#section-6.8-2" class="pilcrow">¶</a></p>
+<p id="section-6.7-1">Identified by the <code>reactivate</code> or <code>reactivate_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.7-1" class="pilcrow">¶</a></p>
+<p id="section-6.7-2">The RP MUST mark a suspended Account as being active in the identity register. The Account MUST be in the <strong>suspended</strong> state. The Account is in the <strong>active</strong> state after successful processing. The RP SHOULD support the Reactivate Command if it supports the Suspend Command.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="archive-command">
-<section id="section-6.9">
+<section id="section-6.8">
         <h3 id="name-archive-command">
-<a href="#section-6.9" class="section-number selfRef">6.9. </a><a href="#name-archive-command" class="section-name selfRef">Archive Command</a>
+<a href="#section-6.8" class="section-number selfRef">6.8. </a><a href="#name-archive-command" class="section-name selfRef">Archive Command</a>
         </h3>
-<p id="section-6.9-1">Identified by the <code>archive</code> or <code>archive_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.9-1" class="pilcrow">¶</a></p>
-<p id="section-6.9-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account and remove the Account from the identity register. The Account MUST be in either the <strong>active</strong> or <strong>suspended</strong> state. The Account is in the <strong>archived</strong> state after successful processing.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
+<p id="section-6.8-1">Identified by the <code>archive</code> or <code>archive_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.8-1" class="pilcrow">¶</a></p>
+<p id="section-6.8-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account and remove the Account from the identity register. The Account MUST be in either the <strong>active</strong> or <strong>suspended</strong> state. The Account is in the <strong>archived</strong> state after successful processing.<a href="#section-6.8-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="restore-command">
-<section id="section-6.10">
+<section id="section-6.9">
         <h3 id="name-restore-command">
-<a href="#section-6.10" class="section-number selfRef">6.10. </a><a href="#name-restore-command" class="section-name selfRef">Restore Command</a>
+<a href="#section-6.9" class="section-number selfRef">6.9. </a><a href="#name-restore-command" class="section-name selfRef">Restore Command</a>
         </h3>
-<p id="section-6.10-1">Identified by the <code>restore</code> or <code>restore_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.10-1" class="pilcrow">¶</a></p>
-<p id="section-6.10-2">The RP MUST restore an archived Account to the identity register and mark it as being active. The Account MUST be in the <strong>archived</strong> state. The Account is in the <strong>active</strong> state after successful processing. The RP SHOULD support the Restore Command if it supports the Archive Command.<a href="#section-6.10-2" class="pilcrow">¶</a></p>
+<p id="section-6.9-1">Identified by the <code>restore</code> or <code>restore_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.9-1" class="pilcrow">¶</a></p>
+<p id="section-6.9-2">The RP MUST restore an archived Account to the identity register and mark it as being active. The Account MUST be in the <strong>archived</strong> state. The Account is in the <strong>active</strong> state after successful processing. The RP SHOULD support the Restore Command if it supports the Archive Command.<a href="#section-6.9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="delete-command">
-<section id="section-6.11">
+<section id="section-6.10">
         <h3 id="name-delete-command">
-<a href="#section-6.11" class="section-number selfRef">6.11. </a><a href="#name-delete-command" class="section-name selfRef">Delete Command</a>
+<a href="#section-6.10" class="section-number selfRef">6.10. </a><a href="#name-delete-command" class="section-name selfRef">Delete Command</a>
         </h3>
-<p id="section-6.11-1">Identified by the <code>delete</code> or <code>delete_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.11-1" class="pilcrow">¶</a></p>
-<p id="section-6.11-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account, and delete all data associated with an Account. The Account can be in any state except <strong>unknown</strong>. The Account is in the <strong>unknown</strong> state after successful processing.<a href="#section-6.11-2" class="pilcrow">¶</a></p>
+<p id="section-6.10-1">Identified by the <code>delete</code> or <code>delete_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.10-1" class="pilcrow">¶</a></p>
+<p id="section-6.10-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account, and delete all data associated with an Account. The Account can be in any state except <strong>unknown</strong>. The Account is in the <strong>unknown</strong> state after successful processing.<a href="#section-6.10-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="audit-command">
-<section id="section-6.12">
+<section id="section-6.11">
         <h3 id="name-audit-command">
-<a href="#section-6.12" class="section-number selfRef">6.12. </a><a href="#name-audit-command" class="section-name selfRef">Audit Command</a>
+<a href="#section-6.11" class="section-number selfRef">6.11. </a><a href="#name-audit-command" class="section-name selfRef">Audit Command</a>
         </h3>
-<p id="section-6.12-1">Identified by the <code>audit</code> or <code>audit_async</code> value in the <code>command</code> Claim of a Command Token.<a href="#section-6.12-1" class="pilcrow">¶</a></p>
-<p id="section-6.12-2">The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns <code>unknown</code> state.<a href="#section-6.12-2" class="pilcrow">¶</a></p>
-<p id="section-6.12-3">The response MAY also include:
+<p id="section-6.11-1">Identified by the <code>audit</code> or <code>audit_async</code> value in the <code>command</code> Claim of a Command Token.<a href="#section-6.11-1" class="pilcrow">¶</a></p>
+<p id="section-6.11-2">The RP MUST include the state of the Account and any Claims for an Account that the RP has retained that were provided by the OP. If the Account is not found, the RP returns <code>unknown</code> state.<a href="#section-6.11-2" class="pilcrow">¶</a></p>
+<p id="section-6.11-3">The response MAY also include:
 - <code>last_access</code> — OPTIONAL
-- <code>authentication_provider</code> — OPTIONAL<a href="#section-6.12-3" class="pilcrow">¶</a></p>
+- <code>authentication_provider</code> — OPTIONAL<a href="#section-6.11-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="invalidate-command">
-<section id="section-6.13">
+<section id="section-6.12">
         <h3 id="name-invalidate-command">
-<a href="#section-6.13" class="section-number selfRef">6.13. </a><a href="#name-invalidate-command" class="section-name selfRef">Invalidate Command</a>
+<a href="#section-6.12" class="section-number selfRef">6.12. </a><a href="#name-invalidate-command" class="section-name selfRef">Invalidate Command</a>
         </h3>
-<p id="section-6.13-1">Identified by the <code>invalidate</code> or <code>invalidate_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.13-1" class="pilcrow">¶</a></p>
-<p id="section-6.13-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account.
-The OP MAY send this Command when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, if the user's device was compromised, or any other security related concern about the account.<a href="#section-6.13-2" class="pilcrow">¶</a></p>
-<p id="section-6.13-3">The Account MUST be in the <strong>active</strong> state, and remains in the <strong>active</strong> state after executing the Command. If the Account is in any other state, the RP MUST return an <a href="#incompatible-state-response">Incompatible State Response</a>.<a href="#section-6.13-3" class="pilcrow">¶</a></p>
-<p id="section-6.13-4">The functionality of the Invalidate Command is also performed by Suspend, Archive, and Delete Commands to ensure an Account in the <strong>suspended</strong>, <strong>archived</strong>, and <strong>unknown</strong> state no longer has access to resources.<a href="#section-6.13-4" class="pilcrow">¶</a></p>
+<p id="section-6.12-1">Identified by the <code>invalidate</code> or <code>invalidate_async</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-6.12-1" class="pilcrow">¶</a></p>
+<p id="section-6.12-2">The RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on the Account.
+The OP MAY send this Command when it suspects a previous OpenID Connect ID Token issued by the OP was granted to a malicious actor, if the user's device was compromised, or any other security related concern about the account.<a href="#section-6.12-2" class="pilcrow">¶</a></p>
+<p id="section-6.12-3">The Account MUST be in the <strong>active</strong> state, and remains in the <strong>active</strong> state after executing the Command. If the Account is in any other state, the RP MUST return an <a href="#incompatible-state-response">Incompatible State Response</a>.<a href="#section-6.12-3" class="pilcrow">¶</a></p>
+<p id="section-6.12-4">The functionality of the Invalidate Command is also performed by Suspend, Archive, and Delete Commands to ensure an Account in the <strong>suspended</strong>, <strong>archived</strong>, and <strong>unknown</strong> state no longer has access to resources.<a href="#section-6.12-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="invalidate-functionality">
-<section id="section-6.14">
+<section id="section-6.13">
         <h3 id="name-invalidate-functionality">
-<a href="#section-6.14" class="section-number selfRef">6.14. </a><a href="#name-invalidate-functionality" class="section-name selfRef">Invalidate Functionality</a>
+<a href="#section-6.13" class="section-number selfRef">6.13. </a><a href="#name-invalidate-functionality" class="section-name selfRef">Invalidate Functionality</a>
         </h3>
-<p id="section-6.14-1">The RP MUST revoke all sessions and tokens including authorization that may have been granted to applications, including <code>offline_access</code>, for Account resources identified by the <code>sub</code>.<a href="#section-6.14-1" class="pilcrow">¶</a></p>
+<p id="section-6.13-1">The RP MUST revoke all sessions and tokens including authorization that may have been granted to applications, including <code>offline_access</code>, for Account resources identified by the <code>sub</code>.<a href="#section-6.13-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="migrate-command">
-<section id="section-6.15">
+<section id="section-6.14">
         <h3 id="name-migrate-command">
-<a href="#section-6.15" class="section-number selfRef">6.15. </a><a href="#name-migrate-command" class="section-name selfRef">Migrate Command</a>
+<a href="#section-6.14" class="section-number selfRef">6.14. </a><a href="#name-migrate-command" class="section-name selfRef">Migrate Command</a>
         </h3>
-<p id="section-6.15-1">Identified by the <code>migrate</code> or <code>migrate_async</code> value in the <code>command</code> claim in a Command Token.<a href="#section-6.15-1" class="pilcrow">¶</a></p>
-<p id="section-6.15-2">The OP sends this Command to request to become the authentication provider for an existing Account. The Command Token MUST include the following additional claim:<a href="#section-6.15-2" class="pilcrow">¶</a></p>
+<p id="section-6.14-1">Identified by the <code>migrate</code> or <code>migrate_async</code> value in the <code>command</code> claim in a Command Token.<a href="#section-6.14-1" class="pilcrow">¶</a></p>
+<p id="section-6.14-2">The OP sends this Command to request to become the authentication provider for an existing Account. The Command Token MUST include the following additional claim:<a href="#section-6.14-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.15-3.1">
-            <p id="section-6.15-3.1.1"><strong>authentication_provider</strong><br>
+<li class="normal" id="section-6.14-3.1">
+            <p id="section-6.14-3.1.1"><strong>authentication_provider</strong><br>
 REQUIRED.<br>
-A JSON string indicating the requested authentication provider status. MUST be set to <code>op</code> if the OP wants to become the sole authentication provider for the Account, or <code>op_migration</code> if the OP wants to enable dual authentication where both the OP and existing authentication methods remain valid.<a href="#section-6.15-3.1.1" class="pilcrow">¶</a></p>
+A JSON string indicating the requested authentication provider status. MUST be set to <code>op</code> if the OP wants to become the sole authentication provider for the Account, or <code>op_migration</code> if the OP wants to enable dual authentication where both the OP and existing authentication methods remain valid.<a href="#section-6.14-3.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-6.15-4">The RP processes the Migrate Command based on the current authentication provider status of the Account and organizational policies:<a href="#section-6.15-4" class="pilcrow">¶</a></p>
+<p id="section-6.14-4">The RP processes the Migrate Command based on the current authentication provider status of the Account and organizational policies:<a href="#section-6.14-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.15-5.1">
-            <p id="section-6.15-5.1.1">If <code>authentication_provider</code> is <code>op</code> and the RP allows the migration, the RP updates the Account's authentication provider status to <code>op</code>, disabling other authentication methods.<a href="#section-6.15-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.14-5.1">
+            <p id="section-6.14-5.1.1">If <code>authentication_provider</code> is <code>op</code> and the RP allows the migration, the RP updates the Account's authentication provider status to <code>op</code>, disabling other authentication methods.<a href="#section-6.14-5.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.15-5.2">
-            <p id="section-6.15-5.2.1">If <code>authentication_provider</code> is <code>op_migration</code> and the RP supports dual authentication, the RP adds the OP as an additional authentication provider while maintaining existing authentication methods. Dual authentication with <code>op_migration</code> SHOULD be a temporary state used to provide a seamless migration from RP to OP as the authentication provider.<a href="#section-6.15-5.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.14-5.2">
+            <p id="section-6.14-5.2.1">If <code>authentication_provider</code> is <code>op_migration</code> and the RP supports dual authentication, the RP adds the OP as an additional authentication provider while maintaining existing authentication methods. Dual authentication with <code>op_migration</code> SHOULD be a temporary state used to provide a seamless migration from RP to OP as the authentication provider.<a href="#section-6.14-5.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <div id="access-denied-error">
-<section id="section-6.15.1">
+<section id="section-6.14.1">
           <h4 id="name-access-denied-error">
-<a href="#section-6.15.1" class="section-number selfRef">6.15.1. </a><a href="#name-access-denied-error" class="section-name selfRef">Access Denied Error</a>
+<a href="#section-6.14.1" class="section-number selfRef">6.14.1. </a><a href="#name-access-denied-error" class="section-name selfRef">Access Denied Error</a>
           </h4>
-<p id="section-6.15.1-1">If the RP does not allow the OP to migrate authentication for the Account, the RP MUST return an HTTP 403 Forbidden response and include the <code>error</code> parameter with the value of <code>access_denied</code>.<a href="#section-6.15.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.14.1-1">If the RP does not allow the OP to migrate authentication for the Account, the RP MUST return an HTTP 403 Forbidden response and include the <code>error</code> parameter with the value of <code>access_denied</code>.<a href="#section-6.14.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authentication-not-transferable-error">
-<section id="section-6.15.2">
+<section id="section-6.14.2">
           <h4 id="name-authentication-not-transfer">
-<a href="#section-6.15.2" class="section-number selfRef">6.15.2. </a><a href="#name-authentication-not-transfer" class="section-name selfRef">Authentication Not Transferable Error</a>
+<a href="#section-6.14.2" class="section-number selfRef">6.14.2. </a><a href="#name-authentication-not-transfer" class="section-name selfRef">Authentication Not Transferable Error</a>
           </h4>
-<p id="section-6.15.2-1">If the Account's current authentication provider does not allow changes in authentication responsibility (e.g., managed by a different OP or external system with non-transferable policies), the RP MUST return an HTTP 409 Conflict response and include the <code>error</code> parameter with the value of <code>authentication_not_transferable</code>.<a href="#section-6.15.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.14.2-1">If the Account's current authentication provider does not allow changes in authentication responsibility (e.g., managed by a different OP or external system with non-transferable policies), the RP MUST return an HTTP 409 Conflict response and include the <code>error</code> parameter with the value of <code>authentication_not_transferable</code>.<a href="#section-6.14.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2291,8 +2317,7 @@ A JSON string indicating the requested authentication provider status. MUST be s
         </h3>
 <p id="section-7.1-1">Identified by the <code>metadata</code> value in the <code>command</code> claim in a Command Token.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
 <p id="section-7.1-2">Additional Command Token claims:
-- <code>metadata</code> — REQUIRED — OP-provided metadata object
-- <code>callback_token</code> — OPTIONAL<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+- <code>metadata</code> — REQUIRED — OP-provided metadata object<a href="#section-7.1-2" class="pilcrow">¶</a></p>
 <p id="section-7.1-3">The OP sends this Command to exchange metadata with the RP. The OP sends its metadata in the Command Request, and the RP sends its metadata in the Command Response. A Metadata Command replaces any previous metadata provided by the OP to the RP in the Command Request, and any metadata provided by the RP to the OP in the Command Response.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
 <div id="op-metadata-object">
 <section id="section-7.1.1">
@@ -2302,7 +2327,7 @@ A JSON string indicating the requested authentication provider status. MUST be s
 <p id="section-7.1.1-1">The <code>metadata</code> claim in the Metadata Command contains a JSON object with the following fields:<a href="#section-7.1.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.1.1-2.1">
-              <p id="section-7.1.1-2.1.1"><code>callback_endpoint</code> — OPTIONAL — HTTPS URL for the OP callback endpoint that RPs can use to request a new command (for example, metadata or audit_tenant) or to deliver async results.<a href="#section-7.1.1-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-7.1.1-2.1.1"><code>notification_endpoint</code> — OPTIONAL — HTTPS URL for the OP notification endpoint that RPs can use to send notifications.<a href="#section-7.1.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-7.1.1-2.2">
               <p id="section-7.1.1-2.2.1"><code>domains</code> — OPTIONAL — Array of strings. Email or DNS domains associated with the Tenant (for discovery, correlation, or scoping at the RP).<a href="#section-7.1.1-2.2.1" class="pilcrow">¶</a></p>
@@ -2337,9 +2362,8 @@ A JSON string indicating the requested authentication provider status. MUST be s
   "jti": "bWJt",
   "command": "metadata",
   "tenant": "ff6e7c96",
-  "callback_token": "eyhwixm236djs9shne9sjdnjs9dhbsk",
   "metadata": {
-    "callback_endpoint": "https://op.example.org/callback",
+    "notification_endpoint": "https://op.example.org/callback",
     "groups": [
       {
         "id": "b0f4861d",
@@ -2392,7 +2416,8 @@ A JSON string indicating the requested authentication provider status. MUST be s
         </ul>
 <p id="section-7.2-3">The response MAY also include:
 - <code>aud_sub_required</code> (OPTIONAL): Indicates the RP requires its <code>aud_sub</code> value be provided in account commands.
-- <code>roles</code> (OPTIONAL): A JSON array of objects describing roles supported by the RP.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+- <code>roles</code> (OPTIONAL): A JSON array of objects describing roles supported by the RP.
+- <code>jwks_uri</code> (OPTIONAL): A URL pointing to a set of JSON-encoded public keys, represented as a JWK Set [RFC7517], which the RP may use for signing notifications sent to the OP.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
 <p id="section-7.2-4">The response MAY also include any OAuth Dynamic Client Registration Metadata <em>TBD <a href="https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata">IANA reference</a></em><a href="#section-7.2-4" class="pilcrow">¶</a></p>
 <p id="section-7.2-5">The RP MAY provide a different response for different <code>iss</code> or <code>tenant</code> values.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
 <p id="section-7.2-6">Following is a non-normative example of Command Response for a Metadata Command:<a href="#section-7.2-6" class="pilcrow">¶</a></p>
@@ -2455,52 +2480,27 @@ cause confusion if the Command Response is signed in the future since the <code>
 </div>
 </section>
 </div>
-<div id="metadata-refresh-request">
-<section id="section-7.3">
-        <h3 id="name-metadata-refresh-request">
-<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-metadata-refresh-request" class="section-name selfRef">Metadata Refresh Request</a>
-        </h3>
-<p id="section-7.3-1">If the OP provided a <code>callback_endpoint</code> and <code>callback_token</code> in its last <code>metadata</code> Command, the RP may request the the OP to perform a new <code>metadata</code> command. One motivation for the RP to make this request is if it's metadata has changed.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<p id="section-7.3-2">The RP does an HTTP POST to the <strong>callback_endpoint</strong> passing the <code>callback_token</code> as a bearer token in the HTTP <code>Authorize</code> header with a <code>content-type</code> of <code>application/json</code> and a JSON string with <code>command_requested</code> set to <code>metadata</code>.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
-<p id="section-7.3-3">Following is a non-normative example:<a href="#section-7.3-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7.3-4">
-<pre>POST /callback HTTP/1.1
-Host: op.example.org
-Authorization: Bearer eyhwixm236djs9shne9sjdnjs9dhbsk
-Content-Type: application/json
-Accept: application/json
-Cache-Control: no-cache
-
-{
-  "command_requested": "metadata"
-}
-</pre><a href="#section-7.3-4" class="pilcrow">¶</a>
-</div>
-<p id="section-7.3-5">If the <code>callback_token</code> is valid, the OP MUST respond with an HTTP 204 No Content response.<a href="#section-7.3-5" class="pilcrow">¶</a></p>
-<p id="section-7.3-6">If the <code>callback_token</code> is not valid, or the content of the request body is not valid, the OP MUST respond with an error per <a href="#RFC6750">RFC6750</a>.<a href="#section-7.3-6" class="pilcrow">¶</a></p>
-</section>
-</div>
 <div id="streaming-request">
-<section id="section-7.4">
+<section id="section-7.3">
         <h3 id="name-streaming-request">
-<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-streaming-request" class="section-name selfRef">Streaming Request</a>
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-streaming-request" class="section-name selfRef">Streaming Request</a>
         </h3>
-<p id="section-7.4-1">All Tenant Commands besides the Metadata Command use <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events">Server-Sent Events</a> (SSE) for the RP to transfer the Command Response. When performing a Streaming Request, the OP MUST include the following HTTP headers when sending the Command Request:<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.3-1">All Tenant Commands besides the Metadata Command use <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events">Server-Sent Events</a> (SSE) for the RP to transfer the Command Response. When performing a Streaming Request, the OP MUST include the following HTTP headers when sending the Command Request:<a href="#section-7.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.4-2.1">
-            <p id="section-7.4-2.1.1"><code>Accept</code> with the value of <code>text/event-stream</code> to indicate support for Server-Sent Events.<a href="#section-7.4-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7.3-2.1">
+            <p id="section-7.3-2.1.1"><code>Accept</code> with the value of <code>text/event-stream</code> to indicate support for Server-Sent Events.<a href="#section-7.3-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.4-2.2">
-            <p id="section-7.4-2.2.1"><code>Cache-Control</code> with the value of <code>no-cache</code> to signal to intermediaries to not cache the response.<a href="#section-7.4-2.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.3-2.2">
+            <p id="section-7.3-2.2.1"><code>Cache-Control</code> with the value of <code>no-cache</code> to signal to intermediaries to not cache the response.<a href="#section-7.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.4-2.3">
-            <p id="section-7.4-2.3.1"><code>Connection</code> with the value of <code>keep-alive</code> to keep the connection open.<a href="#section-7.4-2.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.3-2.3">
+            <p id="section-7.3-2.3.1"><code>Connection</code> with the value of <code>keep-alive</code> to keep the connection open.<a href="#section-7.3-2.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-7.4-3">It is RECOMMENDED the OP accept compression of the response by sending the <code>Accept-Encoding</code> HTTP header with the value of <code>gzip</code>, or <code>gzip, br</code>.<a href="#section-7.4-3" class="pilcrow">¶</a></p>
-<p id="section-7.4-4">The following is a non-normative example of a Streaming Request:
-(with most of the Command Token contents omitted for brevity):<a href="#section-7.4-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7.4-5">
+<p id="section-7.3-3">It is RECOMMENDED the OP accept compression of the response by sending the <code>Accept-Encoding</code> HTTP header with the value of <code>gzip</code>, or <code>gzip, br</code>.<a href="#section-7.3-3" class="pilcrow">¶</a></p>
+<p id="section-7.3-4">The following is a non-normative example of a Streaming Request:
+(with most of the Command Token contents omitted for brevity):<a href="#section-7.3-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7.3-5">
 <pre>POST /commands HTTP/1.1
 Host: rp.example.net
 Content-Type: application/x-www-form-urlencoded
@@ -2510,35 +2510,35 @@ Connection: keep-alive
 Accept-Encoding: gzip, br
 
 command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
-</pre><a href="#section-7.4-5" class="pilcrow">¶</a>
+</pre><a href="#section-7.3-5" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="streaming-response">
-<section id="section-7.5">
+<section id="section-7.4">
         <h3 id="name-streaming-response">
-<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-streaming-response" class="section-name selfRef">Streaming Response</a>
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-streaming-response" class="section-name selfRef">Streaming Response</a>
         </h3>
-<p id="section-7.5-1">The RP sends a Streaming Response to a Streaming Request. In a Streaming Response, the RP uses SSE to stream the Command Response as a sequence of events. If the RP receives a valid Command, it MUST sent the <code>HTTP 200 OK</code> response, followed by the following headers:<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-1">The RP sends a Streaming Response to a Streaming Request. In a Streaming Response, the RP uses SSE to stream the Command Response as a sequence of events. If the RP receives a valid Command, it MUST sent the <code>HTTP 200 OK</code> response, followed by the following headers:<a href="#section-7.4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.5-2.1">
-            <p id="section-7.5-2.1.1"><code>Content-Type</code> with the <code>text/event-stream</code> value<a href="#section-7.5-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7.4-2.1">
+            <p id="section-7.4-2.1.1"><code>Content-Type</code> with the <code>text/event-stream</code> value<a href="#section-7.4-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.5-2.2">
-            <p id="section-7.5-2.2.1"><code>Cache-Control</code> with the <code>no-cache</code> value<a href="#section-7.5-2.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.4-2.2">
+            <p id="section-7.4-2.2.1"><code>Cache-Control</code> with the <code>no-cache</code> value<a href="#section-7.4-2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.5-2.3">
-            <p id="section-7.5-2.3.1"><code>Connection</code> with the <code>keep-alive</code> value<a href="#section-7.5-2.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.4-2.3">
+            <p id="section-7.4-2.3.1"><code>Connection</code> with the <code>keep-alive</code> value<a href="#section-7.4-2.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-7.5-3">If the OP sent a <code>Content-Encoding</code> header in the request with a compression the RP understands, the RP MAY include a <code>Content-Encoding</code> header with one of the OP provided values.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
-<p id="section-7.5-4">Per SSE, the body of the response is a series of events. In addition to the required field name <code>data</code>, each event MUST include the <code>id</code> field with a unique value for each event, and the <code>event</code> field with a value of either <code>account-state</code>, <code>command-complete</code>, or <code>error</code>. The RP sends an <code>account-state</code> event for each Account at the RP for the <code>iss</code>, and <code>org</code> if sent, in the Audit Tenant Command. When all <code>account-state</code> events have been sent, the RP sends a <code>command-complete</code> event. If an unrecoverable error occurs during processing, the RP SHOULD send an <code>error</code> event where the <code>data</code> field is JSON with the JSON string property <code>error_description</code> set to a value determined by the RP.<a href="#section-7.5-4" class="pilcrow">¶</a></p>
-<p id="section-7.5-5">The <code>data</code> parameter of the <code>account-state</code> event MUST contain: <code>sub</code>, <code>account_state</code>.<a href="#section-7.5-5" class="pilcrow">¶</a></p>
-<p id="section-7.5-6">The <code>data</code> parameter MAY include other Claims as defined by the Tenant Command.<a href="#section-7.5-6" class="pilcrow">¶</a></p>
-<p id="section-7.5-7">The <code>data</code> parameter of the <code>command-complete</code> event MUST include <code>total_accounts</code> with the total number of <code>account-state</code> events the RP has sent.<a href="#section-7.5-7" class="pilcrow">¶</a></p>
-<p id="section-7.5-8">If there are no Accounts for the Tenant at the RP, the RP responds with only the <code>command-complete</code> event with <code>total-accounts</code> having a value of <code>0</code>.<a href="#section-7.5-8" class="pilcrow">¶</a></p>
-<p id="section-7.5-9">The following is a non-normative example of a Streaming Response for an Audit Tenant Command:<a href="#section-7.5-9" class="pilcrow">¶</a></p>
-<div class="lang-bash sourcecode" id="section-7.5-10">
+<p id="section-7.4-3">If the OP sent a <code>Content-Encoding</code> header in the request with a compression the RP understands, the RP MAY include a <code>Content-Encoding</code> header with one of the OP provided values.<a href="#section-7.4-3" class="pilcrow">¶</a></p>
+<p id="section-7.4-4">Per SSE, the body of the response is a series of events. In addition to the required field name <code>data</code>, each event MUST include the <code>id</code> field with a unique value for each event, and the <code>event</code> field with a value of either <code>account-state</code>, <code>command-complete</code>, or <code>error</code>. The RP sends an <code>account-state</code> event for each Account at the RP for the <code>iss</code>, and <code>org</code> if sent, in the Audit Tenant Command. When all <code>account-state</code> events have been sent, the RP sends a <code>command-complete</code> event. If an unrecoverable error occurs during processing, the RP SHOULD send an <code>error</code> event where the <code>data</code> field is JSON with the JSON string property <code>error_description</code> set to a value determined by the RP.<a href="#section-7.4-4" class="pilcrow">¶</a></p>
+<p id="section-7.4-5">The <code>data</code> parameter of the <code>account-state</code> event MUST contain: <code>sub</code>, <code>account_state</code>.<a href="#section-7.4-5" class="pilcrow">¶</a></p>
+<p id="section-7.4-6">The <code>data</code> parameter MAY include other Claims as defined by the Tenant Command.<a href="#section-7.4-6" class="pilcrow">¶</a></p>
+<p id="section-7.4-7">The <code>data</code> parameter of the <code>command-complete</code> event MUST include <code>total_accounts</code> with the total number of <code>account-state</code> events the RP has sent.<a href="#section-7.4-7" class="pilcrow">¶</a></p>
+<p id="section-7.4-8">If there are no Accounts for the Tenant at the RP, the RP responds with only the <code>command-complete</code> event with <code>total-accounts</code> having a value of <code>0</code>.<a href="#section-7.4-8" class="pilcrow">¶</a></p>
+<p id="section-7.4-9">The following is a non-normative example of a Streaming Response for an Audit Tenant Command:<a href="#section-7.4-9" class="pilcrow">¶</a></p>
+<div class="lang-bash sourcecode" id="section-7.4-10">
 <pre>  HTTP/1.1 200 OK
   Content-Type: text/event-stream
   Cache-Control: no-cache
@@ -2578,11 +2578,11 @@ command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
   data: {
     "total_accounts": 2
   }
-</pre><a href="#section-7.5-10" class="pilcrow">¶</a>
+</pre><a href="#section-7.4-10" class="pilcrow">¶</a>
 </div>
-<p id="section-7.5-11">If the connection is lost during a Streaming Response, The OP SHOULD generate a new Command Token and send a Streaming Request including the HTTP header <code>Last-Event-Id</code> with the last event <code>id</code> property received per SSE.<a href="#section-7.5-11" class="pilcrow">¶</a></p>
-<p id="section-7.5-12">Following is a non-normative example of a Streaming Request sent after a connection was lost:<a href="#section-7.5-12" class="pilcrow">¶</a></p>
-<div class="lang-bash sourcecode" id="section-7.5-13">
+<p id="section-7.4-11">If the connection is lost during a Streaming Response, The OP SHOULD generate a new Command Token and send a Streaming Request including the HTTP header <code>Last-Event-Id</code> with the last event <code>id</code> property received per SSE.<a href="#section-7.4-11" class="pilcrow">¶</a></p>
+<p id="section-7.4-12">Following is a non-normative example of a Streaming Request sent after a connection was lost:<a href="#section-7.4-12" class="pilcrow">¶</a></p>
+<div class="lang-bash sourcecode" id="section-7.4-13">
 <pre>POST /commands HTTP/1.1
 Host: rp.example.net
 Content-Type: application/x-www-form-urlencoded
@@ -2593,22 +2593,20 @@ Accept-Encoding: gzip, br
 Last-Event-Id: 3
 
 command_token=eyJhbGci ... .eyJpc3Mi ... .T3BlbklE ...
-</pre><a href="#section-7.5-13" class="pilcrow">¶</a>
+</pre><a href="#section-7.4-13" class="pilcrow">¶</a>
 </div>
-<p id="section-7.5-14">If the RP is unable to resume a Streaming Response when provided a <code>Last-Event-Id</code> HTTP header, it MUST respond with an HTTP 404 Not Found and include the <code>error</code> parameter of <code>last-event-id-unavailable</code>.<a href="#section-7.5-14" class="pilcrow">¶</a></p>
+<p id="section-7.4-14">If the RP is unable to resume a Streaming Response when provided a <code>Last-Event-Id</code> HTTP header, it MUST respond with an HTTP 404 Not Found and include the <code>error</code> parameter of <code>last-event-id-unavailable</code>.<a href="#section-7.4-14" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="audit-tenant-command">
-<section id="section-7.6">
+<section id="section-7.5">
         <h3 id="name-audit-tenant-command">
-<a href="#section-7.6" class="section-number selfRef">7.6. </a><a href="#name-audit-tenant-command" class="section-name selfRef">Audit Tenant Command</a>
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-audit-tenant-command" class="section-name selfRef">Audit Tenant Command</a>
         </h3>
-<p id="section-7.6-1">Sent in a Streaming Request and identified by the <code>audit_tenant</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-7.6-1" class="pilcrow">¶</a></p>
-<p id="section-7.6-2">The OP sends the Audit Tenant Command to learn the state of Accounts for a Tenant at an RP.
-Additional Command Token claims:
-- <code>callback_token</code> — OPTIONAL<a href="#section-7.6-2" class="pilcrow">¶</a></p>
-<p id="section-7.6-3">The following is a non-normative example of the Claims Set in the Command Token of an Audit Tenant Command:<a href="#section-7.6-3" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-7.6-4">
+<p id="section-7.5-1">Sent in a Streaming Request and identified by the <code>audit_tenant</code> value in the <code>command</code> Claim in a Command Token.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<p id="section-7.5-2">The OP sends the Audit Tenant Command to learn the state of Accounts for a Tenant at an RP.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+<p id="section-7.5-3">The following is a non-normative example of the Claims Set in the Command Token of an Audit Tenant Command:<a href="#section-7.5-3" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-7.5-4">
 <pre>{
   "iss": "https://op.example.org",
   "aud": "https://rp.example.net/command",
@@ -2616,368 +2614,504 @@ Additional Command Token claims:
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJz",
-  "command": "audit_tenant",
-  "callback_token": "eyhwixm236djs9shne9sjdnjs9dhbsk"
+  "command": "audit_tenant"
 }
-</pre><a href="#section-7.6-4" class="pilcrow">¶</a>
+</pre><a href="#section-7.5-4" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="audit-tenant-response">
-<section id="section-7.7">
+<section id="section-7.6">
         <h3 id="name-audit-tenant-response">
-<a href="#section-7.7" class="section-number selfRef">7.7. </a><a href="#name-audit-tenant-response" class="section-name selfRef">Audit Tenant Response</a>
+<a href="#section-7.6" class="section-number selfRef">7.6. </a><a href="#name-audit-tenant-response" class="section-name selfRef">Audit Tenant Response</a>
         </h3>
-<p id="section-7.7-1">The RP sends a Streaming Response if it received a valid Audit Tenant Command.<a href="#section-7.7-1" class="pilcrow">¶</a></p>
-<p id="section-7.7-2">The RP MUST include any Claims for an Account that the RP has retained that were provided by the OP in the event <code>data</code> parameter JSON string. If the Claim values have been modified at the RP, the modified values should be returned.<a href="#section-7.7-2" class="pilcrow">¶</a></p>
-<p id="section-7.7-3">The RP MAY include a <code>last_access</code> claim, a NumericDate, representing the number of seconds from 1970-01-01T00:00:00Z UTC. The value MUST be an integer and is equivalent to the iat and exp claims as defined in <a href="#RFC7519">RFC7519</a>.<a href="#section-7.7-3" class="pilcrow">¶</a></p>
-<p id="section-7.7-4">Streaming Response Events:
+<p id="section-7.6-1">The RP sends a Streaming Response if it received a valid Audit Tenant Command.<a href="#section-7.6-1" class="pilcrow">¶</a></p>
+<p id="section-7.6-2">The RP MUST include any Claims for an Account that the RP has retained that were provided by the OP in the event <code>data</code> parameter JSON string. If the Claim values have been modified at the RP, the modified values should be returned.<a href="#section-7.6-2" class="pilcrow">¶</a></p>
+<p id="section-7.6-3">The RP MAY include a <code>last_access</code> claim, a NumericDate, representing the number of seconds from 1970-01-01T00:00:00Z UTC. The value MUST be an integer and is equivalent to the iat and exp claims as defined in <a href="#RFC7519">RFC7519</a>.<a href="#section-7.6-3" class="pilcrow">¶</a></p>
+<p id="section-7.6-4">Streaming Response Events:
 - <code>account-state</code> events MUST include: <code>sub</code> (REQUIRED), <code>account_state</code> (REQUIRED)
 - <code>account-state</code> events MAY include: <code>last_access</code>, <code>authentication_provider</code>, other retained Claims
-- A final <code>command-complete</code> event MUST include: <code>total_accounts</code> (REQUIRED)<a href="#section-7.7-4" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="audit-tenant-refresh-request">
-<section id="section-7.8">
-        <h3 id="name-audit-tenant-refresh-reques">
-<a href="#section-7.8" class="section-number selfRef">7.8. </a><a href="#name-audit-tenant-refresh-reques" class="section-name selfRef">Audit Tenant Refresh Request</a>
-        </h3>
-<p id="section-7.8-1">If the OP provided a <code>callback_endpoint</code> and a <code>callback_token</code> in its last <code>audit_tenant</code> Command, the RP may request the the OP to perform a new <code>audit_tenant</code> command. One motivation for the RP to make this request is there have been changes to accounts.<a href="#section-7.8-1" class="pilcrow">¶</a></p>
-<p id="section-7.8-2">The RP does an HTTP POST to the <strong>callback_endpoint</strong> passing the <code>callback_token</code> as a bearer token in the HTTP <code>Authorize</code> header with a <code>content-type</code> of <code>application/json</code> and a JSON string with <code>command_requested</code> set to <code>audit_tenant</code>.<a href="#section-7.8-2" class="pilcrow">¶</a></p>
-<p id="section-7.8-3">Following is a non-normative example:<a href="#section-7.8-3" class="pilcrow">¶</a></p>
-<div class="lang-bash sourcecode" id="section-7.8-4">
-<pre>POST /callback HTTP/1.1
-Host: op.example.org
-Authorization: Bearer eyhwixm236djs9shne9sjdnjs9dhbsk
-Content-Type: application/json
-Accept: application/json
-Cache-Control: no-cache
-
-{
-  "command_requested": "audit_tenant"
-}
-</pre><a href="#section-7.8-4" class="pilcrow">¶</a>
-</div>
-<p id="section-7.8-5">If the <code>callback_token</code> is valid, the OP MUST respond with an HTTP 204 No Content response.<a href="#section-7.8-5" class="pilcrow">¶</a></p>
-<p id="section-7.8-6">If the <code>callback_token</code> is not valid, or the content of the request body is not valid, the OP MUST respond with an error per <a href="#RFC6750">RFC6750</a>.<a href="#section-7.8-6" class="pilcrow">¶</a></p>
+- A final <code>command-complete</code> event MUST include: <code>total_accounts</code> (REQUIRED)<a href="#section-7.6-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="suspend-tenant-command">
-<section id="section-7.9">
+<section id="section-7.7">
         <h3 id="name-suspend-tenant-command">
-<a href="#section-7.9" class="section-number selfRef">7.9. </a><a href="#name-suspend-tenant-command" class="section-name selfRef">Suspend Tenant Command</a>
+<a href="#section-7.7" class="section-number selfRef">7.7. </a><a href="#name-suspend-tenant-command" class="section-name selfRef">Suspend Tenant Command</a>
         </h3>
-<p id="section-7.9-1">Sent in a Streaming Request and identified by the <code>suspend_tenant</code> value in the <code>command</code> Claim in a Command Token.
-Upon receiving this Command, the RP MUST suspend all Accounts in the active state for the Tenant identified by the <code>tenant</code> Claim in the Command Token.<a href="#section-7.9-1" class="pilcrow">¶</a></p>
-<p id="section-7.9-2">The RP sends a Streaming Response if it received a valid Suspend Tenant Command.<a href="#section-7.9-2" class="pilcrow">¶</a></p>
-<p id="section-7.9-3">Streaming Response Events:
+<p id="section-7.7-1">Sent in a Streaming Request and identified by the <code>suspend_tenant</code> value in the <code>command</code> Claim in a Command Token.
+Upon receiving this Command, the RP MUST suspend all Accounts in the active state for the Tenant identified by the <code>tenant</code> Claim in the Command Token.<a href="#section-7.7-1" class="pilcrow">¶</a></p>
+<p id="section-7.7-2">The RP sends a Streaming Response if it received a valid Suspend Tenant Command.<a href="#section-7.7-2" class="pilcrow">¶</a></p>
+<p id="section-7.7-3">Streaming Response Events:
 - <code>account-state</code> events MUST include: <code>sub</code> (REQUIRED), <code>account_state</code> (value <code>suspended</code>)
-- A final <code>command-complete</code> event MUST include: <code>total_accounts</code> (REQUIRED)<a href="#section-7.9-3" class="pilcrow">¶</a></p>
+- A final <code>command-complete</code> event MUST include: <code>total_accounts</code> (REQUIRED)<a href="#section-7.7-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="archive-tenant-command">
-<section id="section-7.10">
+<section id="section-7.8">
         <h3 id="name-archive-tenant-command">
-<a href="#section-7.10" class="section-number selfRef">7.10. </a><a href="#name-archive-tenant-command" class="section-name selfRef">Archive Tenant Command</a>
+<a href="#section-7.8" class="section-number selfRef">7.8. </a><a href="#name-archive-tenant-command" class="section-name selfRef">Archive Tenant Command</a>
         </h3>
-<p id="section-7.10-1">Sent in a Streaming Request and identified by the <code>archive_tenant</code> value in the <code>command</code> Claim in a Command Token.
-Upon receiving this Command, the RP MUST suspend all Accounts in the active and suspended state for the Tenant identified by the <code>tenant</code> Claim in the Command Token.<a href="#section-7.10-1" class="pilcrow">¶</a></p>
-<p id="section-7.10-2">The RP sends a Streaming Response if it received a valid Archive Tenant Command.<a href="#section-7.10-2" class="pilcrow">¶</a></p>
-<p id="section-7.10-3">Streaming Response Events:
+<p id="section-7.8-1">Sent in a Streaming Request and identified by the <code>archive_tenant</code> value in the <code>command</code> Claim in a Command Token.
+Upon receiving this Command, the RP MUST suspend all Accounts in the active and suspended state for the Tenant identified by the <code>tenant</code> Claim in the Command Token.<a href="#section-7.8-1" class="pilcrow">¶</a></p>
+<p id="section-7.8-2">The RP sends a Streaming Response if it received a valid Archive Tenant Command.<a href="#section-7.8-2" class="pilcrow">¶</a></p>
+<p id="section-7.8-3">Streaming Response Events:
 - <code>account-state</code> events MUST include: <code>sub</code> (REQUIRED), <code>account_state</code> (value <code>archived</code>)
-- A final <code>command-complete</code> event MUST include: <code>total_accounts</code> (REQUIRED)<a href="#section-7.10-3" class="pilcrow">¶</a></p>
+- A final <code>command-complete</code> event MUST include: <code>total_accounts</code> (REQUIRED)<a href="#section-7.8-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="delete-tenant-command">
-<section id="section-7.11">
+<section id="section-7.9">
         <h3 id="name-delete-tenant-command">
-<a href="#section-7.11" class="section-number selfRef">7.11. </a><a href="#name-delete-tenant-command" class="section-name selfRef">Delete Tenant Command</a>
+<a href="#section-7.9" class="section-number selfRef">7.9. </a><a href="#name-delete-tenant-command" class="section-name selfRef">Delete Tenant Command</a>
         </h3>
-<p id="section-7.11-1">Sent in a Streaming Request and identified by the <code>delete_tenant</code> value in the <code>command</code> Claim in a Command Token.
-Upon receiving this Command, the RP MUST delete all Accounts for the Tenant identified by the <code>tenant</code> Claim in the Command Token.<a href="#section-7.11-1" class="pilcrow">¶</a></p>
-<p id="section-7.11-2">The RP sends a Streaming Response if it received a valid Delete Tenant Command. If the Delete Tenant Command was successful, the RP will send only a <code>command-complete</code> event with a <code>data</code> parameter containing the JSON string <code>{"total_accounts":0}</code>.<a href="#section-7.11-2" class="pilcrow">¶</a></p>
-<p id="section-7.11-3">Streaming Response Events:
-- A final <code>command-complete</code> event MUST include: <code>total_accounts</code> (REQUIRED). No <code>account-state</code> events are sent upon successful deletion of all Accounts.<a href="#section-7.11-3" class="pilcrow">¶</a></p>
+<p id="section-7.9-1">Sent in a Streaming Request and identified by the <code>delete_tenant</code> value in the <code>command</code> Claim in a Command Token.
+Upon receiving this Command, the RP MUST delete all Accounts for the Tenant identified by the <code>tenant</code> Claim in the Command Token.<a href="#section-7.9-1" class="pilcrow">¶</a></p>
+<p id="section-7.9-2">The RP sends a Streaming Response if it received a valid Delete Tenant Command. If the Delete Tenant Command was successful, the RP will send only a <code>command-complete</code> event with a <code>data</code> parameter containing the JSON string <code>{"total_accounts":0}</code>.<a href="#section-7.9-2" class="pilcrow">¶</a></p>
+<p id="section-7.9-3">Streaming Response Events:
+- A final <code>command-complete</code> event MUST include: <code>total_accounts</code> (REQUIRED). No <code>account-state</code> events are sent upon successful deletion of all Accounts.<a href="#section-7.9-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="invalidate-tenant-command">
-<section id="section-7.12">
+<section id="section-7.10">
         <h3 id="name-invalidate-tenant-command">
-<a href="#section-7.12" class="section-number selfRef">7.12. </a><a href="#name-invalidate-tenant-command" class="section-name selfRef">Invalidate Tenant Command</a>
+<a href="#section-7.10" class="section-number selfRef">7.10. </a><a href="#name-invalidate-tenant-command" class="section-name selfRef">Invalidate Tenant Command</a>
         </h3>
-<p id="section-7.12-1">Sent in a Streaming Request and identified by the <code>invalidate_tenant</code> value in the <code>command</code> Claim in a Command Token.
-Upon receiving this Command, the RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on all Accounts in the <strong>active</strong> state for the Tenant identified by the <code>tenant</code> Claim in the Command Token.<a href="#section-7.12-1" class="pilcrow">¶</a></p>
-<p id="section-7.12-2">The RP sends a Streaming Response if it received a valid Invalidate Tenant Command.<a href="#section-7.12-2" class="pilcrow">¶</a></p>
-<p id="section-7.12-3">Streaming Response Events:
+<p id="section-7.10-1">Sent in a Streaming Request and identified by the <code>invalidate_tenant</code> value in the <code>command</code> Claim in a Command Token.
+Upon receiving this Command, the RP MUST perform the <a href="#invalidate-functionality">Invalidate Functionality</a> on all Accounts in the <strong>active</strong> state for the Tenant identified by the <code>tenant</code> Claim in the Command Token.<a href="#section-7.10-1" class="pilcrow">¶</a></p>
+<p id="section-7.10-2">The RP sends a Streaming Response if it received a valid Invalidate Tenant Command.<a href="#section-7.10-2" class="pilcrow">¶</a></p>
+<p id="section-7.10-3">Streaming Response Events:
 - <code>account-state</code> events MUST include: <code>sub</code> (REQUIRED), <code>account_state</code> (value <code>active</code>)
-- A final <code>command-complete</code> event MUST include: <code>total_accounts</code> (REQUIRED)<a href="#section-7.12-3" class="pilcrow">¶</a></p>
+- A final <code>command-complete</code> event MUST include: <code>total_accounts</code> (REQUIRED)<a href="#section-7.10-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="notifications">
+<section id="section-8">
+      <h2 id="name-notifications">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-notifications" class="section-name selfRef">Notifications</a>
+      </h2>
+<p id="section-8-1">Notifications enable an RP to notify an OP of a change in the RP state or the completion of an asynchronous command. Notifications are authenticated using a Notification Token issued and signed by the RP.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<div id="notification-token">
+<section id="section-8.1">
+        <h3 id="name-notification-token">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-notification-token" class="section-name selfRef">Notification Token</a>
+        </h3>
+<p id="section-8.1-1">A Notification Token is a JSON Web Token (JWT) signed by the RP. The OP validates the signature using the RP's published keys (e.g., via the <code>jwks_uri</code> value that the RP provided in the Metadata Response). To avoid cross-JWT confusion, Notification Tokens MUST include a <code>typ</code> JWS header of <code>notification+jwt</code>.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">Non-normative JWS header example:<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-8.1-3">
+<pre>{
+  "alg": "RS256",
+  "kid": "2025-09-01",
+  "typ": "notification+jwt"
+}
+</pre><a href="#section-8.1-3" class="pilcrow">¶</a>
+</div>
+<p id="section-8.1-4">Notification Tokens are posted to the OP's <code>notification_endpoint</code> using <code>application/x-www-form-urlencoded</code> as the HTTP request body and MUST include a parameter named <code>notification_token</code> whose value is the JWS Compact Serialization of the token.
+The OP MUST respond with HTTP 204 No Content on success. Error responses use standard error status codes and MAY include a JSON body with <code>error</code> and <code>error_description</code>.<a href="#section-8.1-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-8.1-5">
+<pre>POST /notifications HTTP/1.1
+Host: op.example.org
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+Cache-Control: no-cache
+
+notification_token=eyJhbGciOiJS...
+</pre><a href="#section-8.1-5" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="notification-claims">
+<section id="section-8.2">
+        <h3 id="name-notification-claims">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-notification-claims" class="section-name selfRef">Notification Claims</a>
+        </h3>
+<p id="section-8.2-1">All Notification Tokens MUST include the following claims in the payload:<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.2-2.1">
+            <p id="section-8.2-2.1.1"><code>iss</code> - the RP<a href="#section-8.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.2-2.2">
+            <p id="section-8.2-2.2.1"><code>aud</code> - the OP issuer value<a href="#section-8.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.2-2.3">
+            <p id="section-8.2-2.3.1"><code>client_id</code> - the RP's client_id<a href="#section-8.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.2-2.4">
+            <p id="section-8.2-2.4.1"><code>iat</code> -<a href="#section-8.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.2-2.5">
+            <p id="section-8.2-2.5.1"><code>jti</code> -<a href="#section-8.2-2.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.2-2.6">
+            <p id="section-8.2-2.6.1"><code>tenant</code> - the OP tenant<a href="#section-8.2-2.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.2-2.7">
+            <p id="section-8.2-2.7.1"><code>notification</code> - the type of notification (see Notification Types)<a href="#section-8.2-2.7.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-8.2-3">If the notification is for the result of an async command, the properties of the async command will also be included as claims.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<div id="notification-types">
+<section id="section-8.2.1">
+          <h4 id="name-notification-types">
+<a href="#section-8.2.1" class="section-number selfRef">8.2.1. </a><a href="#name-notification-types" class="section-name selfRef">Notification Types</a>
+          </h4>
+<p id="section-8.2.1-1">The <code>notification</code> claim in the Notification Token payload indicates the type of notification. This specification defines the following values:<a href="#section-8.2.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.2.1-2.1">
+              <p id="section-8.2.1-2.1.1"><code>metadata_change</code> — RP indicates its metadata has changed. The OP SHOULD initiate a new Metadata Command.<a href="#section-8.2.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-8.2.1-2.2">
+              <p id="section-8.2.1-2.2.1"><code>audit_tenant_change</code> — RP indicates there have been changes to the tenant’s accounts. The OP SHOULD initiate a new Audit Tenant Command.<a href="#section-8.2.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-8.2.1-2.3">
+              <p id="section-8.2.1-2.3.1"><code>*_async_response</code> — RP is sending the final result for an asynchronous command. The asterisk form is a placeholder for the command name (for example: <code>activate_async_response</code>, <code>suspend_async_response</code>).<a href="#section-8.2.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-8.2.1-3">Additional values MAY be defined by future extensions. The OP MUST ignore unknown notification values.<a href="#section-8.2.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="examples">
+<section id="section-8.2.2">
+          <h4 id="name-examples">
+<a href="#section-8.2.2" class="section-number selfRef">8.2.2. </a><a href="#name-examples" class="section-name selfRef">Examples</a>
+          </h4>
+<p id="section-8.2.2-1">Non-normative examples of Notification Token payloads (JWT Claims Sets):<a href="#section-8.2.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.2.2-2.1">
+              <p id="section-8.2.2-2.1.1">metadata_change<a href="#section-8.2.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<div class="lang-json sourcecode" id="section-8.2.2-3">
+<pre>{
+  "iss": "https://rp.example.net",
+  "aud": "https://op.example.org",
+  "client_id": "s6BhdRkqt3",
+  "iat": 1734007000,
+  "jti": "nt-001",
+  "tenant": "ff6e7c96",
+  "notification": "metadata_change"
+}
+</pre><a href="#section-8.2.2-3" class="pilcrow">¶</a>
+</div>
+<ul class="normal">
+<li class="normal" id="section-8.2.2-4.1">
+              <p id="section-8.2.2-4.1.1">activate<em>async</em>response (successful)<a href="#section-8.2.2-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<div class="lang-json sourcecode" id="section-8.2.2-5">
+<pre>{
+  "iss": "https://rp.example.net",
+  "aud": "https://op.example.org",
+  "client_id": "s6BhdRkqt3",
+  "iat": 1734007100,
+  "jti": "nt-002",
+  "tenant": "ff6e7c96",
+  "notification": "activate_async_response",
+  "sub": "248289761001",
+  "account_state": "active"
+}
+</pre><a href="#section-8.2.2-5" class="pilcrow">¶</a>
+</div>
+<ul class="normal">
+<li class="normal" id="section-8.2.2-6.1">
+              <p id="section-8.2.2-6.1.1">suspend<em>async</em>response (unsuccessful)<a href="#section-8.2.2-6.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<div class="lang-json sourcecode" id="section-8.2.2-7">
+<pre>{
+  "iss": "https://rp.example.net",
+  "aud": "https://op.example.org",
+  "client_id": "s6BhdRkqt3",
+  "iat": 1734007200,
+  "jti": "nt-003",
+  "tenant": "ff6e7c96",
+  "notification": "suspend_async_response",
+  "sub": "248289761001",
+  "account_state": "archived",
+  "error": "incompatible_state",
+  "error_description": "Account is archived and cannot be suspended"
+}
+</pre><a href="#section-8.2.2-7" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
 </section>
 </div>
 </section>
 </div>
 <div id="extensibility">
-<section id="section-8">
+<section id="section-9">
       <h2 id="name-extensibility">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-extensibility" class="section-name selfRef">Extensibility</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-extensibility" class="section-name selfRef">Extensibility</a>
       </h2>
 <div id="defining-new-commands">
-<section id="section-8.1">
+<section id="section-9.1">
         <h3 id="name-defining-new-commands">
-<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-defining-new-commands" class="section-name selfRef">Defining New Commands</a>
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-defining-new-commands" class="section-name selfRef">Defining New Commands</a>
         </h3>
-<p id="section-8.1-1">New Commands can be defined in one of two ways: registered in the OpenID Provider Commands
-registry, or by using a unique absolute URI as its name.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.1-2">Types utilizing a URI name SHOULD be limited to vendor-specific
+<p id="section-9.1-1">New Commands can be defined in one of two ways: registered in the OpenID Provider Commands
+registry, or by using a unique absolute URI as its name.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<p id="section-9.1-2">Types utilizing a URI name SHOULD be limited to vendor-specific
 implementations that are not commonly applicable, and are specific to
 the implementation details of the resource server where they are
-used.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+used.<a href="#section-9.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="defining-new-tenant-metadata">
-<section id="section-8.2">
+<section id="section-9.2">
         <h3 id="name-defining-new-tenant-metadat">
-<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-defining-new-tenant-metadat" class="section-name selfRef">Defining New Tenant Metadata</a>
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-defining-new-tenant-metadat" class="section-name selfRef">Defining New Tenant Metadata</a>
         </h3>
-<p id="section-8.2-1"><em>To be completed.</em><a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-9.2-1"><em>To be completed.</em><a href="#section-9.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="defining-new-relying-party-metadata">
-<section id="section-8.3">
+<section id="section-9.3">
         <h3 id="name-defining-new-relying-party-">
-<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-defining-new-relying-party-" class="section-name selfRef">Defining New Relying Party Metadata</a>
+<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-defining-new-relying-party-" class="section-name selfRef">Defining New Relying Party Metadata</a>
         </h3>
-<p id="section-8.3-1"><em>To be completed.</em><a href="#section-8.3-1" class="pilcrow">¶</a></p>
+<p id="section-9.3-1"><em>To be completed.</em><a href="#section-9.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="defining-new-notifications">
+<section id="section-9.4">
+        <h3 id="name-defining-new-notifications">
+<a href="#section-9.4" class="section-number selfRef">9.4. </a><a href="#name-defining-new-notifications" class="section-name selfRef">Defining New Notifications</a>
+        </h3>
+<p id="section-9.4-1"><em>To be completed.</em><a href="#section-9.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="openid-provider-command-support">
-<section id="section-9">
+<section id="section-10">
       <h2 id="name-openid-provider-command-sup">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-openid-provider-command-sup" class="section-name selfRef">OpenID Provider Command Support</a>
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-openid-provider-command-sup" class="section-name selfRef">OpenID Provider Command Support</a>
       </h2>
-<p id="section-9-1">Relying Parties supporting OpenID Provider Commands register a Command Endpoint with the OP as part of their client registration.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">The Command Endpoint MUST be an absolute URI as defined by
+<p id="section-10-1">Relying Parties supporting OpenID Provider Commands register a Command Endpoint with the OP as part of their client registration.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">The Command Endpoint MUST be an absolute URI as defined by
 Section 4.3 of {{RFC3986}}.
 The Command Endpoint MAY include an
 <code>application/x-www-form-urlencoded</code> formatted
 query component, per Section 3.4 of {{RFC3986}}.
-The Command Endpoint MUST NOT include a fragment component.<a href="#section-9-2" class="pilcrow">¶</a></p>
-<p id="section-9-3">If the RP supports
+The Command Endpoint MUST NOT include a fragment component.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-10-3">If the RP supports
 <a href="#OpenID.Registration">OpenID Connect Dynamic Client Registration 1.0</a>,
-it uses this metadata value to register the OpenID Provider Command Endpoint:<a href="#section-9-3" class="pilcrow">¶</a></p>
+it uses this metadata value to register the OpenID Provider Command Endpoint:<a href="#section-10-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-9-4.1">
-          <p id="section-9-4.1.1"><strong>command_endpoint</strong><br>
+<li class="normal" id="section-10-4.1">
+          <p id="section-10-4.1.1"><strong>command_endpoint</strong><br>
 OPTIONAL.<br>
 RP URL that will receive OpenID Provider Commands from the OP.
 This URL MUST use the <code>https</code> scheme
-and MAY contain path, and query parameter components.<a href="#section-9-4.1.1" class="pilcrow">¶</a></p>
+and MAY contain path, and query parameter components.<a href="#section-10-4.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
 </div>
 <div id="implementation-considerations">
-<section id="section-10">
+<section id="section-11">
       <h2 id="name-implementation-consideratio">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-implementation-consideratio" class="section-name selfRef">Implementation Considerations</a>
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-implementation-consideratio" class="section-name selfRef">Implementation Considerations</a>
       </h2>
-<p id="section-10-1">This specification defines features used by both Relying Parties and
+<p id="section-11-1">This specification defines features used by both Relying Parties and
 OpenID Providers that choose to implement OpenID Provider Commands.
 All of these Relying Parties and OpenID Providers
 MUST implement the features that are listed
 in this specification as being "REQUIRED" or are described with a "MUST".
 No other implementation considerations for implementations of
-OpenID Provider Commands are defined by this specification.<a href="#section-10-1" class="pilcrow">¶</a></p>
+OpenID Provider Commands are defined by this specification.<a href="#section-11-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-11">
+<section id="section-12">
       <h2 id="name-security-considerations">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-11-1">The signed Command Token is required in the Command Request to prevent
+<p id="section-12-1">The signed Command Token is required in the Command Request to prevent
 denial of service attacks by enabling the RP to verify that
-the Command Request is coming from a legitimate party.<a href="#section-11-1" class="pilcrow">¶</a></p>
-<p id="section-11-2">OPs are encouraged to use short expiration times in Command Tokens,
+the Command Request is coming from a legitimate party.<a href="#section-12-1" class="pilcrow">¶</a></p>
+<p id="section-12-2">OPs are encouraged to use short expiration times in Command Tokens,
 preferably at most two minutes in the future,
-to prevent captured Command Tokens from being replayed.<a href="#section-11-2" class="pilcrow">¶</a></p>
+to prevent captured Command Tokens from being replayed.<a href="#section-12-2" class="pilcrow">¶</a></p>
 <div id="cross-jwt-confusion">
-<section id="section-11.1">
+<section id="section-12.1">
         <h3 id="name-cross-jwt-confusion">
-<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-cross-jwt-confusion" class="section-name selfRef">Cross-JWT Confusion</a>
+<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-cross-jwt-confusion" class="section-name selfRef">Cross-JWT Confusion</a>
         </h3>
-<p id="section-11.1-1">As described in Section 2.8 of {{RFC8725}},
+<p id="section-12.1-1">As described in Section 2.8 of {{RFC8725}},
 attackers may attempt to use a JWT issued for one purpose in a context that it was not intended for.
-The mitigations described for these attacks can be applied to Command Tokens.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
-<p id="section-11.1-2">One way that an attacker might attempt to repurpose a Command Token
+The mitigations described for these attacks can be applied to Command Tokens.<a href="#section-12.1-1" class="pilcrow">¶</a></p>
+<p id="section-12.1-2">One way that an attacker might attempt to repurpose a Command Token
 is to try to use it as an ID Token.
 As described in <a href="#command-token">Command Token</a>,
 inclusion of a <code>nonce</code> Claim in a Command Token
-is prohibited to prevent its misuse as an ID Token.<a href="#section-11.1-2" class="pilcrow">¶</a></p>
-<p id="section-11.1-3">Another way to prevent cross-JWT confusion is to use explicit typing,
-as described in Section 3.11 of {{!RFC8725}} and as required in [#command-token].<a href="#section-11.1-3" class="pilcrow">¶</a></p>
+is prohibited to prevent its misuse as an ID Token.<a href="#section-12.1-2" class="pilcrow">¶</a></p>
+<p id="section-12.1-3">Another way to prevent cross-JWT confusion is to use explicit typing,
+as described in Section 3.11 of {{!RFC8725}} and as required in [#command-token].<a href="#section-12.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="privacy-considerations">
-<section id="section-12">
+<section id="section-13">
       <h2 id="name-privacy-considerations">
-<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
       </h2>
-<p id="section-12-1"><em>To be completed.</em><a href="#section-12-1" class="pilcrow">¶</a></p>
+<p id="section-13-1"><em>To be completed.</em><a href="#section-13-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-13">
+<section id="section-14">
       <h2 id="name-iana-considerations">
-<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-13-1"><em>Not all entries have been added.</em><a href="#section-13-1" class="pilcrow">¶</a></p>
+<p id="section-14-1"><em>Not all entries have been added.</em><a href="#section-14-1" class="pilcrow">¶</a></p>
 <div id="json-web-token-claims">
-<section id="section-13.1">
+<section id="section-14.1">
         <h3 id="name-json-web-token-claims">
-<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-json-web-token-claims" class="section-name selfRef">JSON Web Token Claims</a>
+<a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-json-web-token-claims" class="section-name selfRef">JSON Web Token Claims</a>
         </h3>
-<p id="section-13.1-1">This specification registers the following JSON web token claim definitions
+<p id="section-14.1-1">This specification registers the following JSON web token claim definitions
 in the IANA "JSON Web Token Claims" registry
-established by <a href="#RFC7519">RFC7519</a>.<a href="#section-13.1-1" class="pilcrow">¶</a></p>
+established by <a href="#RFC7519">RFC7519</a>.<a href="#section-14.1-1" class="pilcrow">¶</a></p>
 <div id="registry-contents">
-<section id="section-13.1.1">
+<section id="section-14.1.1">
           <h4 id="name-registry-contents">
-<a href="#section-13.1.1" class="section-number selfRef">13.1.1. </a><a href="#name-registry-contents" class="section-name selfRef">Registry Contents</a>
+<a href="#section-14.1.1" class="section-number selfRef">14.1.1. </a><a href="#name-registry-contents" class="section-name selfRef">Registry Contents</a>
           </h4>
 <ul class="normal">
-<li class="normal" id="section-13.1.1-1.1">
-              <p id="section-13.1.1-1.1.1"><strong>Claim Name:</strong> <code>command</code><a href="#section-13.1.1-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-14.1.1-1.1">
+              <p id="section-14.1.1-1.1.1"><strong>Claim Name:</strong> <code>command</code><a href="#section-14.1.1-1.1.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-13.1.1-2"><strong>Claim Description:</strong>
-  An instruction from the <code>iss</code> to the <code>aud</code> of a token.<a href="#section-13.1.1-2" class="pilcrow">¶</a></p>
-<p id="section-13.1.1-3"><strong>Change Controller:</strong> OpenID Foundation<a href="#section-13.1.1-3" class="pilcrow">¶</a></p>
-<p id="section-13.1.1-4"><strong>Specification Document(s):</strong> This document<a href="#section-13.1.1-4" class="pilcrow">¶</a></p>
+<p id="section-14.1.1-2"><strong>Claim Description:</strong>
+  An instruction from the <code>iss</code> to the <code>aud</code> of a token.<a href="#section-14.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-14.1.1-3"><strong>Change Controller:</strong> OpenID Foundation<a href="#section-14.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-14.1.1-4"><strong>Specification Document(s):</strong> This document<a href="#section-14.1.1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-13.1.1-5.1">
-              <p id="section-13.1.1-5.1.1"><strong>Claim Name:</strong> <code>tenant</code><a href="#section-13.1.1-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-14.1.1-5.1">
+              <p id="section-14.1.1-5.1.1"><strong>Claim Name:</strong> <code>tenant</code><a href="#section-14.1.1-5.1.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-13.1.1-6"><strong>Claim Description:</strong>
-  A logically isolated entity within the party identified by the <code>iss</code> of the token.<a href="#section-13.1.1-6" class="pilcrow">¶</a></p>
-<p id="section-13.1.1-7"><strong>Change Controller:</strong> OpenID Foundation<a href="#section-13.1.1-7" class="pilcrow">¶</a></p>
-<p id="section-13.1.1-8"><strong>Specification Document(s):</strong> This document<a href="#section-13.1.1-8" class="pilcrow">¶</a></p>
+<p id="section-14.1.1-6"><strong>Claim Description:</strong>
+  A logically isolated entity within the party identified by the <code>iss</code> of the token.<a href="#section-14.1.1-6" class="pilcrow">¶</a></p>
+<p id="section-14.1.1-7"><strong>Change Controller:</strong> OpenID Foundation<a href="#section-14.1.1-7" class="pilcrow">¶</a></p>
+<p id="section-14.1.1-8"><strong>Specification Document(s):</strong> This document<a href="#section-14.1.1-8" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-13.1.1-9.1">
-              <p id="section-13.1.1-9.1.1"><strong>Claim Name:</strong> <code>metadata</code><a href="#section-13.1.1-9.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-14.1.1-9.1">
+              <p id="section-14.1.1-9.1.1"><strong>Claim Name:</strong> <code>metadata</code><a href="#section-14.1.1-9.1.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-13.1.1-10"><strong>Claim Description:</strong>
-  Metadata about the party identified by the <code>iss</code> of the token.<a href="#section-13.1.1-10" class="pilcrow">¶</a></p>
-<p id="section-13.1.1-11"><strong>Change Controller:</strong> OpenID Foundation<a href="#section-13.1.1-11" class="pilcrow">¶</a></p>
-<p id="section-13.1.1-12"><strong>Specification Document(s):</strong> This document<a href="#section-13.1.1-12" class="pilcrow">¶</a></p>
+<p id="section-14.1.1-10"><strong>Claim Description:</strong>
+  Metadata about the party identified by the <code>iss</code> of the token.<a href="#section-14.1.1-10" class="pilcrow">¶</a></p>
+<p id="section-14.1.1-11"><strong>Change Controller:</strong> OpenID Foundation<a href="#section-14.1.1-11" class="pilcrow">¶</a></p>
+<p id="section-14.1.1-12"><strong>Specification Document(s):</strong> This document<a href="#section-14.1.1-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="oauth-dynamic-client-registration-metadata-registration">
-<section id="section-13.2">
+<section id="section-14.2">
         <h3 id="name-oauth-dynamic-client-regist">
-<a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-oauth-dynamic-client-regist" class="section-name selfRef">OAuth Dynamic Client Registration Metadata Registration</a>
+<a href="#section-14.2" class="section-number selfRef">14.2. </a><a href="#name-oauth-dynamic-client-regist" class="section-name selfRef">OAuth Dynamic Client Registration Metadata Registration</a>
         </h3>
-<p id="section-13.2-1">This specification registers the following client metadata definitions
+<p id="section-14.2-1">This specification registers the following client metadata definitions
 in the IANA "OAuth Dynamic Client Registration Metadata" registry
 <a href="#IANA.OAuth.Parameters">IANA OAuth Parameters</a>
-established by <a href="#RFC7591">RFC7591</a>.<a href="#section-13.2-1" class="pilcrow">¶</a></p>
+established by <a href="#RFC7591">RFC7591</a>.<a href="#section-14.2-1" class="pilcrow">¶</a></p>
 <div id="registry-contents-1">
-<section id="section-13.2.1">
+<section id="section-14.2.1">
           <h4 id="name-registry-contents-2">
-<a href="#section-13.2.1" class="section-number selfRef">13.2.1. </a><a href="#name-registry-contents-2" class="section-name selfRef">Registry Contents</a>
+<a href="#section-14.2.1" class="section-number selfRef">14.2.1. </a><a href="#name-registry-contents-2" class="section-name selfRef">Registry Contents</a>
           </h4>
 <ul class="normal">
-<li class="normal" id="section-13.2.1-1.1">
-              <p id="section-13.2.1-1.1.1"><strong>Client Metadata Name:</strong> <code>command_endpoint</code><a href="#section-13.2.1-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-14.2.1-1.1">
+              <p id="section-14.2.1-1.1.1"><strong>Client Metadata Name:</strong> <code>command_endpoint</code><a href="#section-14.2.1-1.1.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-13.2.1-2"><strong>Client Metadata Description:</strong>
-  RP URL that will receive OpenID Provider Commands from the OP<a href="#section-13.2.1-2" class="pilcrow">¶</a></p>
-<p id="section-13.2.1-3"><strong>Change Controller:</strong> OpenID Foundation<a href="#section-13.2.1-3" class="pilcrow">¶</a></p>
-<p id="section-13.2.1-4"><strong>Specification Document(s):</strong> This document<a href="#section-13.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-14.2.1-2"><strong>Client Metadata Description:</strong>
+  RP URL that will receive OpenID Provider Commands from the OP<a href="#section-14.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-14.2.1-3"><strong>Change Controller:</strong> OpenID Foundation<a href="#section-14.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-14.2.1-4"><strong>Specification Document(s):</strong> This document<a href="#section-14.2.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="media-type-registration">
-<section id="section-13.3">
+<section id="section-14.3">
         <h3 id="name-media-type-registration">
-<a href="#section-13.3" class="section-number selfRef">13.3. </a><a href="#name-media-type-registration" class="section-name selfRef">Media Type Registration</a>
+<a href="#section-14.3" class="section-number selfRef">14.3. </a><a href="#name-media-type-registration" class="section-name selfRef">Media Type Registration</a>
         </h3>
-<p id="section-13.3-1">This specification registers the <code>application/command+jwt</code> media type as per {{!RFC6838}}.<a href="#section-13.3-1" class="pilcrow">¶</a></p>
-<p id="section-13.3-2"><em>To be completed.</em><a href="#section-13.3-2" class="pilcrow">¶</a></p>
+<p id="section-14.3-1">This specification registers the <code>application/command+jwt</code> media type as per {{!RFC6838}}.<a href="#section-14.3-1" class="pilcrow">¶</a></p>
+<p id="section-14.3-2"><em>To be completed.</em><a href="#section-14.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="references">
-<section id="section-14">
+<section id="section-15">
       <h2 id="name-references">
-<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-15" class="section-number selfRef">15. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
 <div id="normative-references">
-<section id="section-14.1">
+<section id="section-15.1">
         <h3 id="name-normative-references">
-<a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-15.1" class="section-number selfRef">15.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <ul class="normal">
-<li class="normal" id="section-14.1-1.1">
-            <p id="section-14.1-1.1.1"><strong>[RFC2119]</strong> Bradner, S. “Key words for use in RFCs to Indicate Requirement Levels,” <em>RFC 2119</em>, March 1997.<a href="#section-14.1-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-15.1-1.1">
+            <p id="section-15.1-1.1.1"><strong>[RFC2119]</strong> Bradner, S. “Key words for use in RFCs to Indicate Requirement Levels,” <em>RFC 2119</em>, March 1997.<a href="#section-15.1-1.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.1-1.2">
-            <p id="section-14.1-1.2.1"><strong>[RFC3986]</strong> Berners-Lee, T., Fielding, R., and Masinter, L. “Uniform Resource Identifier (URI): Generic Syntax,” <em>RFC 3986</em>, January 2005.<a href="#section-14.1-1.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.1-1.2">
+            <p id="section-15.1-1.2.1"><strong>[RFC3986]</strong> Berners-Lee, T., Fielding, R., and Masinter, L. “Uniform Resource Identifier (URI): Generic Syntax,” <em>RFC 3986</em>, January 2005.<a href="#section-15.1-1.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.1-1.3">
-            <p id="section-14.1-1.3.1"><strong>[RFC6750]</strong> Jones, M., and Hardt, D., “The OAuth 2.0 Authorization Framework: Bearer Token Usage,” <em>RFC 6750</em>, October 2012<a href="#section-14.1-1.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.1-1.3">
+            <p id="section-15.1-1.3.1"><strong>[RFC6750]</strong> Jones, M., and Hardt, D., “The OAuth 2.0 Authorization Framework: Bearer Token Usage,” <em>RFC 6750</em>, October 2012<a href="#section-15.1-1.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.1-1.4">
-            <p id="section-14.1-1.4.1"><strong>[RFC7519]</strong> Jones, M., Bradley, J., and Sakimura, N. “JSON Web Token (JWT),” <em>RFC 7519</em>, May 2015.<a href="#section-14.1-1.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.1-1.4">
+            <p id="section-15.1-1.4.1"><strong>[RFC7519]</strong> Jones, M., Bradley, J., and Sakimura, N. “JSON Web Token (JWT),” <em>RFC 7519</em>, May 2015.<a href="#section-15.1-1.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.1-1.5">
-            <p id="section-14.1-1.5.1"><strong>[RFC7591]</strong> Jones, M., Bradley, J., and Sakimura, N. “OAuth 2.0 Dynamic Client Registration Protocol,” <em>RFC 7591</em>, March 2015.<a href="#section-14.1-1.5.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.1-1.5">
+            <p id="section-15.1-1.5.1"><strong>[RFC7591]</strong> Jones, M., Bradley, J., and Sakimura, N. “OAuth 2.0 Dynamic Client Registration Protocol,” <em>RFC 7591</em>, March 2015.<a href="#section-15.1-1.5.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.1-1.6">
-            <p id="section-14.1-1.6.1"><strong>[RFC8414]</strong> Jones, M., and Sakimura, N., “OAuth 2.0 Authorization Server Metadata,” <em>RFC 8414</em>, June 2018.<a href="#section-14.1-1.6.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.1-1.6">
+            <p id="section-15.1-1.6.1"><strong>[RFC8414]</strong> Jones, M., and Sakimura, N., “OAuth 2.0 Authorization Server Metadata,” <em>RFC 8414</em>, June 2018.<a href="#section-15.1-1.6.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.1-1.7">
-            <p id="section-14.1-1.7.1"><strong>[RFC9110]</strong> Fielding, R. “HTTP Semantics,” <em>RFC 9110</em>, June 2022.<a href="#section-14.1-1.7.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.1-1.7">
+            <p id="section-15.1-1.7.1"><strong>[RFC9110]</strong> Fielding, R. “HTTP Semantics,” <em>RFC 9110</em>, June 2022.<a href="#section-15.1-1.7.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.1-1.8">
-            <p id="section-14.1-1.8.1"><strong>[RFC8725]</strong> Bromberg, L. “Security Considerations for JSON Web Tokens,” <em>RFC 8725</em>, June 2020.<a href="#section-14.1-1.8.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.1-1.8">
+            <p id="section-15.1-1.8.1"><strong>[RFC8725]</strong> Bromberg, L. “Security Considerations for JSON Web Tokens,” <em>RFC 8725</em>, June 2020.<a href="#section-15.1-1.8.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.1-1.9">
-            <p id="section-14.1-1.9.1"><strong>[RFC6838]</strong> IANA. “Media Types,” <em>RFC 6838</em>, June 2013.<a href="#section-14.1-1.9.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.1-1.9">
+            <p id="section-15.1-1.9.1"><strong>[RFC6838]</strong> IANA. “Media Types,” <em>RFC 6838</em>, June 2013.<a href="#section-15.1-1.9.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.1-1.10">
-            <p id="section-14.1-1.10.1"><strong>ISO/IEC 24760-1:2019</strong>, “IT Security – A framework for identity management – Part 1: Terminology and concepts.”<a href="#section-14.1-1.10.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.1-1.10">
+            <p id="section-15.1-1.10.1"><strong>ISO/IEC 24760-1:2019</strong>, “IT Security – A framework for identity management – Part 1: Terminology and concepts.”<a href="#section-15.1-1.10.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.1-1.11">
-            <p id="section-14.1-1.11.1"><strong>OpenID.Core</strong> – “OpenID Connect Core 1.0 incorporating errata set 2,” available at <a href="https://openid.net/specs/openid-connect-core-1_0.html">https://openid.net/specs/openid-connect-core-1_0.html</a>.<a href="#section-14.1-1.11.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.1-1.11">
+            <p id="section-15.1-1.11.1"><strong>OpenID.Core</strong> – “OpenID Connect Core 1.0 incorporating errata set 2,” available at <a href="https://openid.net/specs/openid-connect-core-1_0.html">https://openid.net/specs/openid-connect-core-1_0.html</a>.<a href="#section-15.1-1.11.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.1-1.12">
-            <p id="section-14.1-1.12.1"><strong>OpenID.Enterprise</strong> – "OpenID Connect Enterprise Extensions 1.0," available at <a href="https://openid.net/specs/openid-connect-enterprise-extensions-1_0.html">https://openid.net/specs/openid-connect-enterprise-extensions-1_0.html</a>.<a href="#section-14.1-1.12.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.1-1.12">
+            <p id="section-15.1-1.12.1"><strong>OpenID.Enterprise</strong> – "OpenID Connect Enterprise Extensions 1.0," available at <a href="https://openid.net/specs/openid-connect-enterprise-extensions-1_0.html">https://openid.net/specs/openid-connect-enterprise-extensions-1_0.html</a>.<a href="#section-15.1-1.12.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
 </div>
 <div id="informative-references">
-<section id="section-14.2">
+<section id="section-15.2">
         <h3 id="name-informative-references">
-<a href="#section-14.2" class="section-number selfRef">14.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-15.2" class="section-number selfRef">15.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <ul class="normal">
-<li class="normal" id="section-14.2-1.1">
-            <p id="section-14.2-1.1.1"><strong>IANA JSON Web Token Claims Registry</strong>, available at <a href="https://www.iana.org/assignments/jwt/jwt.xhtml">https://www.iana.org/assignments/jwt/jwt.xhtml</a>.<a href="#section-14.2-1.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-15.2-1.1">
+            <p id="section-15.2-1.1.1"><strong>IANA JSON Web Token Claims Registry</strong>, available at <a href="https://www.iana.org/assignments/jwt/jwt.xhtml">https://www.iana.org/assignments/jwt/jwt.xhtml</a>.<a href="#section-15.2-1.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-14.2-1.2">
-            <p id="section-14.2-1.2.1"><strong>IANA OAuth Parameters</strong>, available at <a href="https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata">https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata</a>.<a href="#section-14.2-1.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-15.2-1.2">
+            <p id="section-15.2-1.2.1"><strong>IANA OAuth Parameters</strong>, available at <a href="https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata">https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata</a>.<a href="#section-15.2-1.2.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
