@@ -619,7 +619,7 @@ The OP sends this Command to exchange metadata with the RP. The OP sends its met
 The `metadata` claim in the Metadata Command contains a JSON object with the following fields:
 
 - `notification_endpoint` — OPTIONAL — HTTPS URL for the OP notification endpoint that RPs can use to send notifications.
-- `domains` — OPTIONAL — Array of strings. Email or DNS domains associated with the Tenant (for discovery, correlation, or scoping at the RP).
+- `domains` — OPTIONAL — Array of strings. Email or DNS domains the OP has verified are controlled by the Tenant. Provided to help the RP map the Tenant to the RP's own view of its accounts and tenants (for discovery, correlation, or scoping at the RP). The `domains` values are an assertion by the OP, not a directive to the RP. See [OP-Asserted Domains](#op-asserted-domains) for processing guidance.
 - `claims_supported` — OPTIONAL — Array of strings. Claim names the OP may include in Account Commands or expect back in responses.
 - `groups` — OPTIONAL — Array of group objects. Each object has:
   - `id` — REQUIRED — OP-unique group identifier
@@ -1141,6 +1141,20 @@ is prohibited to prevent its misuse as an ID Token.
 Another way to prevent cross-JWT confusion is to use explicit typing,
 as described in Section 3.11 of {{!RFC8725}} and as required in [#command-token]. 
 
+## OP-Asserted Domains
+
+The `domains` values in the [OP Metadata Object](#op-metadata-object) enable an OP to assert which email or DNS domains its Tenant controls so that the RP can map the Tenant to the RP's own view of its accounts and tenants. This mapping can grant the OP significant control over existing Accounts — including Accounts that were not established through the OP — so the RP MUST treat asserted domains as an input to its own domain and tenancy policy, not as an authoritative instruction.
+
+The OP MUST only include domains it has verified the Tenant controls.
+
+The RP is the final arbiter of any domain-to-tenant mapping. RPs differ in domain models — some enforce platform-wide unique domain ownership, while others allow the same domain to be associated with multiple tenants — and an asserted domain may conflict with an existing mapping at the RP, including a mapping asserted by a different OP. How a conflict is resolved is RP policy. Approaches include:
+
+- rejecting the conflicting assertion (for example, first-come, first-served)
+- requiring an RP administrator to resolve the conflict
+- performing independent domain verification (for example, a DNS or email challenge) to determine control
+
+Before executing Commands that alter Accounts that were not established through the requesting OP — such as during migration — the RP SHOULD independently verify domain control or obtain confirmation from the affected tenant administrator or Account holders. Acting solely on an asserted domain would allow a malicious or compromised OP to take control of, or deny service to, Accounts it has no authority over.
+
 
 # Privacy Considerations
 
@@ -1308,3 +1322,7 @@ specification.
   * Metadata Response: Added `aud_sub_required` response property (OPTIONAL) normatively indicating RP requirement to receive `aud_sub` in subsequent Account Commands.
   * collected all normative claims and properties into new "Claims and Properties" section centralizing definitions of all Command Token claims and response properties
   * Command Token: Introduced normative baseline claim sets for Account vs Tenant Commands; clarified that only listed claims plus command-specific additions may appear (tightening allowed claims surface).
+
+  -03
+
+  * `domains`: clarified the values are OP-verified assertions to help the RP map the Tenant to its own accounts and tenants; added OP-Asserted Domains security considerations covering RP processing, conflict resolution, and migration safeguards (#24)
