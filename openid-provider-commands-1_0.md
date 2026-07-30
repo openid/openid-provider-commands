@@ -1,5 +1,5 @@
 %%%
-title = "OpenID Provider Commands 1.0 - draft 02"
+title = "OpenID Provider Commands 1.0 - draft 03"
 abbrev = "openid-provider-commands"
 ipr = "none"
 workgroup = "OpenID Connect"
@@ -93,6 +93,8 @@ This specification defines the following terms:
 
 - **Tenant**: A logically isolated entity within an OP that represents a distinct organizational or administrative boundary. An OP may have a single Tenant, or multiple Tenants. The Tenant may contain Accounts managed by individuals, or may contain Accounts managed by an organization.
 
+- **RP Tenant**: A logically isolated entity within an RP that represents a distinct organizational or administrative boundary, as described in [OpenID.Enterprise]. A multi-tenant RP may share a single `client_id` across its RP Tenants, in which case an RP Tenant is identified by an `aud_tenant` value.
+
 
 
 ## Protocol Overview
@@ -184,6 +186,7 @@ This section defines all claims and properties used in this specification.
 ## Claims in Command Tokens
 
 - **`aud_sub`**: The RP’s internal identifier for the Account (learned via account resolution). Enables the RP to use its native identifier rather than the (`iss`,`sub`) pair for lookups.
+- **`aud_tenant`**: The RP Tenant identifier, as defined in [OpenID.Enterprise]. Identifies the RP Tenant a Command applies to when a multi-tenant RP shares a single `client_id` across its RP Tenants. If the RP included `aud_tenants` in its Metadata Response, this claim is REQUIRED in all Commands other than the Metadata Command; otherwise this claim is PROHIBITED. The combination of `client_id`, `aud_tenant`, and `aud_sub` uniquely identifies an Account at the RP.
 - **`aud`**: Audience for the token; the RP Command Endpoint URL.
 - **`authentication_provider`**: A string indicating which party can authenticate the user. Values include:
     - `rp`: Only the RP authenticates
@@ -209,6 +212,11 @@ This section defines all claims and properties used in this specification.
 - **`account_state`**: The Account’s state after processing. Supported states include `unknown`, `active`, `suspended`, and `archived`.
 - **`aud_sub_required`**: Boolean indicating if the RP requires `aud_sub` in Account Commands.
 - **`aud_sub`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
+- **`aud_tenant`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
+- **`aud_tenants`**: Array of RP Tenant objects describing the RP Tenants associated with the OP. Each object has:
+    - `id`: The RP Tenant identifier; the value used in the `aud_tenant` claim
+    - `display`: Human-readable RP Tenant name
+    - `description` (optional): RP Tenant description
 - **`authentication_provider`**: See definition and allowed values under [Claims in Command Tokens](#claims-in-command-tokens).
 - **`client_id`**: See definition under [Claims in Command Tokens](#claims-in-command-tokens).
 - **`command_endpoint`**: The RP’s Command Endpoint URL.
@@ -305,11 +313,13 @@ Baseline claim sets (only the listed claims may appear unless a command explicit
 - Account Command baseline claims:
   - REQUIRED: `iss`, `aud` (Command Endpoint), `client_id`, `iat`, `exp`, `jti`, `command`, `tenant`, `sub`
   - OPTIONAL: `aud_sub`
+  - CONDITIONAL: `aud_tenant` — REQUIRED if the RP included `aud_tenants` in its Metadata Response; PROHIBITED otherwise
  
 
 - Tenant Command baseline claims:
   - REQUIRED: `iss`, `aud` (Command Endpoint), `client_id`, `iat`, `exp`, `jti`, `command`, `tenant`
   - PROHIBITED: `sub`, `aud_sub`
+  - CONDITIONAL: `aud_tenant` — REQUIRED if the RP included `aud_tenants` in its Metadata Response, except in the Metadata Command where it is PROHIBITED; PROHIBITED otherwise
  
 
 Command-specific additions referenced later in this document include (non-exhaustive examples):
@@ -373,7 +383,7 @@ A non-normative example JWT Claims Set for the Command Token for an Invalidate C
 
 # Account Commands
 
-Account Commands operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` claim if provided by the RP during account resolution, or the `iss` and `sub` claims. Account Commands include Lifecycle Commands, the Invalidate Command, and the Migrate Command.
+Account Commands operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` claim if provided by the RP during account resolution, or the `iss` and `sub` claims. When the RP included `aud_tenants` in its Metadata Response, the `aud_tenant` claim identifies the RP Tenant containing the Account, and the Account is identified within that RP Tenant. Account Commands include Lifecycle Commands, the Invalidate Command, and the Migrate Command.
 
 For each Account Command, the Command Token MUST include the Account Command baseline claims defined in [Command Token](#command-token). Each command section below lists only command-specific additions or exceptions. Only the claims listed as REQUIRED or OPTIONAL for a command may be present; all others are PROHIBITED unless otherwise specified.
 
@@ -681,6 +691,7 @@ If the Command Token is valid, the RP responds with an `application/json` media 
 
 The response MAY also include:
 - `aud_sub_required` (OPTIONAL): Indicates the RP requires its `aud_sub` value be provided in account commands.
+- `aud_tenants` (OPTIONAL): A JSON array of objects describing the RP Tenants associated with the OP `iss` and `tenant`. Presence indicates the RP is multi-tenant with a single `client_id` and requires the `aud_tenant` claim in all subsequent Commands other than the Metadata Command. See [Claims and Properties](#claims-and-properties).
 - `roles` (OPTIONAL): A JSON array of objects describing roles supported by the RP.
 - `jwks_uri` (OPTIONAL): A URL pointing to a set of JSON-encoded public keys, represented as a JWK Set [RFC7517], which the RP may use for signing notifications sent to the OP. 
  
@@ -711,6 +722,18 @@ Following is a non-normative example of Command Response for a Metadata Command:
     "reactivate",
     "delete",
     "audit"
+  ],
+  "aud_tenants": [
+    {
+      "id": "acme-corp",
+      "display": "Acme Corp",
+      "description": "Acme Corp production workspace"
+    },
+    {
+      "id": "acme-labs",
+      "display": "Acme Labs",
+      "description": "Acme research workspace"
+    }
   ],
   "claims_supported": [
     "sub",
@@ -865,7 +888,7 @@ If the RP is unable to resume a Streaming Response when provided a `Last-Event-I
 
 Sent in a Streaming Request and identified by the `audit_tenant` value in the `command` Claim in a Command Token.
 
-The OP sends the Audit Tenant Command to learn the state of Accounts for a Tenant at an RP. 
+The OP sends the Audit Tenant Command to learn the state of Accounts for a Tenant at an RP. When the RP included `aud_tenants` in its Metadata Response, the Command Token contains the `aud_tenant` claim, and the audit is scoped to the Accounts for the Tenant within that RP Tenant. The OP learns which Accounts exist in each RP Tenant by auditing each RP Tenant from the `aud_tenants` list.
 
 The following is a non-normative example of the Claims Set in the Command Token of an Audit Tenant Command:
 
@@ -877,7 +900,9 @@ The following is a non-normative example of the Claims Set in the Command Token 
   "iat": 1734003000,
   "exp": 1734003060,
   "jti": "bWJz",
-  "command": "audit_tenant"
+  "command": "audit_tenant",
+  "tenant": "ff6e7c96",
+  "aud_tenant": "acme-corp"
 }
 ```
 
@@ -1141,6 +1166,10 @@ is prohibited to prevent its misuse as an ID Token.
 Another way to prevent cross-JWT confusion is to use explicit typing,
 as described in Section 3.11 of {{!RFC8725}} and as required in [#command-token]. 
 
+## RP-Provided Display Strings
+
+The `display` and `description` values in the `aud_tenants` and `roles` Metadata Response properties are RP-authored strings that an OP may render in its own user interfaces (for example, when presenting RP Tenants for an administrator or end-user to select). OPs MUST treat these values as untrusted content: render them as plain text, do not interpret them as markup, and consider truncation and character-set restrictions to mitigate spoofing or misleading content.
+
 
 # Privacy Considerations
 
@@ -1308,3 +1337,11 @@ specification.
   * Metadata Response: Added `aud_sub_required` response property (OPTIONAL) normatively indicating RP requirement to receive `aud_sub` in subsequent Account Commands.
   * collected all normative claims and properties into new "Claims and Properties" section centralizing definitions of all Command Token claims and response properties
   * Command Token: Introduced normative baseline claim sets for Account vs Tenant Commands; clarified that only listed claims plus command-specific additions may appear (tightening allowed claims surface).
+
+  -03
+
+  * added `aud_tenant` claim and RP Tenant terminology for multi-tenant RPs that share a single `client_id` across RP Tenants (see [OpenID.Enterprise])
+  * Metadata Response: added `aud_tenants` response property (OPTIONAL); presence declares the RP requires `aud_tenant` in all subsequent Commands other than the Metadata Command, and enumerates the RP Tenants associated with the OP with display metadata for OP selection UIs
+  * uniqueness: the combination of `client_id`, `aud_tenant`, and `aud_sub` uniquely identifies an Account at the RP
+  * Audit Tenant Command: scoped by `aud_tenant` when the RP declared `aud_tenants`
+  * Security Considerations: added RP-Provided Display Strings
