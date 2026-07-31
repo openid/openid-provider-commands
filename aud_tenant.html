@@ -1235,7 +1235,7 @@ li > p:last-of-type:only-child {
 <dd class="workgroup">OpenID Connect</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-30" class="published">30 July 2026</time>
+<time datetime="2026-07-31" class="published">31 July 2026</time>
     </dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
@@ -1720,10 +1720,10 @@ the use of <em>this fixed-width font</em>.<a href="#section-1.1-3" class="pilcro
         </h3>
 <ul class="normal">
 <li class="normal" id="section-2.1-1.1">
-            <p id="section-2.1-1.1.1"><strong><code>aud_sub</code></strong>: The RP’s internal identifier for the Account (learned via account resolution). Enables the RP to use its native identifier rather than the (<code>iss</code>,<code>sub</code>) pair for lookups.<a href="#section-2.1-1.1.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-1.1.1"><strong><code>aud_sub</code></strong>: The RP’s internal identifier for the Account (learned via account resolution). Enables the RP to use its native identifier rather than the (<code>iss</code>,<code>sub</code>) pair for lookups. An <code>aud_sub</code> value MUST uniquely identify an Account within a <code>client_id</code>, including across RP Tenants. The same <code>aud_sub</code> value may appear with different <code>aud_tenant</code> values when an Account is shared across RP Tenants, enabling an RP to have a central account store.<a href="#section-2.1-1.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-1.2">
-            <p id="section-2.1-1.2.1"><strong><code>aud_tenant</code></strong>: The RP Tenant identifier, as defined in [OpenID.Enterprise]. Identifies the RP Tenant a Command applies to when a multi-tenant RP shares a single <code>client_id</code> across its RP Tenants. If the RP included <code>aud_tenants</code> in its Metadata Response, this claim is REQUIRED in all Commands other than the Metadata Command; otherwise this claim is PROHIBITED. The combination of <code>client_id</code>, <code>aud_tenant</code>, and <code>aud_sub</code> uniquely identifies an Account at the RP.<a href="#section-2.1-1.2.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-1.2.1"><strong><code>aud_tenant</code></strong>: The RP Tenant identifier, as defined in [OpenID.Enterprise]. Identifies the RP Tenant a Command applies to when a multi-tenant RP shares a single <code>client_id</code> across its RP Tenants. If the RP included <code>aud_tenants</code> in its Metadata Response, this claim is REQUIRED in all Commands other than the Metadata Command; otherwise this claim is PROHIBITED. The <code>aud_tenant</code> provides the RP Tenant context for a Command; the <code>aud_sub</code> alone identifies the Account, and the same Account may be associated with more than one RP Tenant.<a href="#section-2.1-1.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-2.1-1.3">
             <p id="section-2.1-1.3.1"><strong><code>aud</code></strong>: Audience for the token; the RP Command Endpoint URL.<a href="#section-2.1-1.3.1" class="pilcrow">¶</a></p>
@@ -2035,7 +2035,7 @@ to trigger different runtime behaviors.<a href="#section-4-5" class="pilcrow">¶
       <h2 id="name-account-commands">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-account-commands" class="section-name selfRef">Account Commands</a>
       </h2>
-<p id="section-6-1">Account Commands operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the <code>aud_sub</code> claim if provided by the RP during account resolution, or the <code>iss</code> and <code>sub</code> claims. When the RP included <code>aud_tenants</code> in its Metadata Response, the <code>aud_tenant</code> claim identifies the RP Tenant containing the Account, and the Account is identified within that RP Tenant. Account Commands include Lifecycle Commands, the Invalidate Command, and the Migrate Command.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-1">Account Commands operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the <code>aud_sub</code> claim if provided by the RP during account resolution, or the <code>iss</code> and <code>sub</code> claims. When the RP included <code>aud_tenants</code> in its Metadata Response, the <code>aud_tenant</code> claim identifies the RP Tenant context for the Command. The <code>aud_sub</code> claim always identifies a unique Account within the <code>client_id</code>; the same Account may be associated with more than one RP Tenant. Account Commands include Lifecycle Commands, the Invalidate Command, and the Migrate Command.<a href="#section-6-1" class="pilcrow">¶</a></p>
 <p id="section-6-2">For each Account Command, the Command Token MUST include the Account Command baseline claims defined in <a href="#command-token">Command Token</a>. Each command section below lists only command-specific additions or exceptions. Only the claims listed as REQUIRED or OPTIONAL for a command may be present; all others are PROHIBITED unless otherwise specified.<a href="#section-6-2" class="pilcrow">¶</a></p>
 <div id="account-lifecycle-states">
 <section id="section-6.1">
@@ -3287,7 +3287,7 @@ specification.<a href="#appendix-B-3" class="pilcrow">¶</a></p>
           <p id="appendix-C-9.2.1">Metadata Response: added <code>aud_tenants</code> response property (OPTIONAL); presence declares the RP requires <code>aud_tenant</code> in all subsequent Commands other than the Metadata Command, and enumerates the RP Tenants associated with the OP with display metadata for OP selection UIs<a href="#appendix-C-9.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-C-9.3">
-          <p id="appendix-C-9.3.1">uniqueness: the combination of <code>client_id</code>, <code>aud_tenant</code>, and <code>aud_sub</code> uniquely identifies an Account at the RP<a href="#appendix-C-9.3.1" class="pilcrow">¶</a></p>
+          <p id="appendix-C-9.3.1">uniqueness: an <code>aud_sub</code> value uniquely identifies an Account within a <code>client_id</code>, including across RP Tenants; the same <code>aud_sub</code> may appear with different <code>aud_tenant</code> values when an Account is shared across RP Tenants, enabling a central account store<a href="#appendix-C-9.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-C-9.4">
           <p id="appendix-C-9.4.1">Audit Tenant Command: scoped by <code>aud_tenant</code> when the RP declared <code>aud_tenants</code><a href="#appendix-C-9.4.1" class="pilcrow">¶</a></p>
