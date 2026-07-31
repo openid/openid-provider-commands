@@ -185,8 +185,8 @@ This section defines all claims and properties used in this specification.
 
 ## Claims in Command Tokens
 
-- **`aud_sub`**: The RP’s internal identifier for the Account (learned via account resolution). Enables the RP to use its native identifier rather than the (`iss`,`sub`) pair for lookups.
-- **`aud_tenant`**: The RP Tenant identifier, as defined in [OpenID.Enterprise]. Identifies the RP Tenant a Command applies to when a multi-tenant RP shares a single `client_id` across its RP Tenants. If the RP included `aud_tenants` in its Metadata Response, this claim is REQUIRED in all Commands other than the Metadata Command; otherwise this claim is PROHIBITED. The combination of `client_id`, `aud_tenant`, and `aud_sub` uniquely identifies an Account at the RP.
+- **`aud_sub`**: The RP’s internal identifier for the Account (learned via account resolution). Enables the RP to use its native identifier rather than the (`iss`,`sub`) pair for lookups. An `aud_sub` value MUST uniquely identify an Account within a `client_id`, including across RP Tenants. The same `aud_sub` value may appear with different `aud_tenant` values when an Account is shared across RP Tenants, enabling an RP to have a central account store.
+- **`aud_tenant`**: The RP Tenant identifier, as defined in [OpenID.Enterprise]. Identifies the RP Tenant a Command applies to when a multi-tenant RP shares a single `client_id` across its RP Tenants. If the RP included `aud_tenants` in its Metadata Response, this claim is REQUIRED in all Commands other than the Metadata Command; otherwise this claim is PROHIBITED. The `aud_tenant` provides the RP Tenant context for a Command; the `aud_sub` alone identifies the Account, and the same Account may be associated with more than one RP Tenant.
 - **`aud`**: Audience for the token; the RP Command Endpoint URL.
 - **`authentication_provider`**: A string indicating which party can authenticate the user. Values include:
     - `rp`: Only the RP authenticates
@@ -383,7 +383,7 @@ A non-normative example JWT Claims Set for the Command Token for an Invalidate C
 
 # Account Commands
 
-Account Commands operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` claim if provided by the RP during account resolution, or the `iss` and `sub` claims. When the RP included `aud_tenants` in its Metadata Response, the `aud_tenant` claim identifies the RP Tenant containing the Account, and the Account is identified within that RP Tenant. Account Commands include Lifecycle Commands, the Invalidate Command, and the Migrate Command.
+Account Commands operate on an Account. Support for any Account Command is OPTIONAL. Account Commands are executed on an RP Account identified in a Command Token by the `aud_sub` claim if provided by the RP during account resolution, or the `iss` and `sub` claims. When the RP included `aud_tenants` in its Metadata Response, the `aud_tenant` claim identifies the RP Tenant context for the Command. The `aud_sub` claim always identifies a unique Account within the `client_id`; the same Account may be associated with more than one RP Tenant. Account Commands include Lifecycle Commands, the Invalidate Command, and the Migrate Command.
 
 For each Account Command, the Command Token MUST include the Account Command baseline claims defined in [Command Token](#command-token). Each command section below lists only command-specific additions or exceptions. Only the claims listed as REQUIRED or OPTIONAL for a command may be present; all others are PROHIBITED unless otherwise specified.
 
@@ -1342,6 +1342,6 @@ specification.
 
   * added `aud_tenant` claim and RP Tenant terminology for multi-tenant RPs that share a single `client_id` across RP Tenants (see [OpenID.Enterprise])
   * Metadata Response: added `aud_tenants` response property (OPTIONAL); presence declares the RP requires `aud_tenant` in all subsequent Commands other than the Metadata Command, and enumerates the RP Tenants associated with the OP with display metadata for OP selection UIs
-  * uniqueness: the combination of `client_id`, `aud_tenant`, and `aud_sub` uniquely identifies an Account at the RP
+  * uniqueness: an `aud_sub` value uniquely identifies an Account within a `client_id`, including across RP Tenants; the same `aud_sub` may appear with different `aud_tenant` values when an Account is shared across RP Tenants, enabling a central account store
   * Audit Tenant Command: scoped by `aud_tenant` when the RP declared `aud_tenants`
   * Security Considerations: added RP-Provided Display Strings
